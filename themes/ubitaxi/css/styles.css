@@ -1,0 +1,41 @@
+header, footer{
+	background-color: #262626;
+}
+header nav ul li a{
+	color: #f5b317 !important;
+	font-weight: bold;
+}
+#wrapper{
+	margin-top: 80px;
+	margin-bottom: 50px;
+}
+footer{
+	clear: both;
+}
+footer .main-wrapper{
+	float: none;
+}
+footer h5{
+	color: white;
+}
+footer li, footer li a{
+	color: #999999;
+}
+footer li{
+	list-style: none;
+}
+body{
+	background-color: #FFDE00;
+}
+#map_canvas{
+	height: 300px;
+}
+.form-horizontal .control-label{
+	width: 100px;
+}
+.form-horizontal .controls{
+	margin-left: 110px;
+}
+#home-butons{
+	text-align: right;
+}

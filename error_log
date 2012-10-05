@@ -1,0 +1,13 @@
+[02-Oct-2012 23:04:13] PHP Warning:  Unexpected character in input:  ''' (ASCII=39) state=1 in /home/qbyewvls/public_html/ubitaxi/localizador/protected/modules/ubitaxi/views/default/index.php on line 3
+[03-Oct-2012 06:36:00] PHP Parse error:  syntax error, unexpected '}' in /home/qbyewvls/public_html/ubitaxi/localizador/protected/modules/ubitaxi/controllers/CarrerasController.php on line 94
+[03-Oct-2012 06:37:44] PHP Parse error:  syntax error, unexpected '}' in /home/qbyewvls/public_html/ubitaxi/localizador/protected/modules/ubitaxi/controllers/CarrerasController.php on line 94
+[03-Oct-2012 18:02:20] PHP Parse error:  syntax error, unexpected ':' in /home/qbyewvls/public_html/ubitaxi/localizador/protected/modules/ubitaxi/views/taxi/login.php on line 8
+[03-Oct-2012 18:02:41] PHP Parse error:  syntax error, unexpected ')', expecting ',' or ';' in /home/qbyewvls/public_html/ubitaxi/localizador/protected/modules/ubitaxi/views/taxi/login.php on line 16
+[03-Oct-2012 18:02:43] PHP Parse error:  syntax error, unexpected ')', expecting ',' or ';' in /home/qbyewvls/public_html/ubitaxi/localizador/protected/modules/ubitaxi/views/taxi/login.php on line 16
+[03-Oct-2012 18:02:59] PHP Parse error:  syntax error, unexpected ')', expecting ',' or ';' in /home/qbyewvls/public_html/ubitaxi/localizador/protected/modules/ubitaxi/views/taxi/login.php on line 21
+[03-Oct-2012 18:03:01] PHP Parse error:  syntax error, unexpected ')', expecting ',' or ';' in /home/qbyewvls/public_html/ubitaxi/localizador/protected/modules/ubitaxi/views/taxi/login.php on line 21
+[03-Oct-2012 18:03:13] PHP Parse error:  syntax error, unexpected ')', expecting ',' or ';' in /home/qbyewvls/public_html/ubitaxi/localizador/protected/modules/ubitaxi/views/taxi/login.php on line 37
+[03-Oct-2012 18:03:14] PHP Parse error:  syntax error, unexpected ')', expecting ',' or ';' in /home/qbyewvls/public_html/ubitaxi/localizador/protected/modules/ubitaxi/views/taxi/login.php on line 37
+[03-Oct-2012 18:04:00] PHP Parse error:  syntax error, unexpected ')', expecting ',' or ';' in /home/qbyewvls/public_html/ubitaxi/localizador/protected/modules/ubitaxi/views/taxi/login.php on line 37
+[03-Oct-2012 18:04:01] PHP Parse error:  syntax error, unexpected ')', expecting ',' or ';' in /home/qbyewvls/public_html/ubitaxi/localizador/protected/modules/ubitaxi/views/taxi/login.php on line 37
+[03-Oct-2012 18:04:02] PHP Parse error:  syntax error, unexpected ')', expecting ',' or ';' in /home/qbyewvls/public_html/ubitaxi/localizador/protected/modules/ubitaxi/views/taxi/login.php on line 37
