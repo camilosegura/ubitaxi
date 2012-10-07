@@ -17,11 +17,12 @@ return array(
 		'application.models.*',
 		'application.components.*',
 		'application.modules.user.models.*',
-        'application.modules.user.components.*',
+                'application.modules.user.components.*',
 		'application.modules.rights.*',
 		'application.modules.rights.components.*',
 		'application.modules.coordenate.*',
 		'application.modules.coordenate.components.*',
+                'application.modules.destinos.controllers.*'
 		
 	),
 
@@ -29,7 +30,7 @@ return array(
 		// uncomment the following to enable the Gii tool
 		'tracker',
 		'destinos',
-		'ubitaxi',
+		'ubi',
 		'personal',
 		'gii'=>array(
 			'class'=>'system.gii.GiiModule',
@@ -62,7 +63,7 @@ return array(
 		                'loginUrl' => array('/user/login'),
 		
 		# page after login
-		                'returnUrl' => array('/user/profile'),
+		                'returnUrl' => array('/destinos/router'),
 		
 		# page after logout
 		                'returnLogoutUrl' => array('/user/login'),
@@ -104,9 +105,12 @@ return array(
 		
 		'db'=>array(
 			'connectionString' => 'mysql:host=localhost;dbname=qbyewvls_ubitaxi',
+                        //'connectionString' => 'mysql:host=localhost;dbname=Localizador',
 			//'emulatePrepare' => true,
 			'username' => 'qbyewvls_ubitaxi',
+                    //'username' => 'root',
 			'password' => '!NPK?LKbEr~g',
+                      //  'password' => 'ESPARTAN',
 			//'charset' => 'utf8',
 			'tablePrefix' => 'tbl_',
 		),
@@ -120,7 +124,7 @@ return array(
 			'routes'=>array(
 				array(
 					'class'=>'CFileLogRoute',
-					'levels'=>'error, warning',
+					'levels'=>'error, warning,trace',
 				),
 				// uncomment the following to show log messages on web pages
 				/*
