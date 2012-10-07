@@ -9,10 +9,14 @@ class TaxiController extends Controller {
     /**
      * @return array action filters
      */
+    
     public function filters() {
-        return array(
+        return array(/*
             'accessControl', // perform access control for CRUD operations
             'postOnly + delete', // we only allow deletion via POST request
+         * 
+         */
+            'rights',
         );
     }
 
@@ -26,14 +30,20 @@ class TaxiController extends Controller {
             array('allow', // allow all users to perform 'index' and 'view' actions
                 'actions' => array('index', 'view', 'login'),
                 'users' => array('*'),
-            ),
+            ),/*
             array('allow', // allow authenticated user to perform 'create' and 'update' actions
                 'actions' => array('create', 'update'),
                 'users' => array('@'),
             ),
+             * 
+             */
             array('allow', // allow admin user to perform 'admin' and 'delete' actions
                 'actions' => array('admin', 'delete'),
                 'users' => array('admin'),
+            ),
+            array('allow',
+                'actions' => array('control'),
+                'roles' => array('Taxista'),
             ),
             array('deny', // deny all users
                 'users' => array('*'),
