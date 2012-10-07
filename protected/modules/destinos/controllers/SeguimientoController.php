@@ -82,25 +82,20 @@ class SeguimientoController extends Controller {
         $model = new Seguimiento;
 
         // Uncomment the following line if AJAX validation is needed
-        // $this->performAjaxValidation($model);
-        //var_dump($_GET);
-        $_GET['Seguimiento']['time_host'] = time();
+        // $this->performAjaxValidation($model);        
+        $_GET['Seguimiento']['time_host'] = time();        
         
-        //$rsp["d"] = $_GET;
-        if (isset($_GET['Seguimiento'])) {
-        //    echo "dentro";
-            $model->attributes = $_GET['Seguimiento'];
-          //  var_dump($model->getErrors() );
-            if ($model->save()) {
-            //    echo "sae";
-                $rsp['succes'] = true;
+        if (isset($_GET['Seguimiento'])) {        
+            $model->attributes = $_GET['Seguimiento'];          
+            if ($model->save()) {            
+                $rsp['success'] = true;
                 $rsp['id'] = $model->id;
-                echo json_encode($rsp);
-                return true;
+                //echo json_encode($rsp);
+                return $model->id;
             }  
             
         }
-        $rsp['succes'] = false;
+        $rsp['success'] = false;
         $rsp['msj'] = "No se enviaron datos";
         echo json_encode($rsp);
         return false;
