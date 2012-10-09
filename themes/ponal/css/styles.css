@@ -1,0 +1,58 @@
+header, footer{
+    background-color: #262626;
+}
+header nav ul li a{
+    color: #f5b317 !important;
+    font-weight: bold;
+}
+#wrapper{
+    margin-top: 80px;
+    margin-bottom: 50px;
+}
+footer{
+    clear: both;
+}
+footer .main-wrapper{
+    float: none;
+}
+footer h5{
+    color: white;
+}
+footer li, footer li a{
+    color: #999999;
+}
+footer li{
+    list-style: none;
+}
+body{
+    color: white;
+    background-color: #02723A;
+}
+#map_canvas{
+    height: 300px;
+}
+.form-horizontal .control-label{
+    width: 100px;
+}
+.form-horizontal .controls{
+    margin-left: 110px;
+}
+#buttons-guest{
+    text-align: center;
+}
+
+/* Large desktop */
+@media (min-width: 1200px) {  }
+
+/* Portrait tablet to landscape and desktop */
+@media (min-width: 768px) and (max-width: 979px) {  }
+
+/* Landscape phone to portrait tablet */
+@media (max-width: 767px) { 
+    #wrapper{
+        margin-top: 0px;
+    }
+}
+
+/* Landscape phones and down */
+@media (max-width: 480px) {  }
