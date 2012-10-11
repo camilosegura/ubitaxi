@@ -90,12 +90,34 @@ class PedidoController extends Controller {
         if (isset($_POST['Pedido'])) {
             $model->attributes = $_POST['Pedido'];
             if ($model->save()) {
+                $vehiculo = new VehiculoController("vehiculo", "destinos");               
+                $disponibles = $vehiculo->getMasCerca($_GET["latitud"], $_GET["longitud"], 10);
+                $this->pedidoAssign($disponibles, $model->id);
                 return $model->id;
             }
         }
+        var_dump($model->getErrors());
 
         return false;
     }
+    
+    private function pedidoAssign($disponibles, $idPedido) {
+        
+        foreach ($disponibles as $key => $disponible) {
+        
+            $asignacion = array('id_pedido' =>$idPedido,'id_vehiculo'=>$disponible["vid"], 'time'=>  time());
+        
+            $asignar = new PedidoAsignacion();
+            $asignar->attributes = $asignacion;
+            if($asignar->save()){
+                $vehiculo = Vehiculo::model()->findByPk($disponible["vid"]);
+                $vehiculo->id_pedido = $idPedido;
+                $vehiculo->save();
+            }
+            
+        }
+    }
+
 
     /**
      * Updates a particular model.
