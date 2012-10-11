@@ -182,6 +182,12 @@ class VehiculoController extends Controller {
         
         return $seguimiento;
     }
+    
+    public function actionGetPedido() {
+        $model = $this->loadModel($_GET['id_vehiculo']);
+        $rsp['id_pedido'] = $model->id_pedido;
+        echo json_encode($rsp);
+    }
 
     /**
      * Returns the data model based on the primary key given in the GET variable.
