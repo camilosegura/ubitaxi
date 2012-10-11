@@ -13,8 +13,12 @@ class VehiculoController extends Controller {
      */
     public function filters() {
         return array(
-            'accessControl', // perform access control for CRUD operations
-            'postOnly + delete', // we only allow deletion via POST request
+            /*
+              'accessControl', // perform access control for CRUD operations
+              'postOnly + delete', // we only allow deletion via POST request
+             * 
+             */
+            'rights'
         );
     }
 
@@ -102,23 +106,20 @@ class VehiculoController extends Controller {
      * @param integer $id the ID of the model to be updated
      */
     public function actionUpdateCar($id, $id_telefono) {
-        
+
         $model = Vehiculo::model()->find(array(
             'condition' => 'id_telefono=:id_telefono',
             'params' => array(':id_telefono' => $id_telefono),
                 ));
-        
-            $model->id_seguimiento = $id;
-            if ($model->save()){                                            
-                return true;
-            }
-            
-            $rsp["success"] = false; 
-            echo json_encode($rsp);
-            return false;
-        
 
-            
+        $model->id_seguimiento = $id;
+        if ($model->save()) {
+            return true;
+        }
+
+        $rsp["success"] = false;
+        echo json_encode($rsp);
+        return false;
     }
 
     /**
@@ -156,6 +157,30 @@ class VehiculoController extends Controller {
         $this->render('admin', array(
             'model' => $model,
         ));
+    }
+
+    public function actionGetId() {
+        $id_telefono = $_GET["id_telefono"];
+        $model = Vehiculo::model()->find(array(
+            'condition' => 'id_telefono=:id_telefono',
+            'params' => array(':id_telefono' => $id_telefono),
+                ));
+        $rsp["id"] = $model->id;
+        echo json_encode($rsp);
+    }
+
+    public function getMasCerca($latitud, $longitud, $radio) {
+    
+        $seguimiento = Yii::app()->db->createCommand()
+                ->select('v.id AS vid, latitud, longitud, ( 3959 * acos( cos( radians(1) ) * cos( radians( latitud ) ) * cos( radians( longitud ) - radians(1) ) + sin( radians(1) ) * sin( radians( latitud ) ) ) ) AS distance')
+                ->from('tbl_vehiculo v')
+                ->join('tbl_seguimiento s', 'v.id_seguimiento=s.id')
+                ->where('estado=0', array(':estado' => 0))
+                ->having('distance < 10000')
+                ->queryAll();
+        
+        
+        return $seguimiento;
     }
 
     /**
