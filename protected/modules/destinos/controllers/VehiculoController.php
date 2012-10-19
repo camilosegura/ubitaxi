@@ -170,22 +170,33 @@ class VehiculoController extends Controller {
     }
 
     public function getMasCerca($latitud, $longitud, $radio) {
-    
+
         $seguimiento = Yii::app()->db->createCommand()
                 ->select('v.id AS vid, latitud, longitud, ( 3959 * acos( cos( radians(1) ) * cos( radians( latitud ) ) * cos( radians( longitud ) - radians(1) ) + sin( radians(1) ) * sin( radians( latitud ) ) ) ) AS distance')
                 ->from('tbl_vehiculo v')
                 ->join('tbl_seguimiento s', 'v.id_seguimiento=s.id')
                 ->where('estado=0', array(':estado' => 0))
                 ->having('distance < 10000')
+                ->limit('1')
+                ->order('distance ASC')
                 ->queryAll();
-        
-        
         return $seguimiento;
     }
-    
+
     public function actionGetPedido() {
         $model = $this->loadModel($_GET['id_vehiculo']);
-        $rsp['id_pedido'] = $model->id_pedido;
+        
+        if ($model->estado == 0) {
+            $pedido = Pedido::model()->findByPk($model->id_pedido);
+            $rsp['id_pedido'] = $model->id_pedido;
+            $rsp['p_do'] = $pedido->direccion_origen;
+            $rsp['lat'] = $pedido->latitud;
+            $rsp['lng'] = $pedido->latitud;
+        } else {
+            $rsp['id_pedido'] = 0;
+        }
+
+
         echo json_encode($rsp);
     }
 
