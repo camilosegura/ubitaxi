@@ -50,12 +50,12 @@
                 </ul>		       
             </nav>
         </header>
-
+        
         <div id="wrapper" class="container-fluid span10 main-wrapper">
             <?php echo $content; ?>
         </div>
 
-        <footer>
+        <footer class="visible-desktop">
             <div class="container-fluid span10 main-wrapper">                
                 <div class="span3">
                     <h5>mi-empresa.co</h5>
