@@ -90,7 +90,7 @@ class PedidoController extends Controller {
         if (isset($_POST['Pedido'])) {
             $model->attributes = $_POST['Pedido'];
             if ($model->save()) {
-                $vehiculo = new VehiculoController("vehiculo", "destinos");               
+                $vehiculo = new VehiculoController("vehiculo", "destinos");
                 $disponibles = $vehiculo->getMasCerca($_GET["latitud"], $_GET["longitud"], 10);
                 $this->pedidoAssign($disponibles, $model->id);
                 return $model->id;
@@ -100,24 +100,143 @@ class PedidoController extends Controller {
 
         return false;
     }
-    
+
     private function pedidoAssign($disponibles, $idPedido) {
-        
+
         foreach ($disponibles as $key => $disponible) {
-        
-            $asignacion = array('id_pedido' =>$idPedido,'id_vehiculo'=>$disponible["vid"], 'time'=>  time());
-        
+
+            $asignacion = array('id_pedido' => $idPedido, 'id_vehiculo' => $disponible["vid"], 'time' => time());
+
             $asignar = new PedidoAsignacion();
             $asignar->attributes = $asignacion;
-            if($asignar->save()){
+            if ($asignar->save()) {
                 $vehiculo = Vehiculo::model()->findByPk($disponible["vid"]);
                 $vehiculo->id_pedido = $idPedido;
                 $vehiculo->save();
             }
-            
         }
     }
 
+    public function actionRechazar() {
+        $vehiculo = Vehiculo::model()->findByPk($_GET['id_vehiculo']);
+        $vehiculo->id_pedido = 0;
+        $vehiculo->save();
+        $rsp["success"] = true;
+        $rsp["msg"] = "El pedido se ha cancelado";
+        echo json_encode($rsp);
+    }
+
+    public function actionAceptar() {
+        $pedido = Pedido::model()->findByPk($_GET['id_pedido']);
+        if ($pedido->id_estado === '0') {
+
+            $vehiculo = Vehiculo::model()->findByPk($_GET['id_vehiculo']);
+            $vehiculo->estado = 1;
+            if ($vehiculo->save()) {
+                $pedido->id_estado = 1;
+                $pedido->save();
+                Vehiculo::model()->updateAll(array('id_pedido' => 0), 'id_pedido=:id_pedido AND estado = 0', array(':id_pedido' => $_GET['id_pedido']));
+                $rsp['direccion'] = $pedido->direccion_origen;
+                $rsp["lat"] = $pedido->latitud;
+                $rsp["lng"] = $pedido->longitud;
+                $rsp['msg'] = 'El pasajero lo espera en ' . $pedido->direccion_origen;
+                $rsp['success'] = true;
+
+                $cliente = User::model()->findByPk($pedido->id_pasajero);
+
+                $message = new YiiMailMessage;
+                $message->setBody('La clave son los últimos 4 números de su Celular', 'text/html');
+                $message->subject = 'Confirmación de Taxi';
+                $message->addTo($cliente->email);
+                $message->from = Yii::app()->params['adminEmail'];
+                Yii::app()->mail->send($message);
+
+                $rsp['id_pa'] = $pedido->id_pasajero;
+                echo json_encode($rsp);
+                return true;
+            }
+        }
+        $rsp['success'] = false;
+        $rsp['msg'] = 'El pedido ya fue asignado';
+        
+        echo json_encode($rsp);
+        //echo 'sdsd';
+        //return false;
+    }
+
+    public function actionSefue() {
+        $model = Pedido::model()->findByPk($_GET["id_pedido"]);
+        $model->id_estado = 2;
+        $model->save();
+
+        $vehiculo = Vehiculo::model()->findByPk($_GET["id_vehiculo"]);
+        $vehiculo->estado = 0;
+        $vehiculo->id_pedido = 0;
+        $vehiculo->save();
+
+        $rsp["success"] = true;
+        $rsp["msg"] = "Reporte exitoso";
+
+        echo json_encode($rsp);
+    }
+
+    public function actionIniciar() {
+        
+        $pedido = Pedido::model()->findByPk($_GET["id_pedido"]);
+        
+        $pedidoVehiculo = new PedidoVehiculo();
+        $pedidoVehiculo->id_pedido = $_GET["id_pedido"];
+        $pedidoVehiculo->id_vehiculo = $_GET["id_vehiculo"];
+        $pedidoVehiculo->time = time();
+        $pedidoVehiculo->save();
+        
+        $model = Pedido::model()->findByPk($_GET["id_pedido"]);
+        $model->id_estado = 3;
+        $model->save();
+        
+        $rsp["success"] = true;
+        $rsp["msg"] = "Iniciando el recorrido";
+        $rsp["id"] = $pedidoVehiculo->id;
+        echo json_encode($rsp);
+    }
+
+    public function actionLlegada() {
+        
+        $pedidoVehiculo = PedidoVehiculo::model()->findByPk($_GET["id_pv"]);
+        $pedidoVehiculo->valor = $_GET["val"];
+        $pedidoVehiculo->unidades = $_GET["uni"];
+        $pedidoVehiculo->latitud = $_GET["lat"];
+        $pedidoVehiculo->longitud = $_GET["lng"];
+        $pedidoVehiculo->save();
+        
+        $model = Pedido::model()->findByPk($_GET["id_pedido"]);
+        $model->id_estado = 4;
+        $model->save();
+        
+        $vehiculo = Vehiculo::model()->findByPk($_GET["id_vehiculo"]);
+        $vehiculo->id_pedido = 0;
+        $vehiculo->estado = 0;
+        $vehiculo->save();
+        
+        $rsp["success"] = true;
+        $rsp["msg"] = "Gracias por su viaje";
+        echo json_encode($rsp);
+    }
+
+    public function actionMensajeUsuario() {
+        $cliente = User::model()->findByPk($_GET["id_pa"]);
+
+        $message = new YiiMailMessage;
+        $message->setBody($_GET["msg"], 'text/html');
+        $message->subject = 'Mensaje del taxista';
+        $message->addTo($cliente->email);
+        $message->from = Yii::app()->params['adminEmail'];
+        Yii::app()->mail->send($message);
+        
+        $rsp["success"] = true;
+        $rsp["msg"] = "Su mensaje se ha enviado";
+        echo json_encode($rsp);
+    }
 
     /**
      * Updates a particular model.
