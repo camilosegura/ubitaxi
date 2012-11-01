@@ -1,0 +1,53 @@
+/* 
+    Document   : mitaxi
+    Created on : Oct 31, 2012, 1:48:50 PM
+    Author     : camilo
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+.slide{
+    background-color: #56B3E6;
+    color: white;
+}
+
+.slide h1{
+    font-size: 80px;
+    font-weight: bold;
+    text-align: center;
+}
+
+#its{
+    text-align: center;
+}
+#tiny, #ing, #imagination {
+    width: inherit;    
+}
+img{
+    border-radius: 25px;
+}
+
+#ing q{    
+    text-align: center;
+    display: block;
+}
+#imagination q{
+    display: block;
+    float:left;
+}
+#source{
+    background: none;
+}
+.pasajero q{
+    float: left;
+    width: 283px;
+    margin-top: 280px;
+}
+
+#inicio{
+    text-align: center;
+    margin-top: 230px;
+}
+#taxi{
+    margin-right: 250px;
+}
