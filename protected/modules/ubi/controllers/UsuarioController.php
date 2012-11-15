@@ -84,7 +84,7 @@ class UsuarioController extends Controller {
     }
 
     public function actionHacerPedidoLogged() {
-        $direccion = Direccion::model()->findByPk($_POST["idDir"]);
+        $direccion = Direccion::model()->findByPk($_GET["idDir"]);
         $user = User::model()->findByPk(Yii::app()->user->id);
         $_GET["direccion"] = $direccion->direccion;
         $_GET["email"] = $user->email;
@@ -218,7 +218,15 @@ class UsuarioController extends Controller {
         $direccion->save();
         $rsp["id"] = $direccion->id;
         echo json_encode($rsp);
-    }    
+    }   
+    public function actionGetDireccion() {
+        $direccion = Direccion::model()->findByPk($_GET["idDir"], 
+                "id_user=:id_user", array(":id_user"=> Yii::app()->user->id));
+        $rsp["lat"] = $direccion->latitud;
+        $rsp["lng"] = $direccion->longitud;
+        echo json_encode($rsp);
+    }
+    
     // Uncomment the following methods and override them if needed
     /*
       public function filters()
