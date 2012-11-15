@@ -83,6 +83,16 @@ class UsuarioController extends Controller {
         echo json_encode($rsp);
     }
 
+    public function actionHacerPedidoLogged() {
+        $direccion = Direccion::model()->findByPk($_POST["idDir"]);
+        $user = User::model()->findByPk(Yii::app()->user->id);
+        $_GET["direccion"] = $direccion->direccion;
+        $_GET["email"] = $user->email;
+        $_GET["latitud"] = $direccion->latitud;
+        $_GET["longitud"] = $direccion->longitud;
+        $this->actionHacerPedido();
+    }
+    
     private function register() {
         $model = new User;
         $profile = new Profile;
@@ -199,6 +209,16 @@ class UsuarioController extends Controller {
             $this->redirect('/destinos/router');
     }
 
+    public function actionAgregarDireccion() {
+        $direccion  = new Direccion();
+        $direccion->id_user = Yii::app()->user->id;
+        $direccion->latitud = $_GET["lat"];
+        $direccion->longitud = $_GET["lng"];
+        $direccion->direccion = $_GET["dir"];
+        $direccion->save();
+        $rsp["id"] = $direccion->id;
+        echo json_encode($rsp);
+    }    
     // Uncomment the following methods and override them if needed
     /*
       public function filters()
