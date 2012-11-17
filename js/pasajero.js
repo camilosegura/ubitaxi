@@ -8,11 +8,11 @@ function pasajeroEvents(){
 $("#formPedido").submit(function(event){        
         var nombre = $("#nombre").val();
         var celular = $("#celular").val();
-        var direccion = $("#direccion").val();
+        direccion = $("#direccion").val();
         var email = $("#email").val();
         var latitud = $("#latitud").val();
         var longitud = $("#longitud").val();
-        var url = "http://ubitaxi.espacioestudiodiseno.com/ubi/usuario/hacerPedido.html";
+        var url = "/ubi/usuario/hacerPedido.html";
         var data = {
           nombre:nombre,
           celular:celular,
@@ -23,7 +23,7 @@ $("#formPedido").submit(function(event){
         };
         
         $.getJSON(url, data, function(rsp){
-            alert(rsp);
+            alert(rsp.msg);
         });
         $("#solicitar").click();
         return false;
