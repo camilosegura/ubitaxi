@@ -62,8 +62,11 @@ class SeguimientoController extends Controller {
      * If creation is successful, the browser will be redirected to the 'view' page.
      */
     public function actionCreate() {
+        
+        $vehiculo = Vehiculo::model()->find("id_telefono=:id_telefono", array(':id_telefono'=>$_GET['id_telefono']));
+        $_POST['Seguimiento']["id_vehiculo"] = $vehiculo->id;
         $model = new Seguimiento;
-
+        
         // Uncomment the following line if AJAX validation is needed
         // $this->performAjaxValidation($model);
 
