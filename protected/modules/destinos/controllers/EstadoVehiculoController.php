@@ -101,17 +101,20 @@ class EstadoVehiculoController extends Controller {
 
     public function actionCreateCar() {
         $model = new EstadoVehiculo;
-
+        $vehiculo = Vehiculo::model()->find('id=:id', array(':id' => $_GET['EstadoVehiculo']['id_vehiculo']));
         // Uncomment the following line if AJAX validation is needed
         // $this->performAjaxValidation($model);
 
         if (isset($_GET['EstadoVehiculo'])) {
             $model->attributes = $_GET['EstadoVehiculo'];
             if ($model->save()) {
-                $rsp['success'] = true;
-                $rsp['id'] = $model->id;
-                echo json_encode($rsp);
-                return true;
+                $vehiculo->estado = $_GET['EstadoVehiculo']['estado'];
+                if ($vehiculo->save()) {
+                    $rsp['success'] = true;
+                    $rsp['id'] = $model->id;
+                    echo json_encode($rsp);
+                    return true;
+                }
             }
         }
         $rsp['success'] = false;
