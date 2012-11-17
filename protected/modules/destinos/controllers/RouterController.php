@@ -28,8 +28,12 @@ class RouterController extends Controller
             case "Admin":
                 $url = "/user/profile";
                 break;
-            case "Taxista":
-                $url = "/ubi/taxi/control";
+            case "Chofer":
+                $url = "/ubi/taxi/control.html";
+                break;
+            case "Cliente":
+                $url = "/ubi/usuario/logged.html";
+                break;
             default:
                 break;
         }
