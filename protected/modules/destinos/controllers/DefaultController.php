@@ -12,9 +12,9 @@ class DefaultController extends Controller
             $seguimiento = new SeguimientoController('seguimiento',$this->module);
             $idPos = $seguimiento->actionCreateCar();
             if($idPos){
-                $id_telefono = $_GET["Seguimiento"]["id_telefono"];
+                $id_vehiculo = $_GET["Seguimiento"]["id_vehiculo"];
                 $vehiculo = new VehiculoController('vehiculo', $this->module);
-                if($vehiculo->actionUpdateCar($idPos, $id_telefono)){
+                if($vehiculo->actionUpdateCar($idPos, $id_vehiculo)){
                     $rsp["success"] = true;
                     echo json_encode($rsp);
                 }
