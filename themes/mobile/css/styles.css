@@ -1,4 +1,4 @@
-.ui-page, #guest .ui-content{
+.ui-page, #guest .ui-content, #newAddresses .ui-content, #confirmarDir .ui-content{
     height: 100%;
     padding: 0px;
 }

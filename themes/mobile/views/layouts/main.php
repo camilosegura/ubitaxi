@@ -1,3 +1,8 @@
+<?php
+$cs = Yii::app()->getClientScript();
+$cs->registerCoreScript('jquery');
+
+?>
 <!doctype html>
 <html lang="es">
     <head>
@@ -9,8 +14,8 @@
         <link href="<?php echo Yii::app()->theme->getBaseUrl(); ?>/css/styles.css" rel="stylesheet">
         <link rel="shortcut icon" href="<?php echo Yii::app()->theme->getBaseUrl(); ?>/img/favicon.ico" type="image/x-icon" />
         
-        <script src="https://maps.googleapis.com/maps/api/js?sensor=true"></script>        
-        <script src="<?php echo Yii::app()->baseUrl; ?>/js/jquery-1.8.2.min.js"></script>
+        <script src="https://maps.googleapis.com/maps/api/js?sensor=true"></script>     
+        
         <script src="<?php echo Yii::app()->baseUrl; ?>/js/geolocation.js"></script>
         <script src="<?php echo Yii::app()->baseUrl; ?>/js/pasajero.js"></script>
         <script src="<?php echo Yii::app()->theme->getBaseUrl(); ?>/js/mobile.js"></script>
