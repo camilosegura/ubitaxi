@@ -105,12 +105,9 @@ class VehiculoController extends Controller {
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id the ID of the model to be updated
      */
-    public function actionUpdateCar($id, $id_telefono) {
+    public function actionUpdateCar($id, $id_vehiculo) {
 
-        $model = Vehiculo::model()->find(array(
-            'condition' => 'id_telefono=:id_telefono',
-            'params' => array(':id_telefono' => $id_telefono),
-                ));
+        $model = Vehiculo::model()->findByPk($id_vehiculo);
 
         $model->id_seguimiento = $id;
         if ($model->save()) {
@@ -175,7 +172,7 @@ class VehiculoController extends Controller {
                 ->select('v.id AS vid, latitud, longitud, ( 3959 * acos( cos( radians(1) ) * cos( radians( latitud ) ) * cos( radians( longitud ) - radians(1) ) + sin( radians(1) ) * sin( radians( latitud ) ) ) ) AS distance')
                 ->from('tbl_vehiculo v')
                 ->join('tbl_seguimiento s', 'v.id_seguimiento=s.id')
-                ->where('estado=0', array(':estado' => 0))
+                ->where('estado=0 AND id_pedido=0', array(':estado' => 0))
                 ->having('distance < 10000')
                 ->limit('1')
                 ->order('distance ASC')
