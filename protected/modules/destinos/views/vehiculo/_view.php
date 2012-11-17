@@ -21,8 +21,8 @@
 	<?php echo CHtml::encode($data->id_conductor); ?>
 	<br />
 
-	<b><?php echo CHtml::encode($data->getAttributeLabel('id_seguimento')); ?>:</b>
-	<?php echo CHtml::encode($data->id_seguimento); ?>
+	<b><?php echo CHtml::encode($data->getAttributeLabel('id_seguimiento')); ?>:</b>
+	<?php echo CHtml::encode($data->id_seguimiento); ?>
 	<br />
 
 	<b><?php echo CHtml::encode($data->getAttributeLabel('id_telefono')); ?>:</b>
@@ -33,5 +33,11 @@
 	<?php echo CHtml::encode($data->estado); ?>
 	<br />
 
+	<?php /*
+	<b><?php echo CHtml::encode($data->getAttributeLabel('id_pedido')); ?>:</b>
+	<?php echo CHtml::encode($data->id_pedido); ?>
+	<br />
+
+	*/ ?>
 
 </div>

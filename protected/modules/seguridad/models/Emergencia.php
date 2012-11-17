@@ -5,7 +5,7 @@
  *
  * The followings are the available columns in table '{{emergencia}}':
  * @property integer $id
- * @property integer $id_vehiculo
+ * @property string $id_vehiculo
  * @property string $time
  * @property integer $estado
  */
@@ -37,9 +37,9 @@ class Emergencia extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('id_vehiculo, time, estado', 'required'),
-			array('id_vehiculo, estado', 'numerical', 'integerOnly'=>true),
-			array('time', 'length', 'max'=>255),
+			array('id_vehiculo, time', 'required'),
+			array('estado', 'numerical', 'integerOnly'=>true),
+			array('id_vehiculo, time', 'length', 'max'=>255),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
 			array('id, id_vehiculo, time, estado', 'safe', 'on'=>'search'),
@@ -82,7 +82,7 @@ class Emergencia extends CActiveRecord
 		$criteria=new CDbCriteria;
 
 		$criteria->compare('id',$this->id);
-		$criteria->compare('id_vehiculo',$this->id_vehiculo);
+		$criteria->compare('id_vehiculo',$this->id_vehiculo,true);
 		$criteria->compare('time',$this->time,true);
 		$criteria->compare('estado',$this->estado);
 

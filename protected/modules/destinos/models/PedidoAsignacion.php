@@ -5,7 +5,7 @@
  *
  * The followings are the available columns in table '{{pedido_asignacion}}':
  * @property integer $id
- * @property integer $id_carrera
+ * @property integer $id_pedido
  * @property integer $id_vehiculo
  * @property string $time
  */
@@ -37,12 +37,12 @@ class PedidoAsignacion extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('id_carrera, id_vehiculo, time', 'required'),
-			array('id_carrera, id_vehiculo', 'numerical', 'integerOnly'=>true),
+			array('id_pedido, id_vehiculo, time', 'required'),
+			array('id_pedido, id_vehiculo', 'numerical', 'integerOnly'=>true),
 			array('time', 'length', 'max'=>255),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('id, id_carrera, id_vehiculo, time', 'safe', 'on'=>'search'),
+			array('id, id_pedido, id_vehiculo, time', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -64,7 +64,7 @@ class PedidoAsignacion extends CActiveRecord
 	{
 		return array(
 			'id' => 'ID',
-			'id_carrera' => 'Id Carrera',
+			'id_pedido' => 'Id Pedido',
 			'id_vehiculo' => 'Id Vehiculo',
 			'time' => 'Time',
 		);
@@ -82,7 +82,7 @@ class PedidoAsignacion extends CActiveRecord
 		$criteria=new CDbCriteria;
 
 		$criteria->compare('id',$this->id);
-		$criteria->compare('id_carrera',$this->id_carrera);
+		$criteria->compare('id_pedido',$this->id_pedido);
 		$criteria->compare('id_vehiculo',$this->id_vehiculo);
 		$criteria->compare('time',$this->time,true);
 

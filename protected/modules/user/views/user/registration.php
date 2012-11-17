@@ -68,7 +68,9 @@ $this->breadcrumbs=array(
 			echo $form->dropDownList($profile,$field->varname,Profile::range($field->range));
 		} elseif ($field->field_type=="TEXT") {
 			echo$form->textArea($profile,$field->varname,array('rows'=>6, 'cols'=>50));
-		} else {
+		} else if($field->field_type=="DATE"){                    
+                    echo $form->dateField($profile,$field->varname,array('size'=>60,'maxlength'=>(($field->field_size)?$field->field_size:255)));
+                }else {
 			echo $form->textField($profile,$field->varname,array('size'=>60,'maxlength'=>(($field->field_size)?$field->field_size:255)));
 		}
 		 ?>

@@ -31,15 +31,16 @@
                     <li id="homelink"><a rel="external" href="/">Inicio</a></li>
                     <li id="aboutlink"><a rel="external" href="/">Nosotros</a></li>                                            
                     <li id="contactlink"><a rel="external" href="/">Contáctenos</a></li>
-                    <li id="contactlink"><a rel="external" href="/">Cómo Pedir su Taxi</a></li>
+                    <li id="contactlink"><a rel="external" href="/">Ayuda</a></li>
+                    <li id="contactlink"><a rel="external" href="javascript:window.location.reload( true )">Recargar</a></li>
                 	<?php
                 	if(Yii::app()->user->isGuest){
                 	?>
-                		<li id="loginlink"><a rel="external" href="/user/login">Ingresar</a></li>
+                		<li id="loginlink"><a rel="external" href="/user/login.html">Ingresar</a></li>
                 	<?php 
                 	}else{
                 	?>
-                		<li id="logoutlink"><a rel="external" href="/">Salir (<?php echo Yii::app()->user->name; ?>)</a></li>
+                		<li id="logoutlink"><a rel="external" href="/user/logout.html">Salir (<?php echo Yii::app()->user->name; ?>)</a></li>
                 	<?php 
                 	}
                 	
@@ -57,7 +58,7 @@
         <footer>
             <div class="container-fluid span10 main-wrapper">                
                 <div class="span3">
-                    <h5>ubitaxi.co</h5>
+                    <h5>mi-empresa.co</h5>
                     <ul>
                         <li><a href="#">Inicio</a></li>
                         <li><a href="#">About</a></li>
@@ -75,7 +76,7 @@
                         <li>Calle xxxxxx</li>
                         <li>Teléfono. (+57) (1) 5435345</li>
                         <li>Cel: (+57) (1) 5353442342</li>
-                        <li>contacto@ubitaxi.co</li>
+                        <li>contacto@mi-empresa.co</li>
                         <li>Bogotá D.C. - Colombia</li>
                     </ul>
                 </div>
@@ -88,7 +89,8 @@
             </div>
         </footer>
 
-        <script src="<?php echo Yii::app()->theme->getBaseUrl(); ?>/js/jquery-1.8.2.min.js"></script>
+        <script src="<?php echo Yii::app()->baseUrl; ?>/js/jquery-1.8.2.min.js"></script>
+        <script src="<?php echo Yii::app()->baseUrl; ?>/js/jquery-ui-1.8.24.custom.min.js"></script>
         <script src="<?php echo Yii::app()->theme->getBaseUrl(); ?>/js/bootstrap.min.js"></script>
 		<!-- <script src="<?php echo Yii::app()->theme->getBaseUrl(); ?>/js/main.js"></script> -->
     </body>

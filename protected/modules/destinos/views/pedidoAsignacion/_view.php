@@ -9,8 +9,8 @@
 	<?php echo CHtml::link(CHtml::encode($data->id), array('view', 'id'=>$data->id)); ?>
 	<br />
 
-	<b><?php echo CHtml::encode($data->getAttributeLabel('id_carrera')); ?>:</b>
-	<?php echo CHtml::encode($data->id_carrera); ?>
+	<b><?php echo CHtml::encode($data->getAttributeLabel('id_pedido')); ?>:</b>
+	<?php echo CHtml::encode($data->id_pedido); ?>
 	<br />
 
 	<b><?php echo CHtml::encode($data->getAttributeLabel('id_vehiculo')); ?>:</b>

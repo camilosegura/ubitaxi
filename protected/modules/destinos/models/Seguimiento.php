@@ -5,7 +5,7 @@
  *
  * The followings are the available columns in table '{{seguimiento}}':
  * @property integer $id
- * @property string $id_telefono
+ * @property string $id_vehiculo
  * @property string $latitud
  * @property string $longitud
  * @property string $altitud
@@ -41,11 +41,11 @@ class Seguimiento extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('id_telefono, latitud, longitud, altitud, velocidad, time, time_host', 'required'),
-			array('id_telefono, latitud, longitud, altitud, velocidad, time, time_host', 'length', 'max'=>255),
+			array('id_vehiculo, latitud, longitud, altitud, velocidad, time, time_host', 'required'),
+			array('id_vehiculo, latitud, longitud, altitud, velocidad, time, time_host', 'length', 'max'=>255),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('id, id_telefono, latitud, longitud, altitud, velocidad, time, time_host', 'safe', 'on'=>'search'),
+			array('id, id_vehiculo, latitud, longitud, altitud, velocidad, time, time_host', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -67,7 +67,7 @@ class Seguimiento extends CActiveRecord
 	{
 		return array(
 			'id' => 'ID',
-			'id_telefono' => 'Id Telefono',
+			'id_vehiculo' => 'Id Vehiculo',
 			'latitud' => 'Latitud',
 			'longitud' => 'Longitud',
 			'altitud' => 'Altitud',
@@ -89,7 +89,7 @@ class Seguimiento extends CActiveRecord
 		$criteria=new CDbCriteria;
 
 		$criteria->compare('id',$this->id);
-		$criteria->compare('id_telefono',$this->id_telefono,true);
+		$criteria->compare('id_vehiculo',$this->id_vehiculo,true);
 		$criteria->compare('latitud',$this->latitud,true);
 		$criteria->compare('longitud',$this->longitud,true);
 		$criteria->compare('altitud',$this->altitud,true);

@@ -2,6 +2,8 @@
 
 class UbiModule extends CWebModule
 {
+    public $rememberMeTime = 2592000;
+    
 	public function init()
 	{
 		// this method is called when the module is being created

@@ -30,7 +30,7 @@ class LoginController extends Controller
 			$this->redirect(Yii::app()->controller->module->returnUrl);
 	}
 	
-	private function lastViset() {
+	public function lastViset() {
 		$lastVisit = User::model()->notsafe()->findByPk(Yii::app()->user->id);
 		$lastVisit->lastvisit = time();
 		$lastVisit->save();

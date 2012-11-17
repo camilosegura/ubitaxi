@@ -3,7 +3,7 @@
 class UsuarioController extends Controller {
 
     public $mobile;
-    
+
     public function filters() {
         // return the filter configuration for this controller, e.g.:
         return array(
@@ -17,7 +17,7 @@ class UsuarioController extends Controller {
     }
 
     public function allowedActions() {
-        return 'index, guest, hacerPedido, loginCar, logoutCar, login';
+        return 'index, guest, hacerPedido, loginCar, logoutCar, login, registration, captcha, activation';
     }
 
     public function actionGuest() {
@@ -34,14 +34,13 @@ class UsuarioController extends Controller {
     }
 
     public function actionLogged() {
-        $direccion = Direccion::model()->findAll("id_user=:id_user", array(":id_user"=>Yii::app()->user->id));
-         if ($this->mobile()) {
-                Yii::app()->theme = 'mobile';
-                $this->render('logged_mobile', array('direccion' => $direccion));
-            } else {
-                $this->render('logged');
-            }
-        
+        $direccion = Direccion::model()->findAll("id_user=:id_user", array(":id_user" => Yii::app()->user->id));
+        if ($this->mobile()) {
+            Yii::app()->theme = 'mobile';
+            $this->render('logged_mobile', array('direccion' => $direccion));
+        } else {
+            $this->render('logged');
+        }
     }
 
     public function actionHacerPedido() {
@@ -92,7 +91,7 @@ class UsuarioController extends Controller {
         $_GET["longitud"] = $direccion->longitud;
         $this->actionHacerPedido();
     }
-    
+
     private function register() {
         $model = new User;
         $profile = new Profile;
@@ -203,14 +202,13 @@ class UsuarioController extends Controller {
             } else {
                 $this->render('guest');
             }
-            
         }
         else
             $this->redirect('/destinos/router');
     }
 
     public function actionAgregarDireccion() {
-        $direccion  = new Direccion();
+        $direccion = new Direccion();
         $direccion->id_user = Yii::app()->user->id;
         $direccion->latitud = $_GET["lat"];
         $direccion->longitud = $_GET["lng"];
@@ -218,15 +216,123 @@ class UsuarioController extends Controller {
         $direccion->save();
         $rsp["id"] = $direccion->id;
         echo json_encode($rsp);
-    }   
+    }
+
     public function actionGetDireccion() {
-        $direccion = Direccion::model()->findByPk($_GET["idDir"], 
-                "id_user=:id_user", array(":id_user"=> Yii::app()->user->id));
+        $direccion = Direccion::model()->findByPk($_GET["idDir"], "id_user=:id_user", array(":id_user" => Yii::app()->user->id));
         $rsp["lat"] = $direccion->latitud;
         $rsp["lng"] = $direccion->longitud;
         echo json_encode($rsp);
     }
-    
+
+    /**
+     * Declares class-based actions.
+     */
+    public function actions() {
+        return array(
+            'captcha' => array(
+                'class' => 'CCaptchaAction',
+                'backColor' => 0xFFFFFF,
+            ),
+        );
+    }
+
+    /**
+     * Registration user
+     */
+    public function actionRegistration() {
+        $model = new RegistrationForm;
+        $profile = new Profile;
+        $profile->regMode = true;
+
+        // ajax validator
+        if (isset($_POST['ajax']) && $_POST['ajax'] === 'registration-form') {
+            echo UActiveForm::validate(array($model, $profile));
+            Yii::app()->end();
+        }
+
+        if (Yii::app()->user->id) {
+            $this->redirect('/destinos/router');
+        } else {
+            if (isset($_POST['RegistrationForm'])) {
+                $model->attributes = $_POST['RegistrationForm'];
+                $profile->attributes = ((isset($_POST['Profile']) ? $_POST['Profile'] : array()));
+                if ($model->validate() && $profile->validate()) {
+                    $soucePassword = $model->password;
+                    $model->activkey = UserModule::encrypting(microtime() . $model->password);
+                    $model->password = UserModule::encrypting($model->password);
+                    $model->verifyPassword = UserModule::encrypting($model->verifyPassword);
+                    $model->superuser = 0;
+                    $model->status = ((Yii::app()->getModule('user')->activeAfterRegister) ? User::STATUS_ACTIVE : User::STATUS_NOACTIVE);
+
+                    if ($model->save()) {
+                        Rights::assign('Cliente', $model->id);
+                        $profile->user_id = $model->id;
+                        $profile->save();
+                        if (Yii::app()->getModule('user')->sendActivationMail) {
+                            $activation_url = $this->createAbsoluteUrl('/ubi/usuario/activation', array("activkey" => $model->activkey, "email" => $model->email));
+                            UserModule::sendMail($model->email, UserModule::t("You registered from {site_name}", array('{site_name}' => Yii::app()->name)), UserModule::t("Please activate you account go to {activation_url}", array('{activation_url}' => $activation_url)));
+                        }
+
+                        if ((Yii::app()->getModule('user')->loginNotActiv || (Yii::app()->getModule('user')->activeAfterRegister && Yii::app()->getModule('user')->sendActivationMail == false)) && Yii::app()->getModule('user')->autoLogin) {
+                            $identity = new UserIdentity($model->username, $soucePassword);
+                            $identity->authenticate();
+                            Yii::app()->user->login($identity, 0);
+                            $this->redirect(Yii::app()->getModule('user')->returnUrl);
+                        } else {
+                            if (!Yii::app()->getModule('user')->activeAfterRegister && !Yii::app()->getModule('user')->sendActivationMail) {
+                                Yii::app()->user->setFlash('registration', UserModule::t("Thank you for your registration. Contact Admin to activate your account."));
+                            } elseif (Yii::app()->getModule('user')->activeAfterRegister && Yii::app()->getModule('user')->sendActivationMail == false) {
+                                Yii::app()->user->setFlash('registration', UserModule::t("Thank you for your registration. Please {{login}}.", array('{{login}}' => CHtml::link(UserModule::t('Login'), Yii::app()->getModule('user')->loginUrl))));
+                            } elseif (Yii::app()->getModule('user')->loginNotActiv) {
+                                Yii::app()->user->setFlash('registration', UserModule::t("Thank you for your registration. Please check your email or login."));
+                            } else {
+                                Yii::app()->user->setFlash('registration', UserModule::t("Gracias por registrarse. Por favor revise su correo."));
+                            }
+                            $this->refresh();
+                        }
+                    }
+                }
+                else
+                    $profile->validate();
+            }
+            if ($this->mobile()) {
+                Yii::app()->theme = 'mobile';
+                $this->render('registration_mobile', array('model' => $model, 'profile' => $profile));
+            } else {
+                $this->render('guest');
+            }
+        }
+    }
+
+    /**
+     * Activation user account
+     */
+    public function actionActivation() {
+        $mobile = "";
+        if ($this->mobile()) {
+            Yii::app()->theme = 'mobile';
+            $mobile = "_mobile";
+        }
+        $email = $_GET['email'];
+        $activkey = $_GET['activkey'];
+        if ($email && $activkey) {
+            $find = User::model()->notsafe()->findByAttributes(array('email' => $email));
+            if (isset($find) && $find->status) {
+                $this->render('/user/message', array('content' => 'Su cuenta está activa', 'continue' => $this->createAbsoluteUrl('/ubi/usuario/login')));
+            } elseif (isset($find->activkey) && ($find->activkey == $activkey)) {
+                $find->activkey = UserModule::encrypting(microtime());
+                $find->status = 1;
+                $find->save();
+                $this->render('activation'.$mobile, array('content' => "Su cuenta se ha activado", 'continue' => $this->createAbsoluteUrl('/ubi/usuario/login')));
+            } else {
+                $this->render('/user/message', array('title' => UserModule::t("User activation"), 'content' => UserModule::t("Incorrect activation URL.")));
+            }
+        } else {
+            $this->render('/user/message', array('title' => UserModule::t("User activation"), 'content' => UserModule::t("Incorrect activation URL.")));
+        }
+    }
+
     // Uncomment the following methods and override them if needed
     /*
       public function filters()

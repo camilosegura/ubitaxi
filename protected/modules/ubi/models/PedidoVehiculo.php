@@ -42,7 +42,7 @@ class PedidoVehiculo extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('id_pedido, id_vehiculo, time, valor, unidades, direccion_destino, latitud, longitud', 'required'),
+			array('id_pedido, id_vehiculo, time', 'required'),
 			array('id_pedido, id_vehiculo', 'numerical', 'integerOnly'=>true),
 			array('time, latitud, longitud', 'length', 'max'=>255),
 			array('valor', 'length', 'max'=>60),

@@ -25,8 +25,9 @@ $this->menu=array(
 		'tipo',
 		'placa',
 		'id_conductor',
-		'id_seguimento',
+		'id_seguimiento',
 		'id_telefono',
 		'estado',
+		'id_pedido',
 	),
 )); ?>

@@ -1,8 +1,8 @@
 <div data-role="page" id="guest">
     <div data-role="header">
         <a href="#popupFormPedido" data-theme="e" data-rel="popup" data-icon="arrow-d" id="solicitar">Solicitar</a>
-        <h1>Ubi Mobil</h1>
-        <a href="#popupMenuPasajero" data-rel="popup" data-icon="gear" class="ui-btn-right">Menú</a>
+        <h1>Mi Taxi</h1>
+        <a href="#popupMenuPasajero" data-rel="popup" data-icon="gear" class="ui-btn-right" data-theme="b">Menú</a>
         <div data-transition="pop" data-role="popup" id="popupFormPedido" data-theme="a" class="ui-corner-all">
             <form id="formPedido">
                 <div style="padding:10px 20px;">
@@ -27,11 +27,11 @@
         </div>
         <div data-role="popup" id="popupMenuPasajero" data-theme="a">
             <ul data-role="listview" data-inset="true" style="min-width:210px;padding:10px 20px;" data-theme="b">                
-                <li><a href="#">Ingresar</a></li>
-                <li><a href="#">Registrarse</a></li>                
+                <li><a href="login.html">Ingresar</a></li>
+                <li><a href="registration.html" data-ajax="false">Registrarse</a></li>                
+                <li><a href="#popupInstruction" data-rel="popup" data-position-to="window">Ayuda</a></li>
             </ul>
-        </div>
-        <a href="#popupInstruction" data-rel="popup" data-position-to="window" id="showIns" style="display: none;"></a>
+        </div>        
     </div>
     <div data-role="content">
         <div id="map_canvas" style="width: 100%; height: 100%"></div>
@@ -55,7 +55,7 @@
                         "Enviar"                        
                     </li>
                 </ol>
-                <a href="#" data-theme="e" data-role="button" id="submitIns" data-rel="back">Ingresar</a>
+                <a href="#" data-theme="e" data-role="button" id="submitIns" data-rel="back">Cerrar</a>
             </div>
         </div>
     </div>

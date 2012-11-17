@@ -32,8 +32,8 @@
 	</div>
 
 	<div class="row">
-		<?php echo $form->label($model,'id_seguimento'); ?>
-		<?php echo $form->textField($model,'id_seguimento'); ?>
+		<?php echo $form->label($model,'id_seguimiento'); ?>
+		<?php echo $form->textField($model,'id_seguimiento'); ?>
 	</div>
 
 	<div class="row">
@@ -44,6 +44,11 @@
 	<div class="row">
 		<?php echo $form->label($model,'estado'); ?>
 		<?php echo $form->textField($model,'estado'); ?>
+	</div>
+
+	<div class="row">
+		<?php echo $form->label($model,'id_pedido'); ?>
+		<?php echo $form->textField($model,'id_pedido'); ?>
 	</div>
 
 	<div class="row buttons">

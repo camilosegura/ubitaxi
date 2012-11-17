@@ -34,9 +34,9 @@
 	</div>
 
 	<div class="row">
-		<?php echo $form->labelEx($model,'id_seguimento'); ?>
-		<?php echo $form->textField($model,'id_seguimento'); ?>
-		<?php echo $form->error($model,'id_seguimento'); ?>
+		<?php echo $form->labelEx($model,'id_seguimiento'); ?>
+		<?php echo $form->textField($model,'id_seguimiento'); ?>
+		<?php echo $form->error($model,'id_seguimiento'); ?>
 	</div>
 
 	<div class="row">
@@ -49,6 +49,12 @@
 		<?php echo $form->labelEx($model,'estado'); ?>
 		<?php echo $form->textField($model,'estado'); ?>
 		<?php echo $form->error($model,'estado'); ?>
+	</div>
+
+	<div class="row">
+		<?php echo $form->labelEx($model,'id_pedido'); ?>
+		<?php echo $form->textField($model,'id_pedido'); ?>
+		<?php echo $form->error($model,'id_pedido'); ?>
 	</div>
 
 	<div class="row buttons">

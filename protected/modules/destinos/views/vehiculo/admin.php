@@ -49,10 +49,11 @@ or <b>=</b>) at the beginning of each of your search values to specify how the c
 		'tipo',
 		'placa',
 		'id_conductor',
-		'id_seguimento',
+		'id_seguimiento',
 		'id_telefono',
 		/*
 		'estado',
+		'id_pedido',
 		*/
 		array(
 			'class'=>'CButtonColumn',

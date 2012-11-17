@@ -16,9 +16,9 @@
 	<?php echo $form->errorSummary($model); ?>
 
 	<div class="row">
-		<?php echo $form->labelEx($model,'id_carrera'); ?>
-		<?php echo $form->textField($model,'id_carrera'); ?>
-		<?php echo $form->error($model,'id_carrera'); ?>
+		<?php echo $form->labelEx($model,'id_pedido'); ?>
+		<?php echo $form->textField($model,'id_pedido'); ?>
+		<?php echo $form->error($model,'id_pedido'); ?>
 	</div>
 
 	<div class="row">

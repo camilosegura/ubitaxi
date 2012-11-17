@@ -8,9 +8,10 @@
  * @property integer $tipo
  * @property string $placa
  * @property integer $id_conductor
- * @property integer $id_seguimento
+ * @property integer $id_seguimiento
  * @property string $id_telefono
  * @property integer $estado
+ * @property integer $id_pedido
  */
 class Vehiculo extends CActiveRecord
 {
@@ -40,13 +41,13 @@ class Vehiculo extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('tipo, placa, id_conductor, id_seguimento, id_telefono', 'required'),
-			array('tipo, id_conductor, id_seguimento, estado', 'numerical', 'integerOnly'=>true),
+			array('tipo, placa, id_conductor, id_seguimiento, id_telefono', 'required'),
+			array('tipo, id_conductor, id_seguimiento, estado, id_pedido', 'numerical', 'integerOnly'=>true),
 			array('placa', 'length', 'max'=>30),
 			array('id_telefono', 'length', 'max'=>255),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('id, tipo, placa, id_conductor, id_seguimento, id_telefono, estado', 'safe', 'on'=>'search'),
+			array('id, tipo, placa, id_conductor, id_seguimiento, id_telefono, estado, id_pedido', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -58,6 +59,7 @@ class Vehiculo extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
+                                        'ultimoseguimiento' =>array(self::BELONGS_TO, 'Seguimiento', 'id_seguimiento')
 		);
 	}
 
@@ -71,9 +73,10 @@ class Vehiculo extends CActiveRecord
 			'tipo' => 'Tipo',
 			'placa' => 'Placa',
 			'id_conductor' => 'Id Conductor',
-			'id_seguimento' => 'Id Seguimento',
+			'id_seguimiento' => 'Id Seguimiento',
 			'id_telefono' => 'Id Telefono',
 			'estado' => 'Estado',
+			'id_pedido' => 'Id Pedido',
 		);
 	}
 
@@ -92,9 +95,10 @@ class Vehiculo extends CActiveRecord
 		$criteria->compare('tipo',$this->tipo);
 		$criteria->compare('placa',$this->placa,true);
 		$criteria->compare('id_conductor',$this->id_conductor);
-		$criteria->compare('id_seguimento',$this->id_seguimento);
+		$criteria->compare('id_seguimiento',$this->id_seguimiento);
 		$criteria->compare('id_telefono',$this->id_telefono,true);
 		$criteria->compare('estado',$this->estado);
+		$criteria->compare('id_pedido',$this->id_pedido);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
