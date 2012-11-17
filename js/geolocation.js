@@ -6,6 +6,7 @@ var oldLng = 0;
 //var revGoeUrl = "http://maps.googleapis.com/maps/api/geocode/json";
 var revGoeUrl = "http://google.com";
 var cafeMarker = "";
+var direccion = ""
 
 function initialize() {
     var myOptions = {
@@ -82,7 +83,8 @@ function handleRevGeocoder(point){
     }, function(resp) {        
         if (resp[0]) {                       
             cafeMarker.setTitle(resp[0].formatted_address);
-            alert(resp[0].formatted_address);
+            direccion = resp[0].formatted_address;
+            alert(resp[0].formatted_address);            
             $("#direccion").val(resp[0].formatted_address);
         }                    
                     
