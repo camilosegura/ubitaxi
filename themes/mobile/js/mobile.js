@@ -74,7 +74,22 @@ $(document).on("pageinit", '#cantidad', function() {
 $(document).on("pageshow", '#confirmarDir', function() {
     $("#map_canvas_conf").attr("src", "http://maps.google.com/maps/api/staticmap?center=" + selectLat + "," + selectLng + "&zoom=15&size=300x300&markers=color:blue%7Clabel:U%7C" + selectLat + "," + selectLng + "&sensor=true");
 });
-
+$(document).on("pagebeforecreate", '#activosLogged', function() {
+    
+    var url = "/ubi/usuario/getPedido.html";
+    var data = {
+        est:'activo'
+    }
+    var listPedido = "";
+    jQuery.ajaxSetup({async: false});
+    $.getJSON(url, data, function(rsp){
+        $.each(rsp, function(index, value){
+            listPedido += "<li><a href='#'>"+ value.direccion_origen +"</a></li>";
+        })    
+        $('#activosList').html(listPedido);
+    });
+    jQuery.ajaxSetup({async: true});
+});
 $(document).on('click', '#contNewAdd', function() {
     var url = "/ubi/usuario/agregarDireccion.html";
     var data = {
