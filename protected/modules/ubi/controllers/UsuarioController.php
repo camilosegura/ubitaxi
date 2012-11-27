@@ -37,10 +37,15 @@ class UsuarioController extends Controller {
         $direccion = Direccion::model()->findAll("id_user=:id_user", array(":id_user" => Yii::app()->user->id));
         if ($this->mobile()) {
             Yii::app()->theme = 'mobile';
-            $this->render('logged_mobile', array('direccion' => $direccion));
+            $this->render('logged_mobile', array('direccion' => $direccion, 'historial' => $this->getHistory()));
         } else {
             $this->render('logged');
         }
+    }
+
+    private function getHistory() {
+        return $pedido = Pedido::model()->with('finalizado')->findAll("id_pasajero=:id_pasajero"
+                , array(':id_pasajero' => Yii::app()->user->id));
     }
 
     public function actionHacerPedido() {
@@ -324,12 +329,46 @@ class UsuarioController extends Controller {
                 $find->activkey = UserModule::encrypting(microtime());
                 $find->status = 1;
                 $find->save();
-                $this->render('activation'.$mobile, array('content' => "Su cuenta se ha activado", 'continue' => $this->createAbsoluteUrl('/ubi/usuario/login')));
+                $this->render('activation' . $mobile, array('content' => "Su cuenta se ha activado", 'continue' => $this->createAbsoluteUrl('/ubi/usuario/login')));
             } else {
                 $this->render('/user/message', array('title' => UserModule::t("User activation"), 'content' => UserModule::t("Incorrect activation URL.")));
             }
         } else {
             $this->render('/user/message', array('title' => UserModule::t("User activation"), 'content' => UserModule::t("Incorrect activation URL.")));
+        }
+    }
+
+    public function actionGetPedido() {
+        if (isset($_GET["est"]) && $_GET["est"] == "activo") {
+            $pedido = Pedido::model()->findAll("(id_estado = 0 OR id_estado = 1) AND id_pasajero=:id_pasajero", array(':id_pasajero' => Yii::app()->user->id));
+            rsort($pedido);
+            foreach ($pedido as $key => $ped) {
+                $rsp[] = $ped->attributes;
+            }
+            echo json_encode($rsp);
+        }
+    }
+
+    public function actionPedido() {
+        $pedido = Pedido::model()->findByPk($_GET["idp"]);
+        if ($this->mobile()) {
+            Yii::app()->theme = 'mobile';
+            $this->render('pedido_activo_mobile', array('pedido' => $pedido));
+        } else {
+            $this->render('guest');
+        }
+    }
+
+    public function actionCancelarPedido() {
+        $pedido = Pedido::model()->findByPk($_GET["id"], "id_pasajero=:id_pasajero", array(':id_pasajero' => Yii::app()->user->id));
+        $pedido->id_estado = 5;
+        if ($pedido->save()) {
+            $rsp["est"] = 5;
+            $rsp["success"] = true;
+            echo json_encode($rsp);
+        } else {
+            $rsp["success"] = false;
+            echo json_encode($rsp);
         }
     }
 
