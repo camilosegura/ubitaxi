@@ -14,14 +14,16 @@ var selectLat = 0;
 var selectLng = 0;
 var pedidoRsp = {};
 var confirPedido = $('#confirPedido');
+var totalPedidoActivos;
+var pedidoActivo;
 
 guest.live('pageinit', function(event) {
 
 });
 $(document).on("pageinit", '#guest', function() {
     mapCanvas = $('#map_canvas');
-    initialize();    
-    pasajeroEvents();   
+    initialize();
+    pasajeroEvents();
     setControlHeight();
 });
 
@@ -52,7 +54,7 @@ $(document).on("pageinit", '#addresses', function() {
 });
 //newAddress.live("pageinit", function() {
 $(document).on("pageinit", '#newAddresses', function() {
-    mapCanvas = $('#map_canvas');    
+    mapCanvas = $('#map_canvas');
     setControlHeight();
     initialize();
 });
@@ -74,22 +76,63 @@ $(document).on("pageinit", '#cantidad', function() {
 $(document).on("pageshow", '#confirmarDir', function() {
     $("#map_canvas_conf").attr("src", "http://maps.google.com/maps/api/staticmap?center=" + selectLat + "," + selectLng + "&zoom=15&size=300x300&markers=color:blue%7Clabel:U%7C" + selectLat + "," + selectLng + "&sensor=true");
 });
-$(document).on("pagebeforecreate", '#activosLogged', function() {
-    
+$(document).on("pagebeforeshow", '#activosLogged', function() {
     var url = "/ubi/usuario/getPedido.html";
     var data = {
-        est:'activo'
+        est: 'activo'
     }
     var listPedido = "";
     jQuery.ajaxSetup({async: false});
-    $.getJSON(url, data, function(rsp){
-        $.each(rsp, function(index, value){
-            listPedido += "<li><a href='#'>"+ value.direccion_origen +"</a></li>";
-        })    
-        $('#activosList').html(listPedido);
+    $.getJSON(url, data, function(rsp) {
+        totalPedidoActivos = rsp;
+        $.each(rsp, function(index, value) {
+            listPedido += "<li><a href='pedido.html?idp=" + value.id + "' data-pedido-activo='" + index + "' class='pedidoActivo'>" + value.direccion_origen + "</a></li>";
+        })
+        $('<ul data-role="listview">' + listPedido + '</ul>').appendTo('#activosList');
+        $('#activosList').trigger("create");
+        $('.pedidoActivo').click(function() {
+            pedidoActivo = $(this).data('pedidoActivo');
+        });
     });
     jQuery.ajaxSetup({async: true});
 });
+
+$(document).on("pageinit", '#controlPedido', function() {
+    var idPedidoActual = $("#pedidoEditar").val();
+    $("#pedidoCancelar").on("click", function() {
+        var url = "/ubi/usuario/cancelarPedido";
+        var data = {
+            id: idPedidoActual
+        };
+        $.getJSON(url, data, function(rsp) {
+            if (rsp.success) {
+                $("#estadoPedido").html(rsp.est);
+                $("#pedidoCancelar").hide();
+            }
+            console.log(rsp);
+        });
+    });
+    $("#mensajePedido").on("submit", function() {
+        var url = "/ubi/usuario/enviarMensaje";
+        var coment = {
+            id_pedido: idPedidoActual,
+            comentario: $("#textMensaje").val(),
+            id_tipo_comentario:0
+        };
+        var data = {
+            PedidoComentario:coment
+        };
+    
+        $.getJSON(url, data, function(rsp) {
+            if (rsp.success) {
+                $("#textMensaje").val("");
+            }
+            console.log(rsp);
+        });
+        return false;
+    });
+
+})
 $(document).on('click', '#contNewAdd', function() {
     var url = "/ubi/usuario/agregarDireccion.html";
     var data = {
@@ -104,10 +147,10 @@ $(document).on('click', '#contNewAdd', function() {
     jQuery.ajaxSetup({async: true});
 });
 
-$(document).on('pageinit', '#confirPedido', function(){
+$(document).on('pageinit', '#confirPedido', function() {
     $('#pedidoRsp').html(pedidoRsp.msg)
-    if(pedidoRsp.success){
-        
+    if (pedidoRsp.success) {
+
     }
 })
 
