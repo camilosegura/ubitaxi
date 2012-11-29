@@ -84,6 +84,7 @@ class UsuarioController extends Controller {
         $pedido = new PedidoController("pedido", "ubi");
         $rsp["id_pedido"] = $pedido->actionCreateUser();
         $rsp["msg"] = "Se ha asignado un Taxi,  por favor revise el correo {$_GET["email"]}";
+        $this->sendPedidoMail($_GET["email"], $rsp["id_pedido"]);
         echo json_encode($rsp);
     }
 
@@ -95,6 +96,17 @@ class UsuarioController extends Controller {
         $_GET["latitud"] = $direccion->latitud;
         $_GET["longitud"] = $direccion->longitud;
         $this->actionHacerPedido();
+    }
+
+    private function sendPedidoMail($mail, $pedido) {
+        $urlPedido = $this->createAbsoluteUrl("usuario/pedido", array('idp'=>$pedido));
+        $message = new YiiMailMessage;
+        $message->setBody("Entregue la siguiente clave al taxista <span>{$clave}</span>.<br>Por favor revise el estado de su pedido en <a href='{$urlPedido}'>{$urlPedido}</a>", 'text/html');
+        $message->subject = 'Confirmación de Taxi';
+        $message->addTo($mail);
+        $message->from = Yii::app()->params['adminEmail'];
+        
+        Yii::app()->mail->send($message);
     }
 
     private function register() {
@@ -370,6 +382,14 @@ class UsuarioController extends Controller {
             $rsp["success"] = false;
             echo json_encode($rsp);
         }
+    }
+
+    public function actionEnviarMensaje() {
+        $comentario = new PedidoComentario();
+        $comentario->attributes = $_GET["PedidoComentario"];
+        $comentario->save();
+        $rsp["success"] = true;
+        echo json_encode($rsp);
     }
 
     // Uncomment the following methods and override them if needed
