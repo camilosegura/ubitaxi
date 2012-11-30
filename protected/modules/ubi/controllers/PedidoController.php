@@ -184,7 +184,7 @@ class PedidoController extends Controller {
 
         $pedido = Pedido::model()->with('uprofile')->findByPk($_GET["id_pedido"]);
         //$pedido = Pedido::model()->findByPk($_GET["id_pedido"]);
-       $clave = substr($pedido->uprofile->celular, -4);
+        $clave = substr($pedido->uprofile->celular, -4);
         if ($clave == $_GET["clave"]) {
 
             $pedidoVehiculo = new PedidoVehiculo();
@@ -200,13 +200,10 @@ class PedidoController extends Controller {
             $rsp["success"] = true;
             $rsp["msg"] = "Iniciando el recorrido";
             $rsp["id"] = $pedidoVehiculo->id;
-        }else{
+        } else {
             $rsp["success"] = false;
             $rsp["msg"] = "La clave no es correcta";
         }
-          
-         
-        
         echo json_encode($rsp);
     }
 
@@ -268,6 +265,33 @@ class PedidoController extends Controller {
         $this->render('update', array(
             'model' => $model,
         ));
+    }
+
+    public function actionUpdateCar() {
+        $pedidoVehiculo = PedidoVehiculo::model()->findByPk($_GET["Pedido"]["id"]);
+
+        // Uncomment the following line if AJAX validation is needed
+        // $this->performAjaxValidation($model);
+        if (isset($_GET['Pedido'])) {
+            $pedidoVehiculo->attributes = $_GET['Pedido'];
+            $pedidoVehiculo->save();
+        }
+    }
+
+    public function actionGetMensaje() {     
+        $mensaje = PedidoComentario::model()->with('vehiculo')->find(
+                't.id_pedido=:id_pedido AND vehiculo.id_conductor=:id_conductor AND id_tipo_comentario=0 AND t.estado = 0', 
+                array(':id_pedido' => $_GET["id"], ':id_conductor' => Yii::app()->user->id));
+        
+        if (!is_null($mensaje)) {
+            $rsp["success"] = true;
+            $rsp["msg"] = $mensaje->comentario;
+            $mensaje->estado = 1;
+            $mensaje->save();
+        } else {
+            $rsp["success"] = false;
+        }
+        echo json_encode($rsp);
     }
 
     /**
