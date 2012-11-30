@@ -198,11 +198,15 @@ class VehiculoController extends Controller {
     }
 
     public function actionGeLastState() {
-        $model = Vehiculo::model()->findByPk($_GET["idv"], "id_conductor=:id_conductor", array(':id_conductor' => Yii::app()->user->id));
-        $rsp["vehiculo"]=$model->attributes;
-        $rsp["success"] = true;
-//        $rsp["error"] = $model->getErros();
-        //var_dump($model);
+        $model = Vehiculo::model()->with('pedido')->findByPk($_GET["idv"], "id_conductor=:id_conductor", array(':id_conductor' => Yii::app()->user->id));
+        if (!is_null($model)) {            
+            $rsp["vehiculo"] = $model->attributes;
+            $rsp["pedido"] = $model->pedido->attributes;
+            $rsp["success"] = true;
+        }  else {
+            $rsp["success"] = false;
+        }
+
         echo json_encode($rsp);
     }
 
