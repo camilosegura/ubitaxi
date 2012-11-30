@@ -117,12 +117,12 @@ $(document).on("pageinit", '#controlPedido', function() {
         var coment = {
             id_pedido: idPedidoActual,
             comentario: $("#textMensaje").val(),
-            id_tipo_comentario:0
+            id_tipo_comentario: 0
         };
         var data = {
-            PedidoComentario:coment
+            PedidoComentario: coment
         };
-    
+
         $.getJSON(url, data, function(rsp) {
             if (rsp.success) {
                 $("#textMensaje").val("");
@@ -132,7 +132,49 @@ $(document).on("pageinit", '#controlPedido', function() {
         return false;
     });
 
-})
+});
+$(document).on("pagebeforeshow", '#addressesEdit', function() {
+    var url = "/ubi/usuario/getDireccionActiva.html";
+    var data = {
+    }
+    var listAddress = "";
+
+    $.getJSON(url, data, function(rsp) {
+        if (rsp.success) {
+            totalDirActivas = rsp.direccion;
+            listAddress += '<div data-role="collapsible-set" data-content-theme="d" data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d">';
+            $.each(rsp.direccion, function(index, value) {
+
+                listAddress += '<div data-role="collapsible" id="activeDir-' + value.id + '">';
+                listAddress += '<h3>' + value.direccion + '</h3>';
+                listAddress += '<div>';
+                listAddress += '<a href="#" class="actualizarDir" data-pedido="' + value.id + '" data-role="button" data-icon="refresh" data-inline="true">Modificar</a>';
+                listAddress += '<a href="#" class="eliminarDir" data-pedido="' + value.id + '" data-role="button" data-icon="delete" data-theme="a" data-inline="true">Eliminar</a>';
+                listAddress += '</div>';
+                listAddress += '</div>';
+
+            });
+            listAddress += '</div>';
+            $('#activasList').html(listAddress);
+            $('#activasList').trigger("create");
+            $('.actualizarDir').click(function() {
+                pedido = $(this).data('pedido');
+                alert(pedido);
+            });
+            $('.eliminarDir').click(function() {
+                pedido = $(this).data('pedido');
+                var url = "/ubi/usuario/eliminarDireccion.html";
+                var data = {
+                    id: pedido
+                }
+                $.getJSON(url, data, function(rsp) {
+                    $('#activeDir-' + pedido).remove();
+                });
+                
+            });
+        }
+    });
+});
 $(document).on('click', '#contNewAdd', function() {
     var url = "/ubi/usuario/agregarDireccion.html";
     var data = {
