@@ -182,7 +182,7 @@ class VehiculoController extends Controller {
 
     public function actionGetPedido() {
         $model = $this->loadModel($_GET['id_vehiculo']);
-        
+
         if ($model->estado == 0) {
             $pedido = Pedido::model()->findByPk($model->id_pedido);
             $rsp['id_pedido'] = $model->id_pedido;
@@ -194,6 +194,15 @@ class VehiculoController extends Controller {
         }
 
 
+        echo json_encode($rsp);
+    }
+
+    public function actionGeLastState() {
+        $model = Vehiculo::model()->findByPk($_GET["idv"], "id_conductor=:id_conductor", array(':id_conductor' => Yii::app()->user->id));
+        $rsp["vehiculo"]=$model->attributes;
+        $rsp["success"] = true;
+//        $rsp["error"] = $model->getErros();
+        //var_dump($model);
         echo json_encode($rsp);
     }
 
