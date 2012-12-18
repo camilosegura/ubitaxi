@@ -12,6 +12,8 @@
  * @property string $latitud
  * @property string $longitud
  * @property integer $id_operador
+ * @property integer $tiempo_llegar
+ * @property integer $borrado
  */
 class Pedido extends CActiveRecord
 {
@@ -42,12 +44,12 @@ class Pedido extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('id_estado, id_pasajero, time, direccion_origen, latitud, longitud, id_operador', 'required'),
-			array('id_estado, id_pasajero, id_operador', 'numerical', 'integerOnly'=>true),
+			array('id_estado, id_pasajero, id_operador, tiempo_llegar, borrado', 'numerical', 'integerOnly'=>true),
 			array('time, latitud, longitud', 'length', 'max'=>255),
 			array('direccion_origen', 'length', 'max'=>500),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('id, id_estado, id_pasajero, time, direccion_origen, latitud, longitud, id_operador', 'safe', 'on'=>'search'),
+			array('id, id_estado, id_pasajero, time, direccion_origen, latitud, longitud, id_operador, tiempo_llegar, borrado', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -60,7 +62,8 @@ class Pedido extends CActiveRecord
 		// class name for the relations automatically generated below.
 		return array(
                     'user'=>array(self::BELONGS_TO, 'User', 'id_pasajero'),
-                    'uprofile'=>array(self::BELONGS_TO, 'Profile', 'id_pasajero'),                 
+                    'uprofile'=>array(self::BELONGS_TO, 'Profile', 'id_pasajero'),   
+                    'finalizado'=>array(self::HAS_ONE, 'PedidoVehiculo', 'id_pedido'),
 		);
 	}
 
@@ -78,6 +81,8 @@ class Pedido extends CActiveRecord
 			'latitud' => 'Latitud',
 			'longitud' => 'Longitud',
 			'id_operador' => 'Id Operador',
+			'tiempo_llegar' => 'Tiempo Llegar',
+			'borrado' => 'Borrado',
 		);
 	}
 
@@ -100,6 +105,8 @@ class Pedido extends CActiveRecord
 		$criteria->compare('latitud',$this->latitud,true);
 		$criteria->compare('longitud',$this->longitud,true);
 		$criteria->compare('id_operador',$this->id_operador);
+		$criteria->compare('tiempo_llegar',$this->tiempo_llegar);
+		$criteria->compare('borrado',$this->borrado);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
