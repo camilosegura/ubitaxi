@@ -13,7 +13,8 @@ class UsuarioController extends Controller {
 
     private function mobile() {
         $useragent = $_SERVER['HTTP_USER_AGENT'];
-        return (preg_match('/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i', $useragent) || preg_match('/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i', substr($useragent, 0, 4)));
+        //return (preg_match('/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i', $useragent) || preg_match('/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i', substr($useragent, 0, 4)));
+        return true;
     }
 
     public function allowedActions() {
@@ -44,10 +45,14 @@ class UsuarioController extends Controller {
     }
 
     private function getHistory() {
-        return $pedido = Pedido::model()->with('finalizado')->findAll("id_pasajero=:id_pasajero"
-                , array(':id_pasajero' => Yii::app()->user->id));
+        return $pedido = Pedido::model()->with('finalizado')->findAll(
+                "id_pasajero=:id_pasajero AND borrado = 0", array(':id_pasajero' => Yii::app()->user->id));
     }
-
+    public function actionElminarHistorial() {
+        $pedido = Pedido::model()->findByPk($_GET["id"]);
+        $pedido->borrado = 1;
+        $pedido->save();
+    }
     public function actionHacerPedido() {
         $idUser = 0;
         if (Yii::app()->user->isGuest) {
@@ -84,7 +89,7 @@ class UsuarioController extends Controller {
         $pedido = new PedidoController("pedido", "ubi");
         $rsp["id_pedido"] = $pedido->actionCreateUser();
         $rsp["msg"] = "Se ha asignado un Taxi,  por favor revise el correo {$_GET["email"]}";
-        $this->sendPedidoMail($_GET["email"], $rsp["id_pedido"]);
+        $rsp["success"] = true;        
         echo json_encode($rsp);
     }
 
@@ -99,13 +104,13 @@ class UsuarioController extends Controller {
     }
 
     private function sendPedidoMail($mail, $pedido) {
-        $urlPedido = $this->createAbsoluteUrl("usuario/pedido", array('idp'=>$pedido));
+        $urlPedido = $this->createAbsoluteUrl("usuario/pedido", array('idp' => $pedido));
         $message = new YiiMailMessage;
         $message->setBody("Entregue la siguiente clave al taxista <span>{$clave}</span>.<br>Por favor revise el estado de su pedido en <a href='{$urlPedido}'>{$urlPedido}</a>", 'text/html');
         $message->subject = 'Confirmación de Taxi';
         $message->addTo($mail);
         $message->from = Yii::app()->params['adminEmail'];
-        
+
         Yii::app()->mail->send($message);
     }
 
@@ -160,20 +165,34 @@ class UsuarioController extends Controller {
     }
 
     public function actionLoginCar() {
+
         $rsp['guest'] = Yii::app()->user->isGuest;
         if (Yii::app()->user->isGuest) {
             $model = new UserLogin;
             // collect user input data
+            $rsp["msg"] = "Su ingreso ha fallado, intente nuevamente.  ";
             if (isset($_GET['username'])) {
-                $model->attributes = $_GET['password'];
-                $model->username = $_GET['username'];
-                $model->password = $_GET['password'];
-                // validate user input and redirect to previous page if valid
-                if ($model->validate()) {
-                    $this->lastViset();
-                    $rsp["success"] = true;
-                    echo json_encode($rsp);
-                    exit();
+                if (strpos($_GET['username'], "@")) {
+                    $user = User::model()->with('vehiculo')->notsafe()->find(
+                            'email=:email AND id_telefono=:id_telefono', array(':email' => $_GET['username'], ':id_telefono' => $_GET['idTel']));
+                } else {
+                    $user = User::model()->with('vehiculo')->notsafe()->find(
+                            'username=:username AND id_telefono=:id_telefono', array(':username' => $_GET['username'], ':id_telefono' => $_GET['idTel']));
+                }
+
+                if ($user === null) {
+                    $rsp["msg"] .= "Nombre de usuario, contraseña o vehiculo invalido";
+                } else if (Yii::app()->getModule('user')->encrypting($_GET['password']) === $user->password) {
+                    $model->attributes = $_GET['password'];
+                    $model->username = $_GET['username'];
+                    $model->password = $_GET['password'];
+                    // validate user input and redirect to previous page if valid
+                    if ($model->validate()) {
+                        $this->lastViset();
+                        $rsp["success"] = true;
+                        echo json_encode($rsp);
+                        exit();
+                    }
                 }
             }
             // display the login form
@@ -240,6 +259,23 @@ class UsuarioController extends Controller {
         $rsp["lat"] = $direccion->latitud;
         $rsp["lng"] = $direccion->longitud;
         echo json_encode($rsp);
+    }
+
+    public function actionGetDireccionActiva() {
+        $direccion = Direccion::model()->findAll("id_user=:id_user", array(":id_user" => Yii::app()->user->id));
+        if (is_array($direccion)) {
+            $rsp["success"] = true;
+            foreach ($direccion as $key => $dir) {
+                $rsp["direccion"][] = $dir->attributes;
+            }
+        } else {
+            $rsp["success"] = false;
+        }
+        echo json_encode($rsp);
+    }
+
+    public function actionEliminarDireccion() {
+        Direccion::model()->deleteByPk($_GET["id"]);
     }
 
     /**
@@ -383,13 +419,16 @@ class UsuarioController extends Controller {
             echo json_encode($rsp);
         }
     }
-
     public function actionEnviarMensaje() {
         $comentario = new PedidoComentario();
         $comentario->attributes = $_GET["PedidoComentario"];
         $comentario->save();
         $rsp["success"] = true;
         echo json_encode($rsp);
+    }
+    public function actionEnviarMailTaxi(){
+        $user = User::model()->findByPk(Yii::app()->user->id);                
+        $this->sendPedidoMail($user->email, $_GET["idp"]);
     }
 
     // Uncomment the following methods and override them if needed
