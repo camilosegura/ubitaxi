@@ -134,6 +134,7 @@ class PedidoController extends Controller {
             $vehiculo->estado = 1;
             if ($vehiculo->save()) {
                 $pedido->id_estado = 1;
+                $pedido->tiempo_llegar = $_GET["tiempo"];
                 $pedido->save();
                 Vehiculo::model()->updateAll(array('id_pedido' => 0), 'id_pedido=:id_pedido AND estado = 0', array(':id_pedido' => $_GET['id_pedido']));
                 $rsp['direccion'] = $pedido->direccion_origen;
