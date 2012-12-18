@@ -54,15 +54,18 @@ return array(
             # automatically login from registration
             'autoLogin' => true,
             # registration path
-            'registrationUrl' => array('/user/registration'),
+            //'registrationUrl' => array('/user/registration'),
+            'registrationUrl' => array('/ubi/usuario/registration'),
             # recovery password path
             'recoveryUrl' => array('/user/recovery'),
             # login form path
-            'loginUrl' => array('/user/login'),
+            //'loginUrl' => array('/user/login'),
+            'loginUrl' => array('/ubi/usuario/login'),
             # page after login
             'returnUrl' => array('/destinos/router'),
             # page after logout
-            'returnLogoutUrl' => array('/user/login'),
+            //'returnLogoutUrl' => array('/user/login'),
+            'loginUrl' => array('/ubi/usuario/login'),
         ),
         'rights' => array(
             'install' => false,
@@ -74,7 +77,8 @@ return array(
             // enable cookie-based authentication
             'class' => 'RWebUser',
             'allowAutoLogin' => true,
-            'loginUrl' => array('/user/login'),
+            //'loginUrl' => array('/user/login'),
+            'loginUrl' => array('/ubi/usuario/login'),
         ),
         // uncomment the following to enable URLs in path-format
 
