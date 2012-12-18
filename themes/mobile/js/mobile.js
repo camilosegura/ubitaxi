@@ -107,6 +107,7 @@ $(document).on("pageinit", '#controlPedido', function() {
         $.getJSON(url, data, function(rsp) {
             if (rsp.success) {
                 $("#estadoPedido").html(rsp.est);
+                //$("#estadoPedido").html("Vehiculo en camino");
                 $("#pedidoCancelar").hide();
             }
             console.log(rsp);
@@ -189,12 +190,34 @@ $(document).on('click', '#contNewAdd', function() {
     jQuery.ajaxSetup({async: true});
 });
 
-$(document).on('pageinit', '#confirPedido', function() {
-    $('#pedidoRsp').html(pedidoRsp.msg)
+$(document).on('pageshow', '#confirPedido', function() {
+    
+    $('#pedidoRsp').html('<a href="/ubi/usuario/pedido.html?idp='+pedidoRsp.id_pedido+'" data-ico="arrow-r" data-ajax="false" data-role="button">Ver estado del pedido</a>');
+    $('#pedidoRsp').trigger("create");
     if (pedidoRsp.success) {
-
+        $("#popupConfirmarCorreo").popup('open');
     }
-})
+    $('#enviarEmail').click(function(){
+        url = "/ubi/usuario/enviarMailTaxi";
+        data = {
+            idp:pedidoRsp.id_pedido
+        }
+        $.getJSON(url, data, function(){
+            
+        })
+    })
+});
+$(document).on('pageshow', '#historialLogged', function() {
+    $('.eliminarHistorial').click(function(){
+        var url = '/ubi/usuario/elminarHistorial';
+        var data = {
+            id:$(this).data('pedido')
+        }
+        $.getJSON(url, data, function(){
+            
+        })
+    })
+});
 
 
 function setControlHeight() {
