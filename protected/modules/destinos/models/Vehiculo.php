@@ -59,7 +59,8 @@ class Vehiculo extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-                                        'ultimoseguimiento' =>array(self::BELONGS_TO, 'Seguimiento', 'id_seguimiento')
+                    'ultimoseguimiento' =>array(self::BELONGS_TO, 'Seguimiento', 'id_seguimiento'),
+                    'pedido' => array(self::BELONGS_TO, 'Pedido', 'id_pedido'),
 		);
 	}
 
