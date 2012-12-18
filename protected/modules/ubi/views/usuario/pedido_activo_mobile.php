@@ -5,19 +5,24 @@
     </div> 
     <div data-role="content">
         <div class="ui-grid-a">
-            <div class="ui-block-a">Estado</div>
-            <div class="ui-block-b"><button type="button"> Cancelar </button></div>	   
+            <div class="ui-block-a" id="estadoPedido">Vehiculo en camino. <?php 
+            if($pedido->tiempo_llegar != 0){
+                echo " El taxista llegará en ".$pedido->tiempo_llegar." minutos";
+            }
+            ?></div>
+            <div class="ui-block-b"><button type="button" id="pedidoCancelar"> Cancelar </button></div>	   
         </div>
         <div class="ui-grid-solo">
             <div class="ui-block-a">
                 <div data-role="collapsible" data-content-theme="d">
                     <h3>Enviar Mensaje</h3>
                     <p>
-                    <form>
-                        <textarea name="textarea" id="textarea-a" placeholder="Escriba su mensaje" required="required">       
+                    <form id="mensajePedido" >
+                        <textarea name="textarea" id="textMensaje" placeholder="Escriba su mensaje" required="required">       
                         </textarea>
+                        <input type="hidden" value="<?php echo $_GET["idp"]; ?>" id="pedidoEditar" >
                         <button type="submit" data-theme="e"> Enviar </button>
-                        </form>
+                    </form>
                     </p>
                 </div></div>
         </div>
