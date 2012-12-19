@@ -1,0 +1,10 @@
+.ui-page, #guest .ui-content, #newAddresses .ui-content, #confirmarDir .ui-content{
+    height: 100%;
+    padding: 0px;
+}
+.open_menu_log {
+    position: fixed;
+    right: 15px;
+    bottom: 10px;
+    z-index: 100;
+}
