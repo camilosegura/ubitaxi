@@ -445,13 +445,10 @@ class UsuarioController extends Controller {
     }
 
     public function actionPedido() {
-        $pedido = Pedido::model()->findByPk($_GET["idp"]);
-        if ($this->mobile()) {
-            Yii::app()->theme = 'mobile';
-            $this->render('pedido_activo_mobile', array('pedido' => $pedido));
-        } else {
-            $this->render('guest');
-        }
+        $pedido = Pedido::model()->findByPk($_GET["id"], "id_pasajero=:id_pasajero", array(':id_pasajero' => Yii::app()->user->id));
+        $rsp["pedido"] = $pedido->attributes;
+        $rsp["success"] = true;
+        echo json_encode($rsp);
     }
 
     public function actionCancelarPedido() {
