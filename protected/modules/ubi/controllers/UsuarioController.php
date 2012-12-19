@@ -18,7 +18,7 @@ class UsuarioController extends Controller {
     }
 
     public function allowedActions() {
-        return 'index, guest, hacerPedido, loginCar, logoutCar, login, registration, captcha, activation';
+        return 'index, guest, hacerPedido, loginCar, logoutCar, login, registration, captcha, activation, loginMobile';
     }
 
     public function actionGuest() {
@@ -36,23 +36,32 @@ class UsuarioController extends Controller {
 
     public function actionLogged() {
         $direccion = Direccion::model()->findAll("id_user=:id_user", array(":id_user" => Yii::app()->user->id));
-        if ($this->mobile()) {
-            Yii::app()->theme = 'mobile';
-            $this->render('logged_mobile', array('direccion' => $direccion, 'historial' => $this->getHistory()));
-        } else {
-            $this->render('logged');
+        foreach ($direccion as $key => $dir) {
+            $rsp[] = $dir->attributes;
         }
+        echo json_encode($rsp);
     }
 
-    private function getHistory() {
-        return $pedido = Pedido::model()->with('finalizado')->findAll(
+    public function actionHistorial() {
+        $historial = Pedido::model()->with('finalizado')->findAll(
                 "id_pasajero=:id_pasajero AND borrado = 0", array(':id_pasajero' => Yii::app()->user->id));
+        rsort($historial);    
+        $rsp = array();
+        foreach ($historial as $key => $direcciones) {
+            $rsp[$key]["origen"] = $direcciones->direccion_origen;
+            $rsp[$key]["destino"] = $direcciones->finalizado->direccion_destino;
+            $rsp[$key]["id"] = $direcciones->id;
+        }
+        
+        echo json_encode($rsp);
     }
+
     public function actionElminarHistorial() {
         $pedido = Pedido::model()->findByPk($_GET["id"]);
         $pedido->borrado = 1;
         $pedido->save();
     }
+
     public function actionHacerPedido() {
         $idUser = 0;
         if (Yii::app()->user->isGuest) {
@@ -89,7 +98,7 @@ class UsuarioController extends Controller {
         $pedido = new PedidoController("pedido", "ubi");
         $rsp["id_pedido"] = $pedido->actionCreateUser();
         $rsp["msg"] = "Se ha asignado un Taxi,  por favor revise el correo {$_GET["email"]}";
-        $rsp["success"] = true;        
+        $rsp["success"] = true;
         echo json_encode($rsp);
     }
 
@@ -203,6 +212,44 @@ class UsuarioController extends Controller {
             $rsp["success"] = true;
             echo json_encode($rsp);
             exit();
+        }
+    }
+
+    public function actionLoginMobile() {
+        $rsp['guest'] = Yii::app()->user->isGuest;
+        if (Yii::app()->user->isGuest) {
+            $model = new UserLogin;
+            // collect user input data
+            $rsp["msg"] = "Su ingreso ha fallado, intente nuevamente.  ";
+            if (isset($_GET['username'])) {
+                if (strpos($_GET['username'], "@")) {
+                    $user = User::model()->notsafe()->find(
+                            'email=:email', array(':email' => $_GET['username']));
+                } else {
+                    $user = User::model()->notsafe()->find(
+                            'username=:username', array(':username' => $_GET['username']));
+                }
+                if ($user === null) {
+                    $rsp["msg"] .= "Nombre de usuario o contraseña";
+                } else if (Yii::app()->getModule('user')->encrypting($_GET['password']) === $user->password) {
+                    $model->attributes = $_GET['password'];
+                    $model->username = $_GET['username'];
+                    $model->password = $_GET['password'];
+                    // validate user input and redirect to previous page if valid
+                    if ($model->validate()) {
+                        $this->lastViset();
+                        $rsp["success"] = true;
+                        echo json_encode($rsp);
+                    }
+                }
+            } else {
+                // display the login form
+                $rsp["success"] = false;
+                echo json_encode($rsp);
+            }
+        } else {
+            $rsp["success"] = true;
+            echo json_encode($rsp);
         }
     }
 
@@ -419,6 +466,7 @@ class UsuarioController extends Controller {
             echo json_encode($rsp);
         }
     }
+
     public function actionEnviarMensaje() {
         $comentario = new PedidoComentario();
         $comentario->attributes = $_GET["PedidoComentario"];
@@ -426,8 +474,9 @@ class UsuarioController extends Controller {
         $rsp["success"] = true;
         echo json_encode($rsp);
     }
-    public function actionEnviarMailTaxi(){
-        $user = User::model()->findByPk(Yii::app()->user->id);                
+
+    public function actionEnviarMailTaxi() {
+        $user = User::model()->findByPk(Yii::app()->user->id);
         $this->sendPedidoMail($user->email, $_GET["idp"]);
     }
 
