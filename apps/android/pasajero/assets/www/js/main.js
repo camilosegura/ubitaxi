@@ -14,6 +14,16 @@ var pedidoActivo;
 $(document).on("pageinit", '#pageLogin', function() {
     $("#loginForm").on("submit", handleLogin);
 });
+$(document).on("pagebeforeshow", '#pageLogin', function() {
+    if (localStorage.getItem('nombre_usuario') && localStorage.getItem('contrasena_usuario')) {
+        username = $('#username').val(localStorage.getItem('nombre_usuario'));
+        userpass = $('#password').val(localStorage.getItem('contrasena_usuario'));
+        $('#registrarse').hide();
+    } else {
+        $('#registrarse').show();
+    }
+
+});
 $(document).on("pageinit", '#addresses', function() {
     continuarDir = $('#continuarDir');
     continuarDir.click(function(e) {
@@ -138,10 +148,10 @@ $(document).on("pagebeforeshow", '#controlPedido', function() {
     };
     $.getJSON(url, data, function(rsp) {
         var msg = "";
-        if(rsp.success){
-            if(rsp.pedido.tiempo_llegar != 0){
-                msg = 'El taxista llegará en '+rsp.pedido.tiempo_llegar+' minutos';
-            }else{
+        if (rsp.success) {
+            if (rsp.pedido.tiempo_llegar != 0) {
+                msg = 'El taxista llegará en ' + rsp.pedido.tiempo_llegar + ' minutos';
+            } else {
                 msg = 'Vehiculo en camino';
             }
         }
@@ -253,7 +263,7 @@ $(document).on('pageshow', '#historialLogged', function() {
         })
     })
 });
-$(document).on('click', '.pedidoActivo', function() {    
+$(document).on('click', '.pedidoActivo', function() {
     pedidoActivo = $(this).data('pedidoActivo');
 });
 
@@ -277,6 +287,8 @@ function handleLogin() {
             sbutton.css('display', 'block');
             if (rsp.success) {
                 login = true;
+                window.localStorage.setItem('nombre_usuario', username);
+                window.localStorage.setItem('contrasena_usuario', userpass);
                 $.mobile.changePage('#addresses', {transition: "slideup"});
             } else {
                 navigator.notification.alert(rsp.msg, function() {
