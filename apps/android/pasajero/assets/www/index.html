@@ -22,36 +22,67 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="format-detection" content="telephone=no" />
-        <meta name="viewport"
-              content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
-        <link rel="stylesheet" type="text/css"
-              href="css/jquery.mobile-1.2.0.min.css" />
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+        <link rel="stylesheet" type="text/css" href="css/ui-lightness/jquery-ui-1.9.2.custom.css" />
+        <link rel="stylesheet" type="text/css" href="css/jquery.mobile-1.2.0.min.css" />        
         <link rel="stylesheet" type="text/css" href="css/index.css" />
         <title>Ubitaxi</title>
     </head>
     <body>
         <div data-role="page" id="pageLogin" data-theme="e">
             <div data-role="header" data-theme="e">
+                <a href="#registration" data-theme="a" data-role="button"
+                   data-icon="plus" data-transition="slide" id="registrarse">Registrarse</a>
                 <h1>Mi Taxi</h1>
             </div>
             <div data-role="content">
                 <form id="loginForm">
                     <div data-role="fieldcontain" class="ui-hide-label">
                         <label for="username">Usuario:</label> <input type="text"
-                                                                      name="username" id="username" value="k_nser@hotmail.com"
+                                                                      name="username" id="username" value=""
                                                                       placeholder="Usuario" required="required" />
                     </div>
                     <div data-role="fieldcontain" class="ui-hide-label">
                         <label for="password">Contraseña:</label> <input type="password"
-                                                                         name="password" id="password" value="123456"
+                                                                         name="password" id="password" value=""
                                                                          placeholder="Contraseña" required="required" />
-                    </div>
+                    </div>                    
                     <input type="submit" value="Ingresar" id="submitButton">
                 </form>
             </div>
             <div data-role="footer" data-theme="e">
                 <h4>&copy; Mi empresa.co</h4>
             </div>
+        </div>
+        <div data-role="page" id="registration" data-theme="e"> 
+            <div data-role="header" data-position="fixed" data-theme="e">
+                <h1>Mi Taxi</h1>
+            </div> 
+            <div data-role="content">
+
+                <form enctype="multipart/form-data" id="registration-form">
+
+                    <input placeholder="Nombre de Usuario" name="User[username]" id="User_username" type="text" maxlength="20" required="required" />            
+
+                    <input placeholder="Contraseña" name="User[password]" id="User_password" type="password" maxlength="128" required="required" />
+                    <p class="hint">La contraseña debe tener minimo 4 caracteres.</p>
+
+                    <input placeholder="Confirme la Contraseña" name="User[verifyPassword]" id="User_verifyPassword" type="password" required="required" />                        
+                    <input placeholder="E-mail" name="User[email]" id="User_email" type="text" />            
+
+                    <input size="60" maxlength="50" placeholder="Nombre" name="Profile[firstname]" id="Profile_firstname" type="text" value="" required="required" />                    
+
+                    <input size="60" maxlength="50" placeholder="Apellido" name="Profile[lastname]" id="Profile_lastname" type="text" value="" required="required" />                    
+
+                    <input size="60" maxlength="255" placeholder="Fecha de Nacimiento" id="Profile_nacimiento" name="Profile[nacimiento]" type="text" value="" required="required" />                    
+
+                    <input placeholder="Celular" name="Profile[celular]" id="Profile_celular" type="number" required="required" />                    
+
+                    <input name="Profile[ciudad]" id="Profile_ciudad" type="hidden" value="Bogotá">                        
+
+                    <input type="submit" name="yt0" value="Register" />
+                </form>            <!-- form -->
+            </div>            
         </div>
         <div data-role="page" id="addresses" data-theme="e">
             <div data-role="header" data-position="fixed">
@@ -216,6 +247,7 @@
         <script src="https://maps.googleapis.com/maps/api/js?sensor=true"></script>
         <script type="text/javascript" src="js/cordova-2.2.0.js"></script>
         <script type="text/javascript" src="js/jquery-1.8.3.min.js"></script>
+        <script type="text/javascript" src="js/jquery-ui-1.9.2.custom.min.js"></script>
         <script type="text/javascript" src="js/jquery.mobile-1.2.0.min.js"></script>
         <script type="text/javascript" src="js/geolocation.js"></script>
         <script type="text/javascript" src="js/index.js"></script>
