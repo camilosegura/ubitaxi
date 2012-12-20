@@ -16,13 +16,22 @@ $(document).on("pageinit", '#pageLogin', function() {
 });
 $(document).on("pagebeforeshow", '#pageLogin', function() {
     if (localStorage.getItem('nombre_usuario') && localStorage.getItem('contrasena_usuario')) {
-        username = $('#username').val(localStorage.getItem('nombre_usuario'));
-        userpass = $('#password').val(localStorage.getItem('contrasena_usuario'));
+        $('#username').val(localStorage.getItem('nombre_usuario'));
+        $('#password').val(localStorage.getItem('contrasena_usuario'));
         $('#registrarse').hide();
     } else {
         $('#registrarse').show();
     }
-
+    logout();
+});
+$(document).on("pageinit", '#registration', function() {
+    $("#registration-form").on("submit", handleRegistration);
+    jQuery('#Profile_nacimiento').datepicker({
+        dateFormat: 'yy-mm-dd',
+        changeMonth: true,
+        changeYear: true,
+        yearRange: "c-60:c+1"
+    });
 });
 $(document).on("pageinit", '#addresses', function() {
     continuarDir = $('#continuarDir');
@@ -50,15 +59,17 @@ $(document).on("pagebeforeshow", '#addresses', function() {
     var url = "http://ubitaxi.argesys.co/ubi/usuario/logged";
     var data = {};
     var listAddress = "";
-    jQuery.ajaxSetup({async: false});
+    jQuery.ajaxSetup({async: false});    
     $.getJSON(url, data, function(rsp) {
-        totalAddress = rsp;
-        $.each(rsp, function(index, value) {
-            listAddress += '<input type="radio" name="direccionList" id="direccionList' + index + '" value="' + value.id + '" />';
-            listAddress += '<label for="direccionList' + index + '">' + value.direccion + '</label>';
-        })
-        $('#direccionFielset').html(listAddress);
-        $('#direccionFielset').trigger("create");
+        if (rsp.success) {
+            totalAddress = rsp;
+            $.each(rsp, function(index, value) {
+                listAddress += '<input type="radio" name="direccionList" id="direccionList' + index + '" value="' + value.id + '" />';
+                listAddress += '<label for="direccionList' + index + '">' + value.direccion + '</label>';
+            })
+            $('#direccionFielset').html(listAddress);
+            $('#direccionFielset').trigger("create");
+        }
     });
     jQuery.ajaxSetup({async: true});
 });
@@ -274,8 +285,8 @@ function setControlHeight() {
 function handleLogin() {
     var sbutton = $("#submitButton");
     sbutton.css('display', 'none');
-    username = $('#username').val();
-    userpass = $('#password').val();
+    var username = $('#username').val();
+    var userpass = $('#password').val();
 
     if (username != '' && userpass != '') {
         var url = "http://ubitaxi.argesys.co/ubi/usuario/loginMobile";
@@ -302,4 +313,48 @@ function handleLogin() {
         });
     }
     return false;
+}
+function handleRegistration() {
+    var error = false;
+    var inputs = $('#registration-form :input');
+    var url = 'http://ubitaxi.argesys.co/ubi/usuario/registrationMobile';
+    var pass = $('#User_password');
+    var passVery = $('#User_verifyPassword');
+    var username = $('#User_username');
+    var data = {};
+    $('#registration-form :input').removeClass('errorField');
+    $.each(inputs, function(i, field) {
+        if ($.trim(field.value) == '') {
+            $('#' + field.id).addClass('errorField');
+            error = true;
+        }
+        data[field.name] = field.value;
+    });
+
+    if (pass.val() != passVery.val()) {
+        pass.addClass('errorField');
+        passVery.addClass('errorField');
+        navigator.notification.alert("Las contraseña son diferentes", function() {
+        }, 'Error');
+        error = true;
+    }
+    if (error) {
+        return false;
+    }
+    $.getJSON(url, data, function(rsp) {
+        if (rsp.success) {
+            window.localStorage.setItem('nombre_usuario', username.val());
+            window.localStorage.setItem('contrasena_usuario', pass.val());
+            $.mobile.changePage('#pageLogin', {transition: "slideup"});
+        } else {
+            //hacer manejo de errores
+        }
+    });
+
+    return false;
+}
+function logout() {    
+    var url = "http://ubitaxi.argesys.co/ubi/usuario/logoutCar.html";
+    var data = {};
+    $.getJSON(url, data, function() {});
 }
