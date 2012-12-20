@@ -18,7 +18,7 @@ class UsuarioController extends Controller {
     }
 
     public function allowedActions() {
-        return 'index, guest, hacerPedido, loginCar, logoutCar, login, registration, captcha, activation, loginMobile';
+        return 'index, guest, hacerPedido, loginCar, logoutCar, login, registration, registrationMobile, captcha, activation, loginMobile';
     }
 
     public function actionGuest() {
@@ -36,8 +36,13 @@ class UsuarioController extends Controller {
 
     public function actionLogged() {
         $direccion = Direccion::model()->findAll("id_user=:id_user", array(":id_user" => Yii::app()->user->id));
-        foreach ($direccion as $key => $dir) {
-            $rsp[] = $dir->attributes;
+        if (!empty($direccion)) {
+            foreach ($direccion as $key => $dir) {
+                $rsp[] = $dir->attributes;
+            }
+            $rsp['success'] = true;
+        }else{
+            $rsp['success'] = false;
         }
         echo json_encode($rsp);
     }
@@ -45,14 +50,14 @@ class UsuarioController extends Controller {
     public function actionHistorial() {
         $historial = Pedido::model()->with('finalizado')->findAll(
                 "id_pasajero=:id_pasajero AND borrado = 0", array(':id_pasajero' => Yii::app()->user->id));
-        rsort($historial);    
+        rsort($historial);
         $rsp = array();
         foreach ($historial as $key => $direcciones) {
             $rsp[$key]["origen"] = $direcciones->direccion_origen;
             $rsp[$key]["destino"] = $direcciones->finalizado->direccion_destino;
             $rsp[$key]["id"] = $direcciones->id;
         }
-        
+
         echo json_encode($rsp);
     }
 
@@ -128,14 +133,16 @@ class UsuarioController extends Controller {
         $profile = new Profile;
 
         $model->attributes = $_POST['User'];
+        $model->password = $_POST['User']["password"];
         $profile->attributes = ((isset($_POST['Profile']) ? $_POST['Profile'] : array()));
         if ($model->validate() && $profile->validate()) {
-            echo "validate";
+            //echo "validate";
+
             $soucePassword = $model->password;
             $model->activkey = UserModule::encrypting(microtime() . $model->password);
             $model->password = UserModule::encrypting($model->password);
             $model->superuser = 0;
-            $model->status = ((Yii::app()->getModule("user")->activeAfterRegister) ? User::STATUS_ACTIVE : User::STATUS_NOACTIVE);
+            $model->status = User::STATUS_ACTIVE;
 
             if ($model->save()) {
                 Rights::assign('Cliente', $model->id);
@@ -239,6 +246,9 @@ class UsuarioController extends Controller {
                     if ($model->validate()) {
                         $this->lastViset();
                         $rsp["success"] = true;
+                        echo json_encode($rsp);
+                    } else {
+                        $rsp = $model->getErrors();
                         echo json_encode($rsp);
                     }
                 }
@@ -402,6 +412,18 @@ class UsuarioController extends Controller {
             } else {
                 $this->render('guest');
             }
+        }
+    }
+
+    public function actionRegistrationMobile() {
+        //var_dump($_GET);
+        unset($_GET['User']["verifyPassword"]);
+        $_POST['User'] = $_GET['User'];
+        $_POST['Profile'] = $_GET['Profile'];
+        if ($this->register()) {
+            $rsp["success"] = true;
+            $rsp["id"] = Yii::app()->user->id;
+            echo json_encode($rsp);
         }
     }
 
