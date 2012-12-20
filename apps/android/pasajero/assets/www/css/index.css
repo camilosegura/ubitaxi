@@ -8,3 +8,6 @@
     bottom: 10px;
     z-index: 100;
 }
+.errorField{
+    border: 1px solid red;
+}
