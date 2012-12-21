@@ -59,7 +59,7 @@ $(document).on("pagebeforeshow", '#addresses', function() {
     var url = "http://ubitaxi.argesys.co/ubi/usuario/logged";
     var data = {};
     var listAddress = "";
-    jQuery.ajaxSetup({async: false});    
+    jQuery.ajaxSetup({async: false});
     $.getJSON(url, data, function(rsp) {
         if (rsp.success) {
             totalAddress = rsp;
@@ -277,12 +277,12 @@ $(document).on('pageshow', '#historialLogged', function() {
 $(document).on('click', '.pedidoActivo', function() {
     pedidoActivo = $(this).data('pedidoActivo');
 });
-
 function setControlHeight() {
     mapCanvas.height($(window).height() - 42);
 }
 
 function handleLogin() {
+    $.mobile.loading('show');
     var sbutton = $("#submitButton");
     sbutton.css('display', 'none');
     var username = $('#username').val();
@@ -300,7 +300,7 @@ function handleLogin() {
                 login = true;
                 window.localStorage.setItem('nombre_usuario', username);
                 window.localStorage.setItem('contrasena_usuario', userpass);
-                $.mobile.changePage('#addresses', {transition: "slideup"});
+                $.mobile.changePage('#addresses');
             } else {
                 navigator.notification.alert(rsp.msg, function() {
                 });
@@ -315,14 +315,19 @@ function handleLogin() {
     return false;
 }
 function handleRegistration() {
+    $.mobile.loading('show');
     var error = false;
-    var inputs = $('#registration-form :input');
+    var msg = '';
+    var inputs = $('#registration-form :input', $.mobile.activePage);
     var url = 'http://ubitaxi.argesys.co/ubi/usuario/registrationMobile';
-    var pass = $('#User_password');
-    var passVery = $('#User_verifyPassword');
-    var username = $('#User_username');
+    var pass = $('#User_password', $.mobile.activePage);
+    var passVery = $('#User_verifyPassword', $.mobile.activePage);
+    var username = $('#User_username', $.mobile.activePage);
+    var email = $('#User_email', $.mobile.activePage);
+    var fecha = $('#Profile_nacimiento', $.mobile.activePage);
+    var celular = $('#Profile_celular', $.mobile.activePage);
     var data = {};
-    $('#registration-form :input').removeClass('errorField');
+    $('#registration-form :input', $.mobile.activePage).removeClass('errorField');
     $.each(inputs, function(i, field) {
         if ($.trim(field.value) == '') {
             $('#' + field.id).addClass('errorField');
@@ -331,30 +336,79 @@ function handleRegistration() {
         data[field.name] = field.value;
     });
 
+    if (username.val().length < 3) {
+        msg += 'El nombre de usuario debe tener minimo 3 caracteres. ';
+        username.addClass('errorField');
+        error = true;
+    }
+    if (username.val().search(/^[A-Za-z0-9_]+$/u) == -1) {
+        msg = "Caracteres invalidos en el Nombre de Usuario (solo A-z0-9). ";
+        username.addClass('errorField');
+        error = true;
+    }
+    if (pass.val().length < 4) {
+        msg += 'La Contraseña debe tener minimo 4 caracteres. ';
+        pass.addClass('errorField');
+        error = true;
+    }
     if (pass.val() != passVery.val()) {
         pass.addClass('errorField');
         passVery.addClass('errorField');
-        navigator.notification.alert("Las contraseña son diferentes", function() {
-        }, 'Error');
+        msg += 'Las contraseña son diferentes. ';
         error = true;
     }
+    if (email.val().search(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\b/i) == -1) {
+        msg += 'Ingrese un correo correcto. ';
+        email.addClass('errorField');
+        error = true;
+    }
+    if (fecha.val().search(/^(\d{4})-((0[1-9])|(1[0-2]))-(0[1-9]|[12][0-9]|3[01])$/i) == -1) {
+        msg += 'Fecha de Nacimiento invalida. ';
+        fecha.addClass('errorField');
+        error = true;
+    }
+    if (celular.val().search(/^[0-9]+$/i) == -1) {
+        msg += 'Celular invalido. ';
+        celular.addClass('errorField');
+        error = true;
+    }
+
     if (error) {
+        $.mobile.loading('hide');
+        navigator.notification.alert(msg, function() {
+        }, 'Corregir');
+    //se hace aqui el return para que no se haga la peticipn ajax
         return false;
     }
+    /*$.ajax({
+     url: url,
+     data: data
+     }).done(function(msj) { 
+     navigator.notification.alert(msj, function() {}, "Tiene un pedido", "Aceptar");
+     });*/
     $.getJSON(url, data, function(rsp) {
+        $.mobile.loading('hide');
         if (rsp.success) {
             window.localStorage.setItem('nombre_usuario', username.val());
             window.localStorage.setItem('contrasena_usuario', pass.val());
-            $.mobile.changePage('#pageLogin', {transition: "slideup"});
+            $.mobile.changePage('#pageLogin');
         } else {
-            //hacer manejo de errores
+            $.each(rsp.user, function(index, value) {
+                msg += value + " ";
+            });
+            $.each(rsp.profile, function(index, value) {
+                msg += value + " ";
+            });
+            navigator.notification.alert(msg, function() {
+            }, 'Corregir');
         }
     });
 
     return false;
 }
-function logout() {    
+function logout() {
     var url = "http://ubitaxi.argesys.co/ubi/usuario/logoutCar.html";
     var data = {};
-    $.getJSON(url, data, function() {});
+    $.getJSON(url, data, function() {
+    });
 }
