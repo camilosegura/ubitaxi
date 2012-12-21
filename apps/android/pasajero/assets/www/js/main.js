@@ -69,6 +69,9 @@ $(document).on("pagebeforeshow", '#addresses', function() {
             })
             $('#direccionFielset').html(listAddress);
             $('#direccionFielset').trigger("create");
+        } else {
+            $('#direccionFielset', $.mobile.activePage).html('No tiene direcciones registradas.  Por favor cree una <a href="#newAddresses" data-theme="e" data-role="button" data-icon="plus" >Nueva</a>');
+            $('#direccionFielset').trigger("create");
         }
     });
     jQuery.ajaxSetup({async: true});
@@ -97,6 +100,7 @@ $(document).on("pageshow", '#confirmarDir', function() {
     $("#map_canvas_conf").attr("src", "http://maps.google.com/maps/api/staticmap?center=" + selectLat + "," + selectLng + "&zoom=15&size=300x300&markers=color:blue%7Clabel:U%7C" + selectLat + "," + selectLng + "&sensor=true");
 });
 $(document).on("pagebeforeshow", '#activosLogged', function() {
+    var activosList = $('#activosList', $.mobile.activePage);
     var url = "http://ubitaxi.argesys.co/ubi/usuario/getPedido.html";
     var data = {
         est: 'activo'
@@ -104,13 +108,17 @@ $(document).on("pagebeforeshow", '#activosLogged', function() {
     var listPedido = "";
     jQuery.ajaxSetup({async: false});
     $.getJSON(url, data, function(rsp) {
-        totalPedidoActivos = rsp;
-        $.each(rsp, function(index, value) {
-            listPedido += "<li><a href='#controlPedido' data-pedido-activo='" + value.id + "' class='pedidoActivo'>" + value.direccion_origen + "</a></li>";
-        })
-        $('#activosList').html('<ul data-role="listview">' + listPedido + '</ul>');
-        $('#activosList').trigger("create");
-
+        if (rsp.success) {
+            totalPedidoActivos = rsp;
+            $.each(rsp, function(index, value) {
+                listPedido += "<li><a href='#controlPedido' data-pedido-activo='" + value.id + "' class='pedidoActivo'>" + value.direccion_origen + "</a></li>";
+            })
+            activosList.html('<ul data-role="listview">' + listPedido + '</ul>');
+            activosList.trigger("create");
+        } else {
+            activosList.html('No tiene pedidos activos');
+            activosList.trigger("create");
+        }
     });
     jQuery.ajaxSetup({async: true});
 });
@@ -170,6 +178,8 @@ $(document).on("pagebeforeshow", '#controlPedido', function() {
     });
 });
 $(document).on("pagebeforeshow", '#addressesEdit', function() {
+    $.mobile.loading('show');
+    var activasList = $('#activasList', $.mobile.activePage);
     var url = "http://ubitaxi.argesys.co/ubi/usuario/getDireccionActiva.html";
     var data = {
     }
@@ -191,23 +201,26 @@ $(document).on("pagebeforeshow", '#addressesEdit', function() {
 
             });
             listAddress += '</div>';
-            $('#activasList').html(listAddress);
-            $('#activasList').trigger("create");
-            $('.actualizarDir').click(function() {
+            activasList.html(listAddress);
+            activasList.trigger("create");
+            activasList.click(function() {
                 pedido = $(this).data('pedido');
                 alert(pedido);
             });
-            $('.eliminarDir').click(function() {
+            $('.eliminarDir', $.mobile.activePage).click(function() {
                 pedido = $(this).data('pedido');
                 var url = "http://ubitaxi.argesys.co/ubi/usuario/eliminarDireccion.html";
                 var data = {
                     id: pedido
                 }
                 $.getJSON(url, data, function(rsp) {
-                    $('#activeDir-' + pedido).remove();
+                    $('#activeDir-' + pedido, $.mobile.activePage).remove();
                 });
 
             });
+        } else {
+            activasList.html('No tiene direcciones registradas.  Por favor cree una <a href="#newAddresses" data-theme="e" data-role="button" data-icon="plus" >Nueva</a>');
+            activasList.trigger("create");
         }
     });
 });
@@ -246,24 +259,29 @@ $(document).on('pagebeforeshow', '#historialLogged', function() {
     var url = "http://ubitaxi.argesys.co/ubi/usuario/historial";
     var data = {};
     var listHistorial = "";
+    var historialFielset = $('#historialFielset', $.mobile.activePage);
     jQuery.ajaxSetup({async: false});
     $.getJSON(url, data, function(rsp) {
-        totalHistorial = rsp;
-        $.each(rsp, function(index, value) {
-            listHistorial += '<div data-role="collapsible" id="activeHistori-' + value.id + '">';
-            listHistorial += '<h3>' + value.origen + ' ' + value.destino + '</h3>';
-            listHistorial += '<div>';
-            listHistorial += '<a href="#" class="eliminarHistorial"	data-pedido="' + value.id + '" data-role="button" data-icon="delete" data-theme="a" data-inline="true">Eliminar</a>';
-            listHistorial += '</div></div>';
-        })
-        $('#historialFielset').html(listHistorial);
-        $('#historialFielset').trigger("create");
+        if (rsp.success) {
+            totalHistorial = rsp;
+            $.each(rsp, function(index, value) {
+                listHistorial += '<div data-role="collapsible" id="activeHistori-' + value.id + '">';
+                listHistorial += '<h3>' + value.origen + ' ' + value.destino + '</h3>';
+                listHistorial += '<div>';
+                listHistorial += '<a href="#" class="eliminarHistorial"	data-pedido="' + value.id + '" data-role="button" data-icon="delete" data-theme="a" data-inline="true">Eliminar</a>';
+                listHistorial += '</div></div>';
+            });
+            historialFielset.html(listHistorial);
+            historialFielset.trigger("create");
+        } else {
+            historialFielset.html('Usted no ha hecho ningun pedido');
+            historialFielset.trigger("create");
+        }
     });
     jQuery.ajaxSetup({async: true});
 });
 $(document).on('pageshow', '#historialLogged', function() {
-    $('.eliminarHistorial').click(function() {
-        console.log("elliminando");
+    $('.eliminarHistorial', $.mobile.activePage).click(function() {
         var url = 'http://ubitaxi.argesys.co/ubi/usuario/elminarHistorial';
         var idHistorial = $(this).data('pedido');
         var data = {
@@ -377,7 +395,7 @@ function handleRegistration() {
         $.mobile.loading('hide');
         navigator.notification.alert(msg, function() {
         }, 'Corregir');
-    //se hace aqui el return para que no se haga la peticipn ajax
+        //se hace aqui el return para que no se haga la peticipn ajax
         return false;
     }
     /*$.ajax({
