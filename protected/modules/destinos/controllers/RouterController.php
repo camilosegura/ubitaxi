@@ -12,8 +12,7 @@ class RouterController extends Controller
         if ($count > 1) {
             
         } else {           
-            foreach ($roles as $key => $role) {
-                $role->name;
+            foreach ($roles as $key => $role) {                
                 $this->redirect($this->getUrlRole($role->name));
             }
         }    
