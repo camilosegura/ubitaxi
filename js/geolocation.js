@@ -29,11 +29,11 @@ function initialize() {
             map.setCenter(initialLocation);
             handleRevGeocoder(initialLocation);
             var cafeMarkerImage = new google.maps.MarkerImage(
-                'http://chart.apis.google.com/chart?chst=d_map_pin_icon&chld=cafe|FFFF00', 
+                'http://maps.google.com/intl/en_us/mapfiles/ms/micons/yellow-dot.png', 
                 null, 
                 null, 
                 null, 
-                new google.maps.Size(60, 90));           
+                new google.maps.Size(90, 90));           
             cafeMarker = new google.maps.Marker({
                 position: initialLocation,
                 map: map,
@@ -58,7 +58,7 @@ function initialize() {
             });            
         }, function() {
             handleNoGeolocation(browserSupportFlag);
-        });
+        }, { enableHighAccuracy: true });
     }
     // Browser doesn't support Geolocation
     else {
@@ -66,9 +66,11 @@ function initialize() {
         handleNoGeolocation(browserSupportFlag);
     }	
 }
-
 function handleNoGeolocation(errorFlag) {
+	alert('code: '    + errorFlag.code    + '\n' +
+            'message: ' + errorFlag.message + '\n');
     if (errorFlag == true) {
+    	
         alert("Falló el servicio de Geolocalización, recargue su navegador.");
 
     } else {
@@ -76,7 +78,6 @@ function handleNoGeolocation(errorFlag) {
     }
     $("#home-butons").hide();
 }
-
 function handleRevGeocoder(point){
     (new google.maps.Geocoder()).geocode({
         latLng: point
@@ -84,10 +85,14 @@ function handleRevGeocoder(point){
         if (resp[0]) {                       
             cafeMarker.setTitle(resp[0].formatted_address);
             direccion = resp[0].formatted_address;
-            alert(resp[0].formatted_address);            
             $("#direccion").val(resp[0].formatted_address);
         }                    
-                    
+/**
+ * Implementar esta funcion en su propio archivo js, es una funcion de 
+ * callback
+ * @returns {undefined}
+ */  
+        callbackRevGeocoder(resp);
     });
 }
 
@@ -95,5 +100,5 @@ function setLatLng(){
     $("#latitud").val(oldLat);
     $("#longitud").val(oldLng);
 }
-//initialize();
+
 
