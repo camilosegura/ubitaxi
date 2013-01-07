@@ -10,7 +10,7 @@
  *
  * @author camilo
  */
-class TPController extends CController {
+class TPController extends Controller {
 
     /**
      * @var string the default layout for the controller view. Defaults to '//layouts/column1',
@@ -29,11 +29,20 @@ class TPController extends CController {
      * for more details on how to specify this property.
      */
     public $breadcrumbs = array();
+    public $empresaId;
+    public $empresaNombre;
+    public $roles;
 
     //put your code here
     public function init() {
         Yii::app()->theme = 'taxisPrivados';
-
+        $this->roles = array_keys(Rights::getAssignedRoles(Yii::app()->user->Id));
+        Yii::app()->user->checkAccess('account');
+        if (Yii::app()->user->isSuperuser) {
+            $this->empresaId = 0;
+        } else {
+            
+        }                
         parent::init();
     }
 

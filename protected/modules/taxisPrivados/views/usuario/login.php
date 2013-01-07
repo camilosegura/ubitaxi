@@ -2,7 +2,7 @@
     <div class="span12">              
 
         <div class="form">
-            <?php echo CHtml::beginForm('', 'post', array('class'=> 'form-signin')); ?>
+            <?php echo CHtml::beginForm('', 'post', array('class'=> 'form-signin container-background')); ?>
             <h2>Ingrese</h2>
             <p class="note"><?php echo UserModule::t('Los campos con <span class="required">*</span> son obligatorios.'); ?></p>
 
