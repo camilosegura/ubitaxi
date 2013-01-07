@@ -14,17 +14,7 @@ body {
 
 .form-signin {
     width: 358px;    
-    padding-left: 58px;
-    padding-bottom: 20px;
-    margin: 0 auto 20px;
-    background-color: #fff;
-    border: 1px solid #e5e5e5;
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-    border-radius: 5px;
-    -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.05);
-    -moz-box-shadow: 0 1px 2px rgba(0,0,0,.05);
-    box-shadow: 0 1px 2px rgba(0,0,0,.05);
+    padding-left: 58px;    
 }
 .form-signin .form-signin-heading,
 .form-signin .checkbox {
@@ -42,4 +32,26 @@ body {
 }
 input[type="checkbox"] {
     width: auto;
+}
+.dropdown-menu.menu-down{
+    left: 0;
+    top: inherit;
+}
+#map_canvas{
+    height: 400px;
+}
+.container-background{
+    padding-bottom: 20px;
+    margin: 0 auto 20px;
+    background-color: #fff;
+    border: 1px solid #e5e5e5;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.05);
+    -moz-box-shadow: 0 1px 2px rgba(0,0,0,.05);
+    box-shadow: 0 1px 2px rgba(0,0,0,.05);
+}
+.main-wrapper{
+    padding: 20px;
 }

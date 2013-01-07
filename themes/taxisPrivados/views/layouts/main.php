@@ -18,32 +18,52 @@
     </head>
 
     <body>
-        
-        <header class="navbar navbar-inverse navbar-fixed-top">
-            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </a>
-            <!-- <img class="hidden-desktop" src="<?php echo Yii::app()->theme->getBaseUrl(); ?>/img/logo-photomd.png"> -->
-            <nav class="nav-collapse collapse span10 main-wrapper" id="main-menu">
-                <ul class="nav">
-                    <?php
-		$this->beginWidget('zii.widgets.CPortlet', array(
-			'title'=>'Operations',
-		));
-		$this->widget('zii.widgets.CMenu', array(
-			'items'=>$this->menu,
-			'htmlOptions'=>array('class'=>'operations'),
-		));
-		$this->endWidget();
-	?>
-                    
-                </ul>		       
-            </nav>
-        </header>
-        
-        <div id="wrapper" class="container main-wrapper">
+
+        <div class="navbar navbar-inverse navbar-fixed-top">
+            <div class="navbar-inner">
+                <div class="container">
+                    <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>           
+                    <!-- <a class="brand" href="./index.html">Mi Empresa</a> -->
+                    <nav class="nav-collapse collapse" id="main-menu">
+                        <?php
+                        
+                        $this->widget('zii.widgets.CMenu', array(
+                            'items' => array(
+                                array('label' => 'Inicio', 'url' => array('/taxisPrivados')),
+                                array('label' => 'Pedido', 'url' => array('#'), 'items' => array(
+                                        array('label' => 'Listar', 'url' => array('#')),
+                                        array('label' => 'Nuevo', 'url' => array('#'))
+                                    ), 'itemOptions'=>array('class'=>'dropdown-submenu'),
+                                ),
+                                array('label' => 'Usuarios', 'url' => array('#'), 'items' => array(
+                                        array('label' => 'Listar', 'url' => array('#')),
+                                        array('label' => 'Nuevo', 'url' => array('#'))
+                                    ), 'itemOptions'=>array('class'=>'dropdown-submenu'),
+                                ),
+                                array('label' => 'Empresas', 'url' => array('#'), 'items' => array(
+                                        array('label' => 'Listar', 'url' => array('#')),
+                                        array('label' => 'Nueva', 'url' => array('/taxisPrivados/empresa/nueva'))
+                                    ), 
+                                    'visible' => in_array("AdminOperador", $this->roles),
+                                    'itemOptions'=>array('class'=>'dropdown-submenu'),
+                                ),
+                                array('label' => 'Reportes', 'url' => array('#'), 'visible' => in_array("AdminOperador", $this->roles)),
+                                array('label' => 'Salir', 'url' => array('/user/logout')),
+                            ),
+                            'htmlOptions' => array('class' => 'nav'),
+                            'submenuHtmlOptions' => array('class' => 'dropdown-menu menu-down')
+                        ));
+                        ?>
+                    </nav>
+                </div>
+            </div>
+        </div>
+
+        <div id="wrapper" class="container main-wrapper container-background">
             <?php echo $content; ?>
         </div>
 
@@ -56,6 +76,6 @@
         <script src="<?php echo Yii::app()->baseUrl; ?>/js/jquery-1.8.3.min.js"></script>
         <script src="<?php echo Yii::app()->baseUrl; ?>/js/jquery-ui-1.9.2.custom.min.js"></script>
         <script src="<?php echo Yii::app()->theme->getBaseUrl(); ?>/js/bootstrap.min.js"></script>
-	<script src="<?php echo Yii::app()->theme->getBaseUrl(); ?>/js/main.js"></script>
+        <script src="<?php echo Yii::app()->theme->getBaseUrl(); ?>/js/main.js"></script>
     </body>
 </html>
