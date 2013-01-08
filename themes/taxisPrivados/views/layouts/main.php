@@ -30,33 +30,46 @@
                     <!-- <a class="brand" href="./index.html">Mi Empresa</a> -->
                     <nav class="nav-collapse collapse" id="main-menu">
                         <?php
-                        
-                        $this->widget('zii.widgets.CMenu', array(
-                            'items' => array(
-                                array('label' => 'Inicio', 'url' => array('/taxisPrivados')),
-                                array('label' => 'Pedido', 'url' => array('#'), 'items' => array(
-                                        array('label' => 'Listar', 'url' => array('#')),
-                                        array('label' => 'Nuevo', 'url' => array('#'))
-                                    ), 'itemOptions'=>array('class'=>'dropdown-submenu'),
+                        if (!Yii::app()->user->isGuest) {
+                            $this->widget('zii.widgets.CMenu', array(
+                                'items' => array(
+                                    array('label' => 'Inicio', 'url' => array('/taxisPrivados')),
+                                    array('label' => 'Pedido', 'url' => array('#'), 'items' => array(
+                                            array('label' => 'Listar', 'url' => array('#')),
+                                            array('label' => 'Nuevo', 'url' => array('#'))
+                                        ), 'itemOptions' => array('class' => 'dropdown-submenu first-level'),
+                                    ),
+                                    array('label' => 'Usuarios', 'url' => array('#'), 'items' => array(
+                                            array('label' => 'Listar', 'url' => array('#')),
+                                            array('label' => 'Nuevo', 'url' => array('#'), 'items' => array(
+                                                    array('label' => 'Pasajero', 'url' => array('/taxisPrivados/usuario/nuevoPasajero')),
+                                                    array('label' => 'Administrador Empresa', 'url' => array('/taxisPrivados/empresa/nueva')),
+                                                    array('label' => 'Conductor', 'url' => array('/taxisPrivados/usuario/nuevoConductor')),
+                                                ), 'itemOptions' => array('class' => 'dropdown-submenu')
+                                            )
+                                        ), 'itemOptions' => array('class' => 'dropdown-submenu first-level'),
+                                    ),
+                                    array('label' => 'Empresas', 'url' => array('#'), 'items' => array(
+                                            array('label' => 'Listar', 'url' => array('#')),
+                                            array('label' => 'Nueva', 'url' => array('/taxisPrivados/empresa/nueva'))
+                                        ),
+                                        'visible' => in_array("AdminOperador", $this->roles),
+                                        'itemOptions' => array('class' => 'dropdown-submenu first-level'),
+                                    ),
+                                    array('label' => 'Vehiculo', 'url' => array('#'), 'items' => array(
+                                            array('label' => 'Listar', 'url' => array('#')),
+                                            array('label' => 'Nuevo', 'url' => array('/taxisPrivados/vehiculo/nuevo'))
+                                        ),
+                                        'visible' => in_array("AdminOperador", $this->roles),
+                                        'itemOptions' => array('class' => 'dropdown-submenu first-level'),
+                                    ),
+                                    array('label' => 'Reportes', 'url' => array('#'), 'visible' => in_array("AdminOperador", $this->roles)),
+                                    array('label' => 'Salir', 'url' => array('/user/logout')),
                                 ),
-                                array('label' => 'Usuarios', 'url' => array('#'), 'items' => array(
-                                        array('label' => 'Listar', 'url' => array('#')),
-                                        array('label' => 'Nuevo', 'url' => array('#'))
-                                    ), 'itemOptions'=>array('class'=>'dropdown-submenu'),
-                                ),
-                                array('label' => 'Empresas', 'url' => array('#'), 'items' => array(
-                                        array('label' => 'Listar', 'url' => array('#')),
-                                        array('label' => 'Nueva', 'url' => array('/taxisPrivados/empresa/nueva'))
-                                    ), 
-                                    'visible' => in_array("AdminOperador", $this->roles),
-                                    'itemOptions'=>array('class'=>'dropdown-submenu'),
-                                ),
-                                array('label' => 'Reportes', 'url' => array('#'), 'visible' => in_array("AdminOperador", $this->roles)),
-                                array('label' => 'Salir', 'url' => array('/user/logout')),
-                            ),
-                            'htmlOptions' => array('class' => 'nav'),
-                            'submenuHtmlOptions' => array('class' => 'dropdown-menu menu-down')
-                        ));
+                                'htmlOptions' => array('class' => 'nav'),
+                                'submenuHtmlOptions' => array('class' => 'dropdown-menu')
+                            ));
+                        }
                         ?>
                     </nav>
                 </div>
