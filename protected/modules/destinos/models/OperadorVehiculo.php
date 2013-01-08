@@ -52,6 +52,7 @@ class OperadorVehiculo extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
+                    'vehiculo'=>array(self::BELONGS_TO, 'Vehiculo', 'id_vehiculo'),
 		);
 	}
 
