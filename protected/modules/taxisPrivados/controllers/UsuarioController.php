@@ -38,16 +38,114 @@ class UsuarioController extends TPController {
         }
     }
 
+    public function actionNuevoAdministrador() {
+        $model = new User;
+        $id = $this->nuevoUsuario();
+        if (is_int((int) $id)) {
+            $this->postNuevo($id);
+            Rights::assign("Empresa", $id);
+        } else {
+            $model->addErrors($id);
+        }
+        $this->render('nuevoAdministrador', array(
+            'model' => $model,
+            'empresas' => $this->empresas,
+        ));
+    }
+
+    public function actionNuevoPasajero() {
+        $model = new User;
+        $id = $this->nuevoUsuario();
+        if (is_int((int) $id)) {
+            $this->postNuevo($id);
+        } else {
+            $model->addErrors($id);
+        }
+        $this->render('nuevoPasajero', array(
+            'model' => $model,
+            'empresas' => $this->empresas,
+        ));
+    }
+
+    public function actionNuevoConductor() {
+        $vehiculo = array();
+        $model = new User;
+        $id = $this->nuevoUsuario();
+        if (is_int((int) $id)) {
+            $setVehiculo = new ConductorVehiculo;
+            $setVehiculo->id_conductor = $id;
+            $setVehiculo->id_vehiculo = $_POST['vehiculo'];
+            $setVehiculo->save();            
+        } else {
+            $model->addErrors($id);
+        }
+        $vehiculos = OperadorVehiculo::model()->with('vehiculo')->findAll('id_operador=:id_operador', array(':id_operador' => 1));
+        if (!empty($vehiculos)) {
+            foreach ($vehiculos as $key => $veh) {
+                $vehiculo[$veh->id_vehiculo] = $veh->vehiculo->placa;
+            }
+        }
+        $this->render('nuevoConductor', array(
+            'model' => $model,
+            'vehiculo' => $vehiculo,
+        ));
+    }
+
+    private function postNuevo($id) {
+        $pasajero = new EmpresaUsuario;
+        $pasajero->id_usuario = $id;
+        $pasajero->id_empresa = $_POST['empresa'];
+        $pasajero->save();
+
+        $direccion = new Direccion;
+        $direccion->id_user = $id;
+        $direccion->direccion = "{$_POST['direccionTexto']} {$_POST['direccionNumero']} {$_POST['direccionCompl']} {$_POST['ciudad']}";
+        $direccion->latitud = $_POST['latitud'];
+        $direccion->longitud = $_POST['longitud'];
+        $direccion->save();
+    }
+
+    private function nuevoUsuario() {
+        $model = new User;
+        if (isset($_POST['User'])) {
+            $usuario = User::model()->find('username=:username OR email=:email', array(':username' => $_POST['User']['username'], ':email' => $_POST['User']['email']));
+
+            if (is_null($usuario)) {
+                $model->username = $_POST['User']['username'];
+                $model->email = $_POST['User']['email'];
+                $model->superuser = 0;
+                $model->status = 1;
+                $model->activkey = UserModule::encrypting(microtime() . $model->password);
+
+                if ($model->validate()) {
+                    $model->password = UserModule::encrypting($model->password);
+                    if ($model->save()) {
+                        return $model->id;
+                    }
+                }
+            } else {
+                if ($usuario->username == $_POST['User']['username']) {
+                    $model->addError('username', 'Ya existe');
+                }
+                if ($usuario->username == $_POST['User']['email']) {
+                    $model->addError('email', 'Ya existe');
+                }
+            }
+        }
+
+        return $model->getErrors();
+    }
+
     // Uncomment the following methods and override them if needed
 
     public function filters() {
         // return the filter configuration for this controller, e.g.:
         return array(
-            'rights',/*
-            array(
-                'class' => 'path.to.FilterClass',
-                'propertyName' => 'propertyValue',
-            ),*/
+            'rights', /*
+                  array(
+                  'class' => 'path.to.FilterClass',
+                  'propertyName' => 'propertyValue',
+                  ), */
         );
     }
 
