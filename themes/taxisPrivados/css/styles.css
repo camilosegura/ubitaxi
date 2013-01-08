@@ -33,7 +33,7 @@ body {
 input[type="checkbox"] {
     width: auto;
 }
-.dropdown-menu.menu-down{
+ .first-level > .dropdown-menu{
     left: 0;
     top: inherit;
 }
