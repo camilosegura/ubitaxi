@@ -8,4 +8,5 @@
 <h1>Crear Empresa</h1>
 
 <?php echo $this->renderPartial('_formulario', array('model'=>$model)); ?>
+<?php echo $this->renderPartial('/default/_mapa'); ?>
 </div>

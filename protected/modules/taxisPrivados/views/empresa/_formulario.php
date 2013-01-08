@@ -53,4 +53,3 @@ JS
     <?php $this->endWidget(); ?>        
 
 </div><!-- form -->
-<div  id="map_canvas" class="span8"></div>
