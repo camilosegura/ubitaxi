@@ -36,6 +36,7 @@ return array(
         'ubi',
         'personal',
         'seguridad',
+        'taxisPrivados',
         'gii' => array(
             'class' => 'system.gii.GiiModule',
             'password' => '123456',
