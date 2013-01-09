@@ -42,6 +42,16 @@ JS
         <?php echo $form->textField($model, 'email', array('size' => 60, 'maxlength' => 128)); ?>
         <?php echo $form->error($model, 'email'); ?>
     </div>
+    <div >
+        <label for="Profile_firstname" class="required">Nombre <span class="required">*</span></label>
+        <input size="60" maxlength="50" name="Profile[firstname]" id="Profile_firstname" type="text" value="">
+        <div class="errorMessage" id="Profile_firstname_em_" style="display:none"></div>
+    </div>
+    <div >
+        <label for="Profile_lastname" class="required">Apellido <span class="required">*</span></label>
+        <input size="60" maxlength="50" name="Profile[lastname]" id="Profile_lastname" type="text" value="">
+        <div class="errorMessage" id="Profile_lastname_em_" style="display:none"></div>
+    </div>
     <div>
         <label for="direccionNumero" class="required">Dirección <span class="required">*</span></label>
         <div class="input-prepend">        
