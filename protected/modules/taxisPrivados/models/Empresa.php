@@ -52,6 +52,10 @@ class Empresa extends CActiveRecord
 		// class name for the relations automatically generated below.
 		return array(
                     'usuario' => array(self::HAS_MANY, 'EmpresaUsuario', 'id_empresa'),
+                    'usuarioPerfil' => array(self::HAS_MANY, 'Profile', array('id_usuario'=>'user_id'), 'through'=>'usuario'),
+                    'usuarioDireccion' => array(self::HAS_MANY, 'Direccion', array('id_usuario'=>'id_user'), 'through'=>'usuario'),
+                    'empresaDireccio' => array(self::HAS_MANY, 'EmpresaDireccion', 'id_empresa'),
+                    'direccion' => array(self::HAS_MANY, 'Direccion', array('id_direccion'=>'id'), 'through'=>'empresaDireccio'),
 		);
 	}
 
