@@ -75,7 +75,7 @@ class UsuarioController extends TPController {
             $setVehiculo = new ConductorVehiculo;
             $setVehiculo->id_conductor = $id;
             $setVehiculo->id_vehiculo = $_POST['vehiculo'];
-            $setVehiculo->save();            
+            $setVehiculo->save();
         } else {
             $model->addErrors($id);
         }
@@ -107,6 +107,7 @@ class UsuarioController extends TPController {
 
     private function nuevoUsuario() {
         $model = new User;
+        $profile = new Profile;
         if (isset($_POST['User'])) {
             $usuario = User::model()->find('username=:username OR email=:email', array(':username' => $_POST['User']['username'], ':email' => $_POST['User']['email']));
 
@@ -120,6 +121,14 @@ class UsuarioController extends TPController {
                 if ($model->validate()) {
                     $model->password = UserModule::encrypting($model->password);
                     if ($model->save()) {
+                        $profile->firstname = $_POST['Profile']['firstname'];
+                        $profile->lastname = $_POST['Profile']['lastname'];
+                        $profile->user_id = $model->id;
+                        $profile->nacimiento = '2000-00-01';
+                        $profile->celular = 0;
+                        $profile->ciudad = 'Bogotá';
+                        $profile->direccion = 'Bogota';
+                        $profile->save();                        
                         return $model->id;
                     }
                 }
