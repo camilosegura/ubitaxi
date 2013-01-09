@@ -187,4 +187,26 @@ class EmpresaController extends TPController {
         }
     }
 
+    public function actionUsuariosYDirecciones() {
+        $rsp = array();
+        if (isset($_GET['id'])) {
+            $usuarios = Empresa::model()->with('usuarioPerfil')->findAllByPk($_GET['id']);
+            
+            foreach ($usuarios[0]->usuarioPerfil as $key => $usuario) {
+                $rsp["usuario"][$usuario->user_id]['nombre'] = "{$usuario->firstname} {$usuario->lastname}";
+            }
+            
+            $usuariosDireccion = Empresa::model()->with('usuarioDireccion')->findAllByPk($_GET['id']);
+            foreach ($usuariosDireccion[0]->usuarioDireccion as $key => $direccion) {
+                $rsp["usuario"][$direccion->id_user]['direccion'][$direccion->id] = "{$direccion->direccion}";
+            }
+            
+            $direcciones = Empresa::model()->with('direccion')->findAllByPk($_GET['id']);
+            foreach ($direcciones[0]->direccion as $key => $direccion) {
+                $rsp["direccion"][$direccion->id] = "{$direccion->direccion}";
+            }
+            echo json_encode($rsp);
+        }
+    }
+
 }
