@@ -36,14 +36,14 @@
                                     array('label' => 'Inicio', 'url' => array('/taxisPrivados')),
                                     array('label' => 'Pedido', 'url' => array('#'), 'items' => array(
                                             array('label' => 'Listar', 'url' => array('#')),
-                                            array('label' => 'Nuevo', 'url' => array('#'))
+                                            array('label' => 'Nuevo', 'url' => array('/taxisPrivados/pedido/nuevo'))
                                         ), 'itemOptions' => array('class' => 'dropdown-submenu first-level'),
                                     ),
                                     array('label' => 'Usuarios', 'url' => array('#'), 'items' => array(
                                             array('label' => 'Listar', 'url' => array('#')),
                                             array('label' => 'Nuevo', 'url' => array('#'), 'items' => array(
                                                     array('label' => 'Pasajero', 'url' => array('/taxisPrivados/usuario/nuevoPasajero')),
-                                                    array('label' => 'Administrador Empresa', 'url' => array('/taxisPrivados/empresa/nueva')),
+                                                    array('label' => 'Administrador Empresa', 'url' => array('/taxisPrivados/usuario/nuevoAdministrador')),
                                                     array('label' => 'Conductor', 'url' => array('/taxisPrivados/usuario/nuevoConductor')),
                                                 ), 'itemOptions' => array('class' => 'dropdown-submenu')
                                             )
@@ -88,6 +88,7 @@
 
         <script src="<?php echo Yii::app()->baseUrl; ?>/js/jquery-1.8.3.min.js"></script>
         <script src="<?php echo Yii::app()->baseUrl; ?>/js/jquery-ui-1.9.2.custom.min.js"></script>
+        <script src="<?php echo Yii::app()->baseUrl; ?>/js/jquery-ui-timepicker-addon.js"></script>
         <script src="<?php echo Yii::app()->theme->getBaseUrl(); ?>/js/bootstrap.min.js"></script>
         <script src="<?php echo Yii::app()->theme->getBaseUrl(); ?>/js/main.js"></script>
     </body>
