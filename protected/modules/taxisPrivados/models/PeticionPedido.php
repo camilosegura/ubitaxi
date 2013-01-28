@@ -1,24 +1,19 @@
 <?php
 
 /**
- * This is the model class for table "{{empresa_pedido}}".
+ * This is the model class for table "{{peticion_pedido}}".
  *
- * The followings are the available columns in table '{{empresa_pedido}}':
+ * The followings are the available columns in table '{{peticion_pedido}}':
  * @property integer $id
- * @property integer $id_empresa
  * @property integer $id_pedido
- * @property integer $personas
- * @property integer $destinos
- * @property string $hora_inicio
- * @property string $direcciones
- * @property integer $personas_vehiculo
+ * @property integer $id_peticion
  */
-class EmpresaPedido extends CActiveRecord
+class PeticionPedido extends CActiveRecord
 {
 	/**
 	 * Returns the static model of the specified AR class.
 	 * @param string $className active record class name.
-	 * @return EmpresaPedido the static model class
+	 * @return PeticionPedido the static model class
 	 */
 	public static function model($className=__CLASS__)
 	{
@@ -30,7 +25,7 @@ class EmpresaPedido extends CActiveRecord
 	 */
 	public function tableName()
 	{
-		return '{{empresa_pedido}}';
+		return '{{peticion_pedido}}';
 	}
 
 	/**
@@ -41,12 +36,11 @@ class EmpresaPedido extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('id_empresa, id_pedido, personas, destinos, hora_inicio, direcciones', 'required'),
-			array('id_empresa, id_pedido, personas, destinos, personas_vehiculo', 'numerical', 'integerOnly'=>true),
-			array('direcciones', 'length', 'max'=>255),
+			array('id_pedido, id_peticion', 'required'),
+			array('id_pedido, id_peticion', 'numerical', 'integerOnly'=>true),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('id, id_empresa, id_pedido, personas, destinos, hora_inicio, direcciones, personas_vehiculo', 'safe', 'on'=>'search'),
+			array('id, id_pedido, id_peticion', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -68,13 +62,8 @@ class EmpresaPedido extends CActiveRecord
 	{
 		return array(
 			'id' => 'ID',
-			'id_empresa' => 'Id Empresa',
 			'id_pedido' => 'Id Pedido',
-			'personas' => 'Personas',
-			'destinos' => 'Destinos',
-			'hora_inicio' => 'Hora Inicio',
-			'direcciones' => 'Direcciones',
-			'personas_vehiculo' => 'Personas Vehiculo',
+			'id_peticion' => 'Id Peticion',
 		);
 	}
 
@@ -90,13 +79,8 @@ class EmpresaPedido extends CActiveRecord
 		$criteria=new CDbCriteria;
 
 		$criteria->compare('id',$this->id);
-		$criteria->compare('id_empresa',$this->id_empresa);
 		$criteria->compare('id_pedido',$this->id_pedido);
-		$criteria->compare('personas',$this->personas);
-		$criteria->compare('destinos',$this->destinos);
-		$criteria->compare('hora_inicio',$this->hora_inicio,true);
-		$criteria->compare('direcciones',$this->direcciones,true);
-		$criteria->compare('personas_vehiculo',$this->personas_vehiculo);
+		$criteria->compare('id_peticion',$this->id_peticion);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
