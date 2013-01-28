@@ -13,8 +13,11 @@ class PeticionController extends TPController {
      */
     public function filters() {
         return array(
-            'accessControl', // perform access control for CRUD operations
-            'postOnly + delete', // we only allow deletion via POST request
+            'rights', /*
+                  'accessControl', // perform access control for CRUD operations
+                  'postOnly + delete', // we only allow deletion via POST request
+                 * 
+                 */
         );
     }
 
@@ -75,20 +78,84 @@ class PeticionController extends TPController {
     }
 
     public function actionNuevo() {
-        $model = new Peticion;
+        $hasPedido['success'] = false;
+        if (isset($_POST['empresa'])) {
+            $direccion = Direccion::model()->findByPk($_POST['direccionSalida']);
 
-        // Uncomment the following line if AJAX validation is needed
-        // $this->performAjaxValidation($model);
+            $peticion = new Peticion;
+            $peticion->hora_empresa = $_POST['horaEmpresa'];
+            $peticion->id_empresa = $_POST['empresa'];
+            $peticion->estado = 0;
+            $peticion->sentido = $_POST['sentido'];
+            $peticion->observaciones = $_POST['observaciones'];
+            $peticion->time = date("Y-m-d H:i:s");
+            $peticion->id_usuario = Yii::app()->user->id;
 
-        if (isset($_POST['Peticion'])) {
-            $model->attributes = $_POST['Peticion'];
-            if ($model->save())
-                $this->redirect(array('view', 'id' => $model->id));
+            if ($peticion->save()) {
+                $this->nuevoDireccion($_POST['direccionEmpresa'], $peticion->id, 1);
+                $this->nuevoDireccion($_POST['pasajeros'], $peticion->id, 0);
+                $hasPeticion['success'] = true;
+                $hasPeticion['id'] = $peticion->id;
+            }
         }
+        $this->render('nuevo', array(
+            'empresas' => $this->empresas,
+            'peticion' => $hasPeticion)
+        );
+    }
 
-        $this->render('create', array(
-            'model' => $model,
-        ));
+    public function actionVer() {
+        
+    }
+
+    public function actionEditar() {
+        if (isset($_GET['id'])) {
+            $peticion = Peticion::model()->with('peticionDireccion', 'direcciones', 'empresa', 'reservas')->findByPk($_GET['id']);
+            if (!is_null($peticion)) {
+                foreach ($peticion->direcciones as $key => $direccion) {
+                    if ($direccion->id_user == '0') {
+                        $empresaDir[$direccion->id] = $direccion->direccion;
+                    } else {
+                        $pasajeroDir[$direccion->id] = $direccion->direccion;
+                    }
+                }
+                foreach ($peticion->reservas as $key => $reserva) {
+
+                    $pedidos[$reserva->id_pedido]['inicio'] = $reserva->hora_inicio;
+                    $pedidos[$reserva->id_pedido]['fin'] = $reserva->hora_fin;
+                    $pedidos[$reserva->id_pedido]['idVehiculo'] = $reserva->id_vehiculo;
+                    $vehiculo = Vehiculo::model()->findByPk($reserva->id_vehiculo);
+                    $pedidos[$reserva->id_pedido]['placaVehiculo'] = $vehiculo->placa;
+                    $direccionesPedido = PedidoReserva::model()->with('direccionesCompletas')->find('t.id_pedido=:id_pedido', array(':id_pedido' => $reserva->id_pedido));
+
+                    foreach ($direccionesPedido->direccionesCompletas as $key => $direccion) {
+
+                        if ($direccion->id_user == '0') {
+                            $pedidos[$reserva->id_pedido]['empresaDir'][$direccion->id] = $direccion->direccion;
+                        } else {
+                            $pedidos[$reserva->id_pedido]['pasajeroDir'][$direccion->id] = $direccion->direccion;
+                            unset($pasajeroDir[$direccion->id]);
+                        }
+                    }
+                }
+                $this->render('editar', array(
+                    'peticion' => $peticion,
+                    'empresaDir' => $empresaDir,
+                    'pasajeroDir' => $pasajeroDir,
+                    'pedidos' => $pedidos)
+                );
+            }
+        }
+    }
+
+    private function nuevoDireccion($direcciones, $idPeticion, $tipo) {
+        foreach ($direcciones as $key => $idDireccion) {
+            $peticionDireccion = new PeticionDireccion;
+            $peticionDireccion->id_direccion = $idDireccion;
+            $peticionDireccion->id_peticion = $idPeticion;
+            $peticionDireccion->tipo = $tipo;
+            $peticionDireccion->save();
+        }
     }
 
     /**
