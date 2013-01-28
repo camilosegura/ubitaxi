@@ -41,23 +41,27 @@ class UsuarioController extends Controller {
                 $rsp[] = $dir->attributes;
             }
             $rsp['success'] = true;
-        }else{
+        } else {
             $rsp['success'] = false;
         }
         echo json_encode($rsp);
     }
 
     public function actionHistorial() {
+        $rsp = array();
         $historial = Pedido::model()->with('finalizado')->findAll(
                 "id_pasajero=:id_pasajero AND borrado = 0", array(':id_pasajero' => Yii::app()->user->id));
-        rsort($historial);
-        $rsp = array();
-        foreach ($historial as $key => $direcciones) {
-            $rsp[$key]["origen"] = $direcciones->direccion_origen;
-            $rsp[$key]["destino"] = $direcciones->finalizado->direccion_destino;
-            $rsp[$key]["id"] = $direcciones->id;
+        if (!empty($direccion)) {
+            rsort($historial);
+            foreach ($historial as $key => $direcciones) {
+                $rsp[$key]["origen"] = $direcciones->direccion_origen;
+                $rsp[$key]["destino"] = $direcciones->finalizado->direccion_destino;
+                $rsp[$key]["id"] = $direcciones->id;
+            }
+            $rsp["success"] = true;
+        } else {
+            $rsp["success"] = false;
         }
-
         echo json_encode($rsp);
     }
 
@@ -209,6 +213,9 @@ class UsuarioController extends Controller {
                         echo json_encode($rsp);
                         exit();
                     }
+                }  else {
+                    //$p =Yii::app()->getModule('user')->encrypting($_GET['password']);
+                    $rsp["msg"] .= "Nombre de usuario, contraseña o vehiculo invalido";
                 }
             }
             // display the login form
@@ -320,7 +327,7 @@ class UsuarioController extends Controller {
 
     public function actionGetDireccionActiva() {
         $direccion = Direccion::model()->findAll("id_user=:id_user", array(":id_user" => Yii::app()->user->id));
-        if (is_array($direccion)) {
+        if (!empty($direccion)) {
             $rsp["success"] = true;
             foreach ($direccion as $key => $dir) {
                 $rsp["direccion"][] = $dir->attributes;
@@ -458,9 +465,14 @@ class UsuarioController extends Controller {
     public function actionGetPedido() {
         if (isset($_GET["est"]) && $_GET["est"] == "activo") {
             $pedido = Pedido::model()->findAll("(id_estado = 0 OR id_estado = 1) AND id_pasajero=:id_pasajero", array(':id_pasajero' => Yii::app()->user->id));
-            rsort($pedido);
-            foreach ($pedido as $key => $ped) {
-                $rsp[] = $ped->attributes;
+            if (!empty($pedido)) {
+                rsort($pedido);
+                foreach ($pedido as $key => $ped) {
+                    $rsp[] = $ped->attributes;
+                }
+                $rsp["success"] = true;
+            }else{
+                $rsp["success"] = false;
             }
             echo json_encode($rsp);
         }
