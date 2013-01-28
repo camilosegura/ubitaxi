@@ -53,6 +53,28 @@ class UsuarioController extends TPController {
         ));
     }
 
+    public function actionNuevoCoordinador() {
+        $model = new User;
+        $empresas = array();
+        $id = $this->nuevoUsuario();
+        if (is_int((int) $id)) {
+            foreach ($_POST['empresa'] as $key => $idEmpresa) {
+                $this->setEmpresaUsuario($id, $idEmpresa);
+            }
+            Rights::assign("CoordinadorOperador", $id);
+        } else {
+            $model->addErrors($id);
+        }
+        $empresa = Empresa::model()->findAll();
+        foreach ($empresa as $key => $emp) {
+            $empresas[$emp->id] = $emp->nombre;
+        }
+        $this->render('nuevoCoordinador', array(
+            'model' => $model,
+            'empresas' => $empresas,
+        ));
+    }
+
     public function actionNuevoPasajero() {
         $model = new User;
         $id = $this->nuevoUsuario();
@@ -76,6 +98,12 @@ class UsuarioController extends TPController {
             $setVehiculo->id_conductor = $id;
             $setVehiculo->id_vehiculo = $_POST['vehiculo'];
             $setVehiculo->save();
+            
+            $currentVehiculo = Vehiculo::model()->findByPk($_POST['vehiculo']);
+            $currentVehiculo->id_conductor = $id;
+            $currentVehiculo->save();
+
+            Rights::assign("Chofer", $id);
         } else {
             $model->addErrors($id);
         }
@@ -92,10 +120,7 @@ class UsuarioController extends TPController {
     }
 
     private function postNuevo($id) {
-        $pasajero = new EmpresaUsuario;
-        $pasajero->id_usuario = $id;
-        $pasajero->id_empresa = $_POST['empresa'];
-        $pasajero->save();
+        $this->setEmpresaUsuario($id, $_POST['empresa']);
 
         $direccion = new Direccion;
         $direccion->id_user = $id;
@@ -103,6 +128,13 @@ class UsuarioController extends TPController {
         $direccion->latitud = $_POST['latitud'];
         $direccion->longitud = $_POST['longitud'];
         $direccion->save();
+    }
+
+    private function setEmpresaUsuario($idUser, $idEmpresa) {
+        $pasajero = new EmpresaUsuario;
+        $pasajero->id_usuario = $idUser;
+        $pasajero->id_empresa = $idEmpresa;
+        $pasajero->save();
     }
 
     private function nuevoUsuario() {
@@ -116,10 +148,10 @@ class UsuarioController extends TPController {
                 $model->email = $_POST['User']['email'];
                 $model->superuser = 0;
                 $model->status = 1;
-                $model->activkey = UserModule::encrypting(microtime() . $model->password);
+                $model->activkey = UserModule::encrypting(microtime() . $_POST['User']['password']);
 
                 if ($model->validate()) {
-                    $model->password = UserModule::encrypting($model->password);
+                    $model->password = UserModule::encrypting($_POST['User']['password']);
                     if ($model->save()) {
                         $profile->firstname = $_POST['Profile']['firstname'];
                         $profile->lastname = $_POST['Profile']['lastname'];
@@ -128,7 +160,7 @@ class UsuarioController extends TPController {
                         $profile->celular = 0;
                         $profile->ciudad = 'Bogotá';
                         $profile->direccion = 'Bogota';
-                        $profile->save();                        
+                        $profile->save();
                         return $model->id;
                     }
                 }
