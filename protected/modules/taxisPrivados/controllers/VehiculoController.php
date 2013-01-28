@@ -146,6 +146,24 @@ class VehiculoController extends TPController {
             'model' => $model,
         ));
     }
+    
+    public function actionLibres() {
+        $vehiculos = Vehiculo::model()->findAll('id NOT IN (SELECT id_vehiculo FROM tbl_pedido_reserva WHERE 
+            (hora_inicio > :hora_inicio AND hora_inicio < :hora_fin) OR 
+            (hora_fin > :hora_inicio AND hora_fin < :hora_fin) OR 
+            (hora_inicio < :hora_inicio AND hora_fin > :hora_fin))', 
+                array(':hora_inicio'=> $_GET['horaInicio'], ':hora_fin'=>$_GET['horaFin']));
+        $rsp = array();
+        if(count($vehiculos)){
+            $rsp['success'] = true;
+            foreach ($vehiculos as $key => $vehiculo) {
+                $rsp['libres'][$vehiculo->id] = $vehiculo->placa;
+            }
+        }else{
+            $rsp['success'] = false;
+        }
+        echo json_encode($rsp);
+    }
 
     /**
      * Returns the data model based on the primary key given in the GET variable.
