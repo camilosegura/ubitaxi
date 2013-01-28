@@ -25,5 +25,19 @@
 	<?php echo CHtml::encode($data->estado); ?>
 	<br />
 
+	<b><?php echo CHtml::encode($data->getAttributeLabel('sentido')); ?>:</b>
+	<?php echo CHtml::encode($data->sentido); ?>
+	<br />
+
+	<b><?php echo CHtml::encode($data->getAttributeLabel('observaciones')); ?>:</b>
+	<?php echo CHtml::encode($data->observaciones); ?>
+	<br />
+
+	<?php /*
+	<b><?php echo CHtml::encode($data->getAttributeLabel('id_usuario')); ?>:</b>
+	<?php echo CHtml::encode($data->id_usuario); ?>
+	<br />
+
+	*/ ?>
 
 </div>

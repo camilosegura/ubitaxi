@@ -39,6 +39,24 @@
 		<?php echo $form->error($model,'estado'); ?>
 	</div>
 
+	<div class="row">
+		<?php echo $form->labelEx($model,'sentido'); ?>
+		<?php echo $form->textField($model,'sentido'); ?>
+		<?php echo $form->error($model,'sentido'); ?>
+	</div>
+
+	<div class="row">
+		<?php echo $form->labelEx($model,'observaciones'); ?>
+		<?php echo $form->textArea($model,'observaciones',array('rows'=>6, 'cols'=>50)); ?>
+		<?php echo $form->error($model,'observaciones'); ?>
+	</div>
+
+	<div class="row">
+		<?php echo $form->labelEx($model,'id_usuario'); ?>
+		<?php echo $form->textField($model,'id_usuario'); ?>
+		<?php echo $form->error($model,'id_usuario'); ?>
+	</div>
+
 	<div class="row buttons">
 		<?php echo CHtml::submitButton($model->isNewRecord ? 'Create' : 'Save'); ?>
 	</div>

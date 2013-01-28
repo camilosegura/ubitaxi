@@ -26,5 +26,8 @@ $this->menu=array(
 		'hora_empresa',
 		'id_empresa',
 		'estado',
+		'sentido',
+		'observaciones',
+		'id_usuario',
 	),
 )); ?>

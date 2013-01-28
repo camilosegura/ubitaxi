@@ -50,40 +50,55 @@ JS
         , CClientScript::POS_READY);
 ?>
 
+<div class="row">
+    <h1>Crear Pedido</h1>
+    <div class="form span4">
+        <?php echo CHtml::beginForm(); ?>
 
-<h1>Crear Pedido</h1>
-<div class="form">
-    <?php echo CHtml::beginForm(); ?>
+        <div>
+            <?php echo CHtml::label('Empresa', 'empresa') ?>
+            <?php echo CHtml::dropDownList('empresa', '', $empresas); ?>            
+        </div>
 
-    <div>
-        <?php echo CHtml::label('Empresa', 'empresa') ?>
-        <?php echo CHtml::dropDownList('empresa', '', $empresas); ?>            
-    </div>
+        <div >
+            <?php echo CHtml::label('Dirección de salida', 'direccionSalida'); ?>
+            <?php echo CHtml::dropDownList('direccionSalida', '', array()) ?>
+        </div> 
+        <div >
+            <?php echo CHtml::label('Pasajeros', 'pasajeros'); ?>
+            <?php echo CHtml::dropDownList('pasajeros[]', '', array(), array('multiple' => 'multiple')) ?>
+        </div>
 
-    <div >
-        <?php echo CHtml::label('Dirección de salida', 'direccionSalida'); ?>
-        <?php echo CHtml::dropDownList('direccionSalida', '', array()) ?>
-    </div> 
-    <div >
-        <?php echo CHtml::label('Pasajeros', 'pasajeros'); ?>
-        <?php echo CHtml::dropDownList('pasajeros[]', '', array(), array('multiple' => 'multiple')) ?>
-    </div>
+        <div class="rememberMe">
+            <?php echo CHtml::label('Número de pasajeros', 'numPasajeros'); ?>
+            <?php echo CHtml::textField('numPasajeros', '', array('readonly' => 'readonly')) ?>
+        </div>
+        <div>
+            <?php echo CHtml::label('Número de destinos', 'numDestinos'); ?>
+            <?php echo CHtml::tag('input', array('type' => 'number', 'name' => 'numDestinos', 'id' => 'numDestinos')) ?>
+        </div>
+        <div>
+            <?php echo CHtml::label('Hora de salida', 'horaSalida'); ?>
+            <?php echo CHtml::textField('horaSalida') ?>
+        </div>
+        <div class="row submit">
+            <?php echo CHtml::submitButton('Pedir'); ?>
+        </div>
 
-    <div class="rememberMe">
-        <?php echo CHtml::label('Número de pasajeros', 'numPasajeros'); ?>
-        <?php echo CHtml::textField('numPasajeros', '', array('readonly' => 'readonly')) ?>
+        <?php echo CHtml::endForm(); ?>
+    </div><!-- form -->
+    <div class="span8">
+        <?php if($pedido["success"]){?>
+        <div class="alert alert-info">
+            <button type="button" class="close" data-dismiss="alert">×</button>
+            <p><strong>Se ha hecho un pedido!</strong> En el siguiente enlace podra hacer seguimiento al su pedido.</p>
+            <a href="<?php echo $this->createUrl('/taxisPrivados/pedido/ver', array('id'=>$pedido['id'])); ?>" class="btn btn-primary">Ver estado del pedido</a>
+        </div>
+        <?php } ?>
+        <p>
+            <a href="/taxisPrivados/usuario/nuevoPasajero.html" class="btn btn-primary">Nuevo pasajero</a>
+            <a href="#" class="btn btn-primary">Nueva dirección</a>
+        </p>
+        
     </div>
-    <div>
-        <?php echo CHtml::label('Número de destinos', 'numDestinos'); ?>
-        <?php echo CHtml::tag('input', array('type' => 'number', 'name' => 'numDestinos', 'id' => 'numDestinos')) ?>
-    </div>
-    <div>
-        <?php echo CHtml::label('Hora de salida', 'horaSalida'); ?>
-        <?php echo CHtml::textField('horaSalida') ?>
-    </div>
-    <div class="row submit">
-        <?php echo CHtml::submitButton('Pedir'); ?>
-    </div>
-
-    <?php echo CHtml::endForm(); ?>
-</div><!-- form -->
+</div>
