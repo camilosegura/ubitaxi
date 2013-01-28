@@ -21,7 +21,9 @@ class VehiculoController extends Controller {
             'rights'
         );
     }
-
+    public function allowedActions() {
+        return 'getid';
+    }
     /**
      * Specifies the access control rules.
      * This method is used by the 'accessControl' filter.
@@ -162,7 +164,12 @@ class VehiculoController extends Controller {
             'condition' => 'id_telefono=:id_telefono',
             'params' => array(':id_telefono' => $id_telefono),
                 ));
-        $rsp["id"] = $model->id;
+        if(is_null($model)){
+            $rsp['success'] = false;
+        }else{
+            $rsp['success'] = true;
+            $rsp["id"] = $model->id;
+        }                   
         echo json_encode($rsp);
     }
 
