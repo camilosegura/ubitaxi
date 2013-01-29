@@ -65,15 +65,13 @@ function onDeviceReady() {
     getIdVehiculo();
     logout();
 }
-
-
 $(document).bind("mobileinit", function() {
     $.mobile.ignoreContentEnabled = true;
     $.mobile.pushStateEnabled = false;
     $.mobile.buttonMarkup.hoverDelay = 0;
 });
 
-$(document).bind('pageinit', function() {    
+$(document).bind('pageinit', function() {
     $("#loginForm").on("submit", handleLogin);
 });
 $(window).resize(function() {
@@ -88,18 +86,19 @@ control.live("pageshow", function() {
     directionsDisplay.setOptions({suppressMarkers: true});
     layer = new google.maps.TrafficLayer();
     layer.setMap(map);
-    getLastState();
+    getLastState();/*-------------------------------------------------------------*/
 });
 control.live("pageinit", function() {
     controlContent = $('#controlContent');
     mapCanvas = $('#map_canvas');
-    buttonEvent();
+    buttonEvent();/*-------------------------------------------------------------*/
     setControlHeight();
+    setInterval(getPedido, 5000);
 });
 function setControlHeight() {
     controlContent.height($(window).height() - 42);
 }
-function getLastState() {
+function getLastState() {/*-------------------------------------------------------------*/
     if (idVehiculo == 0) {
         if (lastStateInterval == "") {
             lastStateInterval = setInterval(getLastState, 2000);
@@ -109,16 +108,8 @@ function getLastState() {
         var data = {
             idv: idVehiculo
         };
-        /*
-         $.ajax({
-         url: url,
-         data: data
-         }).done(function(msj) { 
-         navigator.notification.alert(msj, function() {}, "Tiene un pedido", "Aceptar");		
-         });
-         */
-        $.getJSON(url, data, function(rsp) {
 
+        $.getJSON(url, data, function(rsp) {
 
             if (rsp.success) {
                 if (rsp.vehiculo.id_pedido != 0) {
@@ -152,7 +143,6 @@ function getLastState() {
         clearInterval(lastStateInterval);
     }
 }
-
 function mapRefresh() {
 
     origin = new google.maps.LatLng(oldLat, oldLng);
@@ -194,7 +184,7 @@ function markerDestinos() {
         mapCanvas.gmap('addMarker', {'position': home, 'icon': casaIcon});
     });
 }
-function sendIdTelefono(idtelefono) {
+function sendIdTelefono(idtelefono) {/*-------------------------------------------------------------*/
     navigator.notification.alert(idtelefono, function() {
     });
     idTelefono = idtelefono;
@@ -229,23 +219,15 @@ function handleLogin() {
             password: userpass,
             idTel: idTelefono
         };
-        /*
-         $.ajax({
-         url: url,
-         data: data
-         }).done(function(msj) { 
-         navigator.notification.alert(msj, function() {}, "Tiene un pedido", "Aceptar");		
-         });
-         */
 
         $.getJSON(url, data, function(rsp) {
             sbutton.css('display', 'block');
             if (rsp.success) {
-                //navigator.notification.alert(rsp.success, function() {});
                 login = true;
-                $.mobile.changePage('#control', {transition: "slideup"});
+                $.mobile.changePage('#control');
             } else {
-                navigator.notification.alert(rsp.msg, function() {}, 'Error de Ingreso', 'Volver a intentar');
+                navigator.notification.alert(rsp.msg, function() {
+                }, 'Error de Ingreso', 'Volver a intentar');
             }
         });
 
@@ -280,7 +262,7 @@ Locator.prototype.sendLocation = function(lat, lng, alt, speed, time) {
     difLat = Math.abs(lat - oldLat);
     difLng = Math.abs(lng - oldLng);
     //if(difLat > 0.00001 || difLng > 0.00001){
-    
+
     var url = "http://ubitaxi.argesys.co/destinos/default/savepos.html";
     var seguimiento = {
         latitud: lat,
@@ -302,9 +284,6 @@ Locator.prototype.sendLocation = function(lat, lng, alt, speed, time) {
     //}
 };
 
-Locator.prototype.send = function() {
-    $("#testlayer").text("dd");
-};
 
 window.locator = new Locator();
 
@@ -312,47 +291,109 @@ function getIdVehiculo() {
     var url = "http://ubitaxi.argesys.co/destinos/vehiculo/getid.html";
     var data = {
         id_telefono: idTelefono
-    };    
-    
+    };
+
     $.getJSON(url, data, function(rsp) {
-        
-    	if(rsp.success){
+
+        if (rsp.success) {
             idVehiculo = rsp.id;
-        }else{
-            navigator.notification.alert("Por favor registre este dispositivo.  UUID:"+idTelefono, function() {}, 'Terminal sin registrar', 'Aceptar');
-        }        
+        } else {
+            navigator.notification.alert("Por favor registre este dispositivo.  UUID:" + idTelefono, function() {
+            }, 'Terminal sin registrar', 'Aceptar');
+        }
     });
 }
 
-setInterval(getPedido, 5000);
 
-function getPedido() {
-    //navigator.notification.alert(estado+" "+idVehiculo+" "+pendiente, function() {}, "Tiene un pedido", "Aceptar");
-    if (estado == 0 && idVehiculo != 0 && pendiente == 0) {
-        var url = 'http://ubitaxi.argesys.co/destinos/vehiculo/getPedido.html';
-        var data = {
-            id_vehiculo: idVehiculo
-        };
-        $.getJSON(url, data, function(rsp) {
-            //navigator.notification.alert(rsp.msg, function() {}, "Tiene un pedido", "Aceptar");
-            if (rsp.id_pedido != 0) {
-                //navigator.notification.alert(rsp.p_do, aceptarPedido, "Tiene un pedido", "Aceptar");
-                $("#popConfTiempo p").html(rsp.p_do);
-                $("#popConfTiempo").popup('open');
-                $("#aceptarPedido").click(aceptarPedido);
-                speak("Tiene un pedido");
-                idPedido = rsp.id_pedido;
-                pendiente = 1;
-            } else {
-                //$("#testlayer").html("id pedido "+idPedido);               
-            }
-        });
-    } else if (pendiente == 1) {
-        speak("Tiene un pedido");
-    }
+function getPedido() {/*-------------------------------------------------------------*/
+    //navigator.notification.alert("sss", function() {}, "Tiene un pedido", "Aceptar");
+    var url = 'http://ubitaxi.argesys.co/taxisPrivados/pedido/getReservasVehiculo.html';
+    var data = {
+        id_vehiculo: idVehiculo
+    };
+
+    $.getJSON(url, data, function(rsp) {
+        if (rsp.success) {
+            var botonPedido = '';
+            var popupPedido = '';
+            var listEmpresaDir = '';
+            var listPasajeroDir = '';
+            var selectoresCont = '';
+            var selectoresPanel = '';
+            $.each(rsp.pedidos, function(id, pedido) {
+                selectoresCont += '#panelPedido-' + id + '-popup,';
+                selectoresPanel += '#panelPedido-' + id + ',';
+                botonPedido += '<a href="#panelPedido-' + id + '" data-role="button" data-rel="popup">' + pedido.inicio + '</a>';
+                popupPedido += '<div data-role="popup" id="panelPedido-' + id + '" data-corners="false" data-theme="none" data-shadow="false" data-tolerance="0,0">';
+                listPasajeroDir = '';
+                $.each(pedido.pasajeroDir, function(idDir, direccion) {
+                    listPasajeroDir += '<input type="checkbox" name="checkbox-' + idDir + '" id="checkbox-' + idDir + '" class="custom" />';
+                    listPasajeroDir += '<label for="checkbox-' + idDir + '">' + direccion.direccion + '<br>' + direccion.nombre_pasajero + '</label>';
+                });
+                listEmpresaDir = '';
+                $.each(pedido.empresaDir, function(idDir, direccion) {
+                    if (pedido.sentido == '0') {
+                        listEmpresaDir += '<li>' + direccion.direccion + '<br>'+pedido.inicio+'</li>';
+                    }else{
+                        listEmpresaDir += '<li>' + direccion.direccion + '<br>'+pedido.fin+'</li>';
+                    }
+                });
+
+                if (pedido.sentido == '0') {
+                    popupPedido += '<div class="pedidoDirCont"><h3>Inicio recorrido</h3>';
+                    popupPedido += '<ul data-role="listview" data-inset="true">';
+                    popupPedido += listEmpresaDir;
+                    popupPedido += '</ul></div>';
+                    popupPedido += '<div class="pedidoDirCont"><h3>Fin recorrido</h3>';
+                    popupPedido += '<fieldset data-role="controlgroup">';
+                    popupPedido += listPasajeroDir;
+                    popupPedido += '</fieldset></div>';
+                } else {
+                    popupPedido += '<div class="pedidoDirCont"><h3>Inicio recorrido</h3>';
+                    popupPedido += '<fieldset data-role="controlgroup">';
+                    popupPedido += listPasajeroDir;
+                    popupPedido += '</fieldset></div>';
+                    popupPedido += '<div class="pedidoDirCont"><h3>Fin recorrido</h3>';
+                    popupPedido += '<ul data-role="listview" data-inset="true">';
+                    popupPedido += listEmpresaDir;
+                    popupPedido += '</ul></div>';
+                }
+                popupPedido += '<div style="clear:both;"></div>';
+                popupPedido += '</div>';
+
+            });
+            $('#panelPedidos').html(botonPedido);
+            $('#panelPedidos').trigger("create");
+            $('#panelPedido').html(popupPedido);
+            $('#panelPedido').trigger("create");
+
+
+            selectoresCont = selectoresCont.substring(0, selectoresCont.length - 1);
+            selectoresPanel = selectoresPanel.substring(0, selectoresPanel.length - 1);
+            $(selectoresCont).css({
+                'left': '0 !important'
+            });
+            $(selectoresPanel).css({
+                'width': '108%',
+                'border': '1px solid #000',
+                'border-right': 'none',
+                'background': 'rgba(0,0,0,.5)',
+                'margin': '-1px 0'});
+            $(selectoresPanel).on({
+                popupbeforeposition: function() {
+                    var h = $(window).height();
+
+                    $(selectoresPanel).css("height", h);
+                }
+            });
+        } else {
+            //$("#testlayer").html("id pedido "+idPedido);               
+        }
+    });
+
 }
 
-function aceptarPedido() {
+function aceptarPedido() {/*-------------------------------------------------------------*/
     var url = 'http://ubitaxi.argesys.co/taxisPrivados/pedido/aceptar';
     var data = {
         id_vehiculo: idVehiculo,
@@ -399,7 +440,7 @@ function getMensaje() {
         }
     });
 }
-function buttonEvent() {
+function buttonEvent() {/*-------------------------------------------------------------*/
     var estados = $('#estado');
     $('#salir').click(function() {
         logout();
@@ -526,7 +567,7 @@ function buttonEvent() {
         }
     });
 }
-function handleRevGeocoder(point, idPedido) {
+function handleRevGeocoder(point, idPedido) {/*-------------------------------------------------------------*/
     (new google.maps.Geocoder()).geocode({
         latLng: point
     }, function(resp) {
