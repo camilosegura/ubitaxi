@@ -105,32 +105,32 @@ class PedidoController extends TPController {
             } else {
                 $pedidoReserva->hora_inicio = $_GET['fin'];
             }
-            if ($pedidoReserva->save()) {                
-                PedidoDireccion::model()->deleteAll('id_pedido=:id_pedido', array(':id_pedido'=>$_GET['id']));
+            if ($pedidoReserva->save()) {
+                PedidoDireccion::model()->deleteAll('id_pedido=:id_pedido', array(':id_pedido' => $_GET['id']));
                 $this->setPedidoDireccion($_GET['dirPasa'], 0, $_GET['id']);
                 $this->setPedidoDireccion($_GET['dirEmp'], 1, $_GET['id']);
                 $rsp['success'] = true;
-            }else{
+            } else {
                 $rsp['success'] = false;
             }
-        }else{
+        } else {
             $rsp['success'] = false;
         }
-        
+
         echo json_encode($rsp);
     }
-    
+
     public function actionPeticionEliminar() {
         if (isset($_GET['id'])) {
-            PedidoDireccion::model()->deleteAll('id_pedido=:id_pedido', array(':id_pedido'=>$_GET['id']));
+            PedidoDireccion::model()->deleteAll('id_pedido=:id_pedido', array(':id_pedido' => $_GET['id']));
             Pedido::model()->deleteByPk($_GET['id']);
-            PedidoReserva::model()->deleteAll('id_pedido=:id_pedido', array(':id_pedido'=>$_GET['id']));
-            PeticionPedido::model()->deleteAll('id_pedido=:id_pedido', array(':id_pedido'=>$_GET['id']));
+            PedidoReserva::model()->deleteAll('id_pedido=:id_pedido', array(':id_pedido' => $_GET['id']));
+            PeticionPedido::model()->deleteAll('id_pedido=:id_pedido', array(':id_pedido' => $_GET['id']));
             $rsp['success'] = true;
-        }else{
+        } else {
             $rsp['success'] = false;
         }
-        
+
         echo json_encode($rsp);
     }
 
@@ -140,7 +140,7 @@ class PedidoController extends TPController {
             $pedidoDireccion->id_direccion = $direccion;
             $pedidoDireccion->id_pedido = $idPedido;
             $pedidoDireccion->tipo = $tipo;
-            $pedidoDireccion->save();            
+            $pedidoDireccion->save();
         }
     }
 
@@ -231,7 +231,39 @@ class PedidoController extends TPController {
             $rsp["id"] = $pedidoVehiculo->id;
         } else {
             $rsp["success"] = false;
-            $rsp["msg"] = "El pedido no es correcta";
+            $rsp["msg"] = "El pedido no es correcto";
+        }
+        echo json_encode($rsp);
+    }
+
+    public function actionGetReservasVehiculo() {
+        $pedidos = array();
+        $rsp = array();
+        $reservas = PedidoReserva::model()->with('direccionesCompletas')->findAll('id_vehiculo=:id_vehiculo AND hora_inicio > NOW()', array(':id_vehiculo' => $_GET['id_vehiculo']));
+        if (count($reservas)) {
+            foreach ($reservas as $key => $reserva) {
+                foreach ($reserva->direccionesCompletas as $key => $direccion) {
+                    if ($direccion->id_user == '0') {
+                        $pedidos[$reserva->id_pedido]['empresaDir'][$direccion->id]['direccion'] = $direccion->direccion;
+                        $pedidos[$reserva->id_pedido]['empresaDir'][$direccion->id]['latitud'] = $direccion->latitud;
+                        $pedidos[$reserva->id_pedido]['empresaDir'][$direccion->id]['longitud'] = $direccion->longitud;                        
+                    } else {
+                        $pasajero = Profile::model()->find("user_id=:user_id", array(':user_id' => $direccion->id_user));
+                        $pedidos[$reserva->id_pedido]['pasajeroDir'][$direccion->id]['nombre_pasajero'] = "{$pasajero->firstname} {$pasajero->lastname}";
+                        $pedidos[$reserva->id_pedido]['pasajeroDir'][$direccion->id]['direccion'] = $direccion->direccion;
+                        $pedidos[$reserva->id_pedido]['pasajeroDir'][$direccion->id]['latitud'] = $direccion->latitud;
+                        $pedidos[$reserva->id_pedido]['pasajeroDir'][$direccion->id]['longitud'] = $direccion->longitud;
+                    }
+                    $peticion = Peticion::model()->with('peticionPedidos')->find('id_pedido=:id_pedido', array(':id_pedido'=>$reserva->id_pedido));
+                    $pedidos[$reserva->id_pedido]['sentido'] = $peticion->sentido;                    
+                    $pedidos[$reserva->id_pedido]['inicio'] = $reserva->hora_inicio;
+                    $pedidos[$reserva->id_pedido]['fin'] = $reserva->hora_fin;
+                }
+            }
+            $rsp['success'] = true;
+            $rsp['pedidos'] = $pedidos;
+        }else{
+            $rsp['success'] = false;
         }
         echo json_encode($rsp);
     }
