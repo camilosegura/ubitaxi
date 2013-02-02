@@ -14,7 +14,6 @@
         <script type="text/javascript" charset="utf-8" src="js/main.js"></script>
         <script type="text/javascript" charset="utf-8" src="js/jquery.mobile-1.2.0.min.js"></script>
         <script type="text/javascript" charset="utf-8" src="js/jquery.ui.map.full.min.js"></script>
-
     </head>
     <body>
         <div data-role="page" id="pageLogin" data-theme="e">
@@ -22,95 +21,46 @@
                 <h1>Mi Taxi</h1>
             </div>
             <div data-role="content">
-
                 <form id="loginForm">
                     <div data-role="fieldcontain" class="ui-hide-label">
-                        <label for="username">Usuario:</label> <input type="text"
-                                                                      name="username" id="username" value="camilo" placeholder="Usuario"
-                                                                      required="required" />
+                        <label for="username">Usuario:</label> <input type="text" name="username" id="username" value="" placeholder="Usuario" required="required" />
                     </div>
-
                     <div data-role="fieldcontain" class="ui-hide-label">
-                        <label for="password">Contraseña:</label> <input type="password"
-                                                                         name="password" id="password" value="123456"
-                                                                         placeholder="Contraseña" required="required" />
+                        <label for="password">Contraseña:</label> <input type="password" name="password" id="password" value="" placeholder="Contraseña" required="required" />
                     </div>
-
                     <input type="submit" value="Ingresar" id="submitButton">
                 </form>
-
             </div>
-
             <div data-role="footer" data-theme="e">
                 <h4>&copy; Mi empresa.co</h4>
             </div>
         </div>        
         <div data-role="page" id="control" data-theme="e">
             <div data-role="header" data-theme="e">
-
-                <select name="estado" id="estado" data-native-menu="false"
-                        data-corners="false">
-                    <option value="0">Disponible</option>
-                    <option value="5">No Disponible</option>
-                    <option value="1">Ocupado</option>
-                    <option value="2">Almorzando</option>
-                    <option value="3">Varado</option>
-                    <option value="6">Policia</option>
-                    <option value="4">Descanso</option>
-                </select>
-                <a href="#popupConfirmar" data-corners="false" data-rel="popup" id="iniciar" class="menu-hiden" style="display: none;">
-                    Iniciar Recorrido
+                <a href="#panelSelectPedido" data-theme="b" data-rel="popup" id="verPedido" data-icon="arrow-d" style="display: none;">
+                    Ver pedido
                 </a>
-                <a href="#" data-corners="false" id="sefue" class="menu-hiden" style="display: none;">
-                    Se Fue
+                <a href="#panelPedidos" id="todosPedidos" data-rel="popup" data-icon="arrow-d" class="ui-btn-right" style="margin-right: 90px;">
+                    Todos los pedidos
                 </a>
-                <a href="#" data-corners="false" id="llegada" class="menu-hiden" style="display: none;">
-                    Finalizar Recorrido
-                </a>
-                <a href="#popupMainMenu" data-rel="popup" data-icon="grid" class="ui-btn-right" data-corners="false">
+                <a href="#popupMainMenu" data-rel="popup" data-icon="grid" class="ui-btn-right">
                     Menú
                 </a>
-                <div data-role="popup" id="popupConfirmar" data-theme="a" class="ui-corner-all">
-                    <div style="padding: 10px 20px;">                        
-                        <label for="un" class="ui-hidden-accessible">Número de pasajeros:</label>
-                        <select name="cantP" id="cantidadPasajeros" data-native-menu="false">
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                        </select>
-                        <a href="#" data-role="button" data-theme="b" data-rel="back" id="confirmarPasajeros">Enviar</a>
-                    </div>
-                </div>
                 <div data-role="popup" id="popupMainMenu" data-theme="a">
-                    <ul data-role="listview" data-inset="true" style="min-width: 210px;"
-                        data-theme="b">
+                    <ul data-role="listview" data-inset="true" style="min-width: 210px;" data-theme="b">                        
                         <li><a href="#" id="salir" data-inline="true">Salir</a></li>
                     </ul>
                 </div>
-                <div data-role="popup" id="popConfTiempo" data-theme="a"
-                     class="ui-corner-all">
-                    <div style="padding: 10px 20px;">
-                        <h3>Tiene un pedido</h3>
-                        <p></p>
-                        <label for="cantidadTiempo">Tiempo en llegar (minutos)</label>
-                        <select name="cant" id="cantidadTiempo" data-native-menu="false">
-                            <option value="5">5</option>
-                            <option value="10">10</option>
-                            <option value="15">15</option>
-                            <option value="20">20</option>
-                        </select>
-                        <a href="#" data-role="button" data-theme="b" data-rel="back" id="aceptarPedido">Aceptar</a>
-                    </div>
+                <div data-role="popup" id="panelPedidos" data-corners="false" data-theme="none" data-shadow="false" data-tolerance="0,0" class="popupPedido"></div>
 
-                </div>
+                <div id="panelPedido" ></div>
+                <div data-role="popup" id="panelSelectPedido" data-corners="false" data-theme="none" data-shadow="false" data-tolerance="0,0" class="popupPedido"></div>
+                <div id="panelPopupLoginForm"></div>
                 <span class="ui-title" />
             </div>
 
             <div data-role="content" id="controlContent">
-
-                <div id="map_canvas" style="width: 100%; height: 100%"></div>
-                <a href="#" data-role="button" data-theme="b" id="ocupado">Ocupado</a>
+                <div id="map_canvas" style="width: 100%; height: 100%"></div>                
             </div>
         </div>
 
