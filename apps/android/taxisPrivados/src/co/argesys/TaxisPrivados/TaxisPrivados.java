@@ -22,7 +22,6 @@ package co.argesys.TaxisPrivados;
 import android.location.LocationManager;
 import android.provider.Settings;
 import android.view.KeyEvent;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -35,7 +34,7 @@ public class TaxisPrivados extends DroidGap
     {
         super.onCreate(savedInstanceState);
         super.setBooleanProperty("keepRunning", true); 
-        //super.setIntegerProperty("splashscreen", R.drawable.splash);
+        super.setIntegerProperty("splashscreen", R.drawable.splash);
         super.loadUrl("file:///android_asset/www/index.html", 10000);
      
         myLocation();
