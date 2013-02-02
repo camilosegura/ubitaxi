@@ -1,10 +1,23 @@
 <?php
-$horaEmpresa = ($peticion->sentido == '0') ? $peticion->hora_empresa : '0';
+$horaEmpresa = $peticion->hora_empresa;
+$sentido = $peticion->sentido;
+if($peticion->sentido == '0'){
+    $minTime = $horaEmpresa;
+    $maxTime = '';   
+}else{
+    $minTime = 0;
+    $maxTime = $horaEmpresa;
+}
+
+var_dump(date('l jS \of F Y h:i:s A'));
 
 $cs = Yii::app()->getClientScript();
 $cs->registerScript('script', <<<JS
 
-   var horaEmpresa = "$horaEmpresa";       
+   var horaEmpresa = "$horaEmpresa";   
+   var sentido = "$sentido";
+   var minTime = "$minTime";
+   var maxTime = "$maxTime";    
    
     $( "#empresaDir" ).sortable({
       connectWith: ".empresasDir",
@@ -92,14 +105,20 @@ function setTimePicker(pedidoForm){
     $('.timePicker', pedidoForm).datetimepicker({
         dateFormat: "yy-mm-dd",
         timeFormat: "HH:mm:ss",
-        minDate: new Date(horaEmpresa),
+        minDate: new Date(minTime),
+        maxDate: new Date(maxTime),
         onClose: function(dateText, inst){
             var that = $(this);
             var url = '/taxisPrivados/vehiculo/libres';
-            var data = {
-                horaInicio:horaEmpresa,
-                horaFin:dateText
-            };
+            var data = {};
+            if(sentido === "0"){
+                data["horaInicio"] = horaEmpresa;
+                data["horaFin"] = dateText;
+            }else{
+                data["horaInicio"] = dateText;
+                data["horaFin"] = horaEmpresa;
+            }
+                            
             $.getJSON(url, data, function(rsp){
                 var direccion = '';
                 var pedidoForm = {};
