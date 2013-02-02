@@ -13,8 +13,6 @@ var idTelefono = 0;
 var idVehiculo = 0;
 var idPedido = 0;
 var estado = 0;
-var idPedidoVehiculo = 0;
-var idPasajero = 0;
 var login = false;
 var pageLogin = $("#pageLogin");
 var pendiente = 0;
@@ -40,6 +38,7 @@ var layer;
 var mensajeInterval;
 var lastStateInterval = "";
 var reservas = {};
+var reintentos = {};
 var directionsService = new google.maps.DirectionsService();
 var taxiIcon = new google.maps.MarkerImage(
         'http://ubitaxi.argesys.co/images/taxi.png',
@@ -112,22 +111,28 @@ $(document).on('click', '.iniciar', function() {
         id: idPedido,
         estado: 3
     };
+    $.getJSON(url, data, function(rsp) {
+    }).error(function(jqXHR, textStatus, errorThrown) {
+        var currentTime = new Date().getTime();
+        reintentos[currentTime] = setInterval(function() {
+            reintentarEnvio(url, data, currentTime, dummy)
+        }, 5000);
+
+    });
 
     reservas = JSON.parse(reservas);
     dirDestinos = reservas[idPedido]['pasajeroDir'];
     var listPasajeroDir = listPasajeroFin(idPedido, dirPasajeros[idPedido]);
     var listEmpresaDir = listEmpresadirInicio(reservas[idPedido]['empresaDir'], reservas[idPedido]['sentido'], reservas[idPedido]['inicio'], reservas[idPedido]['fin']);
     var popupPedido = pedidoPopup(idPedido, listPasajeroDir, listEmpresaDir, reservas[idPedido]['sentido'], 'panelSelectPedido', '<a href="#" data-rel="back" data-role="button" data-theme="b" data-icon="minus" data-inline="true" class="finalizar" data-id-pedido="' + idPedido + '">Finalizar</a>');
-    //$('#panelSelectPedido-' + idPedido+'-popup').remove();
-    $('#panelSelectPedido').html(popupPedido);
+
+    $('#panelSelectPedido').html($(popupPedido).html());
     $('#panelSelectPedido').trigger("create");
+
     setPanelHeight();
     reservas = JSON.stringify(reservas);
-    $('#verPedido').attr('href', '#panelSelectPedido-' + idPedido);
     $('#verPedido').show();
-    $.getJSON(url, data, function(rsp) {
 
-    });
 });
 $(document).on('click', '.finalizar', function() {
     idPedido = $(this).data('idPedido');
@@ -140,6 +145,11 @@ $(document).on('click', '.finalizar', function() {
     mapRefresh();
     $('#verPedido').hide();
     $.getJSON(url, data, function(rsp) {
+    }).error(function(jqXHR, textStatus, errorThrown) {
+        var currentTime = new Date().getTime();
+        reintentos[currentTime] = setInterval(function() {
+            reintentarEnvio(url, data, currentTime, dummy)
+        }, 5000);
 
     });
 });
@@ -158,9 +168,13 @@ $(document).on('submit', '.popupLoginForm', function() {
             data[field.name] = field.value;
         });
         $.getJSON(url, data, function(rsp) {
+        }).error(function(jqXHR, textStatus, errorThrown) {
+            var currentTime = new Date().getTime();
+            reintentos[currentTime] = setInterval(function() {
+                reintentarEnvio(url, data, currentTime, dummy)
+            }, 5000);
 
         });
-        navigator.notification.alert("ddd");
     }
     $(this).parent().popup("close");
     $('#panelSelectPedido-' + idPedido).popup('open');
@@ -222,7 +236,10 @@ function handleLogin() {
                 navigator.notification.alert(rsp.msg, function() {
                 }, 'Error de Ingreso', 'Volver a intentar');
             }
-        });
+        }).error(function(jqXHR, textStatus, errorThrown) {
+        navigator.notification.alert('Hay problemas en la conexión, intente de nuevo', function(){}, 'Error', 'Aceptar');
+
+    });;
 
     } else {
         //Thanks Igor!
@@ -359,17 +376,21 @@ function getPedido() {/*--------------------------------------------------------
                     dirPasajeros[$(this).data('idPedido')] = dirPasajero;
                     url = 'http://ubitaxi.argesys.co/taxisPrivados/pedido/setConfirmacion';
 
-                    $.getJSON(url, data, function(rsp) {
-
-                    });
                 } else {
                     delete dirPasajeros[$(this).data('idPedido')][$(this).data('idDireccion')];
                     //dirPasajeros[$(this).data('idPedido')].splice($(this).data('idDireccion'), 1);
                     url = 'http://ubitaxi.argesys.co/taxisPrivados/pedido/borrarConfirmacion';
-                    $.getJSON(url, data, function(rsp) {
 
-                    });
                 }
+                $.getJSON(url, data, function(rsp) {
+
+                }).error(function(jqXHR, textStatus, errorThrown) {
+                    var currentTime = new Date().getTime();
+                    reintentos[currentTime] = setInterval(function() {
+                        reintentarEnvio(url, data, currentTime, dummy)
+                    }, 5000);
+
+                });
                 reservas = JSON.stringify(reservas);
             });
         } else {
@@ -465,6 +486,16 @@ function setPanelHeight() {
             $('.popupPedido').css("height", h);
         }
     });
+}
+function reintentarEnvio(url, data, interval, callback) {
+
+    $.getJSON(url, data, function(rsp) {
+        clearInterval(reintentos[interval]);
+        callback(rsp);
+    });
+}
+
+function dummy(rsp) {
 }
 function getMensaje() {
     //navigator.notification.alert("dddffgg", function(){}, "Error", "Aceptar");
