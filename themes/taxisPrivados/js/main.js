@@ -7,7 +7,7 @@
  * @param {type} resp
  * @returns {undefined}
  */
-function callbackRevGeocoder(resp){
+function callbackRevGeocoder(resp) {
     console.log(resp);
     var dirText = '';
     var dirNum = '';
@@ -20,10 +20,17 @@ function callbackRevGeocoder(resp){
         dirText = dir[0];
         dir = dir[1].split(',');
         dirNum = dir[0];
-        
+
     }
-    $('#dirTexto').html(dirText+' #');
-    $('#direccionTexto').val(dirText+' #');
+    $('#dirTexto').html(dirText + ' #');
+    $('#direccionTexto').val(dirText + ' #');
     $('#direccionNumero').val(dirNum);
     $('#ciudad').val(city);
 }
+
+jQuery.ajaxSetup({beforeSend: function() {
+        $('#ajaxLoader').toggle();
+    },
+    complete: function() {
+        $('#ajaxLoader').toggle();
+    }});
