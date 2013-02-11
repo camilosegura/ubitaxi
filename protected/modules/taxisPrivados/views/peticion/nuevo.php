@@ -1,9 +1,14 @@
 <?php
+$baseUrl = Yii::app()->baseUrl;
 $cs = Yii::app()->getClientScript();
+$cs->registerScriptFile('http://maps.google.com/maps/api/js?sensor=true', CClientScript::POS_END);
+$cs->registerScriptFile($baseUrl . '/js/geolocation.js', CClientScript::POS_END);
 $cs->registerScript('script', <<<JS
 var pasajero = $('#pasajeros');
 var numPasajeros = $('#numPasajeros'); 
 var empresa = $('#empresa');    
+var pasajerosExcelForm = $('#pasajerosExcelForm');
+var direccionesPasajero = $('#direccionesPasajero');
 $('#horaEmpresa').datetimepicker({
     dateFormat: "yy-mm-dd",
     timeFormat: "HH:mm:ss"
@@ -23,7 +28,73 @@ pasajero.click(function(){
     }
 });
 
+pasajerosExcelForm.submit(function(){
+    var formdata = new FormData();
+    var input = document.getElementById("pasajerosExcel");
+    var idEmpresa = empresa.val();
+    $('#pasajerosError').html();
+    $('#pasajerosError').parent().hide();
+    formdata.append("pasajerosExcel", input.files[0]);
+    formdata.append("idEmpresa", idEmpresa);    
+    if (formdata) {
+        $.ajax({
+            url: "/taxisPrivados/usuario/nuevoArchivo",
+            type: "POST",
+            data: formdata,
+            processData: false,
+            contentType: false                
+        }).done(function(data, textStatus, jqXHR){
+            data = JSON.parse(data);
+            $.each(data.pasajeros, function(id, pasajero){
+                if($('#pasajero-'+id).length == 0){
+                    pasajeros = '<fieldset id="pasajero-'+id+'" class="table-bordered"><legend>'+pasajero.nombre+'</legend>';                                   
+                    pasajeros += '<div class="row"><label class="checkbox span5"><input type="checkbox" class="chb" name="pasajeros[]" id="'+pasajero.idDireccion+'" value="'+pasajero.idDireccion+'" checked>'+pasajero.direccion+'</label><div class="span3"><button class="btn btn-success editarDireccion" type="button" data-id-direccion="'+pasajero.idDireccion+'">Editar</button><button type="button" class="btn btn-danger eliminarDireccion" data-id-direccion="'+pasajero.idDireccion+'">Eliminar</button></div></div>';                    
+                    pasajeros += '</fieldset>';
+                    direccionesPasajero.append(pasajeros);
+                }else{
+                    if($('#'+pasajero.idDireccion).length == 0){
+                        pasajeros = '<div class="row"><label class="checkbox span5"><input type="checkbox" class="chb" name="pasajeros[]" id="'+pasajero.idDireccion+'" value="'+pasajero.idDireccion+'" checked>'+pasajero.direccion+'</label><div class="span3"><button class="btn btn-success editarDireccion" type="button" data-id-direccion="'+pasajero.idDireccion+'">Editar</button><button type="button" class="btn btn-danger eliminarDireccion" data-id-direccion="'+pasajero.idDireccion+'">Eliminar</button></div></div>';                    
+                        $('#pasajero-'+id).append(pasajeros);
+                    }
+                }               
+            });
+             if(data.pasajeros.error){
+                    errorPasajero = '';
+                    $.each(data.pasajeros.errores, function(index, error){
+                        errorPasajero += '<li>'+error+'</li>';
+                    });
+                    $('#pasajerosError').html(errorPasajero);
+                    $('#pasajerosError').parent().show();
+                }
+        });
+    }
+    return false;
+});
 
+$(document).on('click', '.eliminarDireccion', function(){
+    console.log($(this).data('idDireccion'));
+    $(this).parent().parent().remove();
+});
+
+$(document).on('click', '.editarDireccion', function(){
+    $('#direccionMapa').text($(this).parent().parent().children('label').text());
+    $('#editarDireccion').show();
+    initialize();
+});            
+
+$('#cancelarMapa').click(function(){
+    $('#editarDireccion').hide();
+});
+
+$('#aceptarMapa').click(function(){
+    $('#editarDireccion').hide();
+});
+
+$(document).on('change', '.chb', function(){
+    $('input[type="checkbox"]', $(this).parent().parent().parent()).addClass('chb');
+    $(this).removeClass('chb');
+    $('.chb', $(this).parent().parent().parent()).attr('checked',false);
+});
 function getUsuariosYDireccionesEmpresa(){
     var idEmpresa = $('#empresa').val();
     var url = '/taxisPrivados/empresa/usuariosYDirecciones';
@@ -31,20 +102,21 @@ function getUsuariosYDireccionesEmpresa(){
         id:idEmpresa
     };
     $.getJSON(url, data, function(rsp){
-        var direccion = '';
+        var direccion = '<legend>Dirección empresa</legend>';
         var pasajeros = '';        
         $.each(rsp.direccion, function(index, value){            
-            direccion += '<label class="checkbox"><input type="checkbox" name="direccionEmpresa[]" value="'+index+'">'+value+'</label>';
+            direccion += '<div class="row"><label class="checkbox span5"><input type="checkbox" name="direccionEmpresa[]" value="'+index+'">'+value+'</label><div class="span3"><button class="btn btn-success editarDireccion" type="button" data-id-direccion="'+index+'">Editar</button><button type="button" class="btn btn-danger eliminarDireccion" data-id-direccion="'+index+'">Eliminar</button></div></div>';
         });
         $('#direccionesEmpresa').html(direccion);
         
         $.each(rsp.usuario, function(index, value){
-            pasajeros += '<label>'+value.nombre+'</label>';
+            pasajeros += '<fieldset id="pasajero-'+index+'" class="table-bordered"><legend>'+value.nombre+'</legend>';
             $.each(value.direccion, function(id, dir){                
-                pasajeros += '<label class="checkbox"><input type="checkbox" class="chb" name="pasajeros[]" value="'+id+'">'+dir+'</label>';
-            });            
+                pasajeros += '<div class="row"><label class="checkbox span5"><input type="checkbox" class="chb" name="pasajeros[]" id="'+id+'" value="'+id+'">'+dir+'</label><div class="span3"><button class="btn btn-success editarDireccion" type="button" data-id-direccion="'+id+'">Editar</button><button type="button" class="btn btn-danger eliminarDireccion" data-id-direccion="'+id+'">Eliminar</button></div></div>';
+            }); 
+            pasajeros += '</fieldset>';
         });
-        $('#direccionesPasajero').html(pasajeros);
+        direccionesPasajero.html(pasajeros);
         //checkToRadio();
         numPasajeros.val(0);
     });
@@ -58,36 +130,64 @@ function checkToRadio(){
            });
      });                            
 }
+    
 JS
         , CClientScript::POS_READY);
 ?>
-
+<style type="text/css">
+    .table-bordered{
+        border-left: 1px solid #ddd;
+        padding: 0 20px;
+        margin-bottom: 15px;
+    }
+    .editarDireccion{
+        margin-right: 10px;
+    }
+    .span3 {
+        margin-bottom: 10px;
+        width: 156px;
+    }
+    #editarDireccion{
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: transparent;     
+        background-image: url('/images/background.png');
+        z-index: 10000;
+    }
+    #editarDireccion .span12{
+        margin: 100px auto;
+        float: none;
+        background-color: white;
+    }
+    #pasajerosExcelForm fieldset{
+        padding: 10px;
+    }
+</style>
 <div class="row">
-    <h1>Crear Petición</h1>
-    <div class="form span4">
+    <h1 class="span8">Crear Petición</h1>
+    <div class="form span8">
         <?php echo CHtml::beginForm(); ?>
 
         <div>
             <?php echo CHtml::label('Sentido', 'sentido') ?>
-            <?php echo CHtml::dropDownList('sentido', '', array('0'=>'Empresa - Casa', '1'=>'Casa - Empresa')); ?>            
+            <?php echo CHtml::dropDownList('sentido', '', array('0' => 'Empresa - Casa', '1' => 'Casa - Empresa')); ?>            
         </div>
         <div>
             <?php echo CHtml::label('Empresa', 'empresa') ?>
             <?php echo CHtml::dropDownList('empresa', '', $empresas); ?>            
         </div>
 
-        <div >
-            <?php echo CHtml::label('Dirección empresa', 'direccionSalida'); ?> 
-            <fieldset id="direccionesEmpresa"></fieldset>            
+        <div >            
+            <fieldset id="direccionesEmpresa" class="table-bordered"></fieldset>            
         </div> 
         <div >
-            <?php echo CHtml::label('Pasajeros', 'pasajeros'); ?>
-            <fieldset id="direccionesPasajero"></fieldset>              
-        </div>
-        <div class="rememberMe">
-            <?php echo CHtml::label('Número de pasajeros', 'numPasajeros'); ?>
-            <?php echo CHtml::textField('numPasajeros', '', array('readonly' => 'readonly')) ?>
-        </div>        
+            <h3>Pasajeros</h3>
+            <div id="direccionesPasajero"></div>              
+        </div>                
         <div>
             <?php echo CHtml::label('Hora empresa', 'horaEmpresa'); ?>
             <?php echo CHtml::textField('horaEmpresa') ?>
@@ -96,25 +196,64 @@ JS
             <?php echo CHtml::label('Observaciones', 'observaciones'); ?>
             <?php echo CHtml::textArea('observaciones') ?>
         </div>
-        <div class="row submit">
-            <?php echo CHtml::submitButton('Pedir'); ?>
+        <div class="submit">
+            <?php echo CHtml::submitButton('Pedir', array('class' => 'btn btn-primary')); ?>
         </div>
 
         <?php echo CHtml::endForm(); ?>
     </div><!-- form -->
-    <div class="span8">
-        <?php if($peticion["success"]){?>
-        <div class="alert alert-info">
-            <button type="button" class="close" data-dismiss="alert">×</button>
-            <p><strong>Se ha hecho una petición!</strong></p>
-            <a href="<?php echo $this->createUrl('/taxisPrivados/peticion/ver', array('id'=>$peticion['id'])); ?>" class="btn btn-primary">Ver</a>
-            <a href="<?php echo $this->createUrl('/taxisPrivados/peticion/editar', array('id'=>$peticion['id'])); ?>" class="btn btn-primary">Editar</a>
-        </div>
+    <div class="span4">
+        <?php if ($peticion["success"]) { ?>
+            <div class="alert alert-success">
+                <button type="button" class="close" data-dismiss="alert">×</button>
+                <p><strong>Se ha hecho una petición!</strong></p>
+                <a href="<?php echo $this->createUrl('/taxisPrivados/peticion/ver', array('id' => $peticion['id'])); ?>" class="btn btn-primary">Ver</a>                
+            </div>
+        <?php } ?>  
+        <?php if (count($error)) { ?>
+            <div class="alert alert-error">
+                <button type="button" class="close" data-dismiss="alert">×</button>
+                <p><strong>Hay errores en el formulario</strong></p>
+                <ul>
+                    <?php foreach ($error as $key => $er) { ?>
+                        <li><?php echo "<b>$key</b> {$er[0]}"; ?></li>
+                    <? } ?>
+                </ul>
+            </div>
         <?php } ?>
-        <p>
-            <a href="/taxisPrivados/usuario/nuevoPasajero.html" class="btn btn-primary">Nuevo pasajero</a>
-            <a href="#" class="btn btn-primary">Nueva dirección</a>
-        </p>
-        
+        <div>
+            <form id="pasajerosExcelForm" enctype="multipart/form-data">
+                <fieldset class="table-bordered">                    
+                    <label for="pasajerosExcel">Subir listado de pasajeros:</label>
+                    <input type="file" name="pasajerosExcel" id="pasajerosExcel">
+                    <button type="submit" class="btn">Cargar</button>                    
+                </fieldset>
+            </form>            
+        </div>
+        <div class="alert alert-error" style="display: none;">
+            <button type="button" class="close" data-dismiss="alert">×</button>
+            <p><strong>Hay errores con los pasajeros</strong></p>
+            <ul id="pasajerosError">
+
+            </ul>
+        </div>
+    </div>
+    <div id="editarDireccion">
+        <div class="row">
+            <div class="span12">
+                <div class="row">
+                    <div  id="map_canvas" class="span8"></div>
+                    <div class="span4">
+                        <dl>
+                            <dt>Direccion:</dt>
+                            <dd id="direccionMapa"></dd>                            
+                        </dl>
+                        <button class="btn btn-primary" id="aceptarMapa">Aceptar</button>
+                        <button class="btn btn-danger" id="cancelarMapa">Cancelar</button>
+                        <p>Para ubicar las coordenadas de la dirección por favor <b>haga click</b> o <b>mueva el globo</b> al lugar al que pertenece.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
