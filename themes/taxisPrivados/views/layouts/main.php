@@ -34,19 +34,14 @@
                             $this->widget('zii.widgets.CMenu', array(
                                 'items' => array(
                                     array('label' => 'Inicio', 'url' => array('/taxisPrivados')),
-                                    array('label' => 'Petición', 'url' => array('#'), 'items' => array(
-                                            array('label' => 'Listar', 'url' => array('#')),
+                                    array('label' => 'Petición', 'url' => array('/taxisPrivados/peticion/ver'), 'items' => array(
+                                            array('label' => 'Listar', 'url' => array('/taxisPrivados/peticion/ver')),
                                             array('label' => 'Nuevo', 'url' => array('/taxisPrivados/peticion/nuevo'))
                                         ), 'itemOptions' => array('class' => 'dropdown-submenu first-level'),
                                     ),
-                                    array('label' => 'Pedido', 'url' => array('#'), 'items' => array(
-                                            array('label' => 'Listar', 'url' => array('#')),
-                                            array('label' => 'Nuevo', 'url' => array('/taxisPrivados/pedido/nuevo'))
-                                        ), 'itemOptions' => array('class' => 'dropdown-submenu first-level'),
-                                    ),
-                                    array('label' => 'Usuarios', 'url' => array('#'), 'items' => array(
-                                            array('label' => 'Listar', 'url' => array('#')),
-                                            array('label' => 'Nuevo', 'url' => array('#'), 'items' => array(
+                                    array('label' => 'Usuarios', 'url' => array('/taxisPrivados/usuario/nuevoPasajero'), 'items' => array(
+                                            array('label' => 'Listar', 'url' => array('/taxisPrivados/usuario/nuevoPasajero')),
+                                            array('label' => 'Nuevo', 'url' => array('/taxisPrivados/usuario/nuevoPasajero'), 'items' => array(
                                                     array('label' => 'Pasajero', 'url' => array('/taxisPrivados/usuario/nuevoPasajero')),
                                                     array('label' => 'Administrador Empresa', 'url' => array('/taxisPrivados/usuario/nuevoAdministrador')),
                                                     array('label' => 'Coordinador', 'url' => array('/taxisPrivados/usuario/nuevoCoordinador')),
@@ -55,21 +50,21 @@
                                             )
                                         ), 'itemOptions' => array('class' => 'dropdown-submenu first-level'),
                                     ),
-                                    array('label' => 'Empresas', 'url' => array('#'), 'items' => array(
-                                            array('label' => 'Listar', 'url' => array('#')),
+                                    array('label' => 'Empresas', 'url' => array('/taxisPrivados/empresa/listar'), 'items' => array(
+                                            array('label' => 'Listar', 'url' => array('/taxisPrivados/empresa/listar')),
                                             array('label' => 'Nueva', 'url' => array('/taxisPrivados/empresa/nueva'))
                                         ),
                                         'visible' => in_array("AdminOperador", $this->roles),
                                         'itemOptions' => array('class' => 'dropdown-submenu first-level'),
                                     ),
-                                    array('label' => 'Vehiculo', 'url' => array('#'), 'items' => array(
-                                            array('label' => 'Listar', 'url' => array('#')),
+                                    array('label' => 'Vehiculo', 'url' => array('/taxisPrivados/vehiculo/listar'), 'items' => array(
+                                            array('label' => 'Listar', 'url' => array('/taxisPrivados/vehiculo/listar')),
                                             array('label' => 'Nuevo', 'url' => array('/taxisPrivados/vehiculo/nuevo'))
                                         ),
                                         'visible' => in_array("AdminOperador", $this->roles),
                                         'itemOptions' => array('class' => 'dropdown-submenu first-level'),
                                     ),
-                                    array('label' => 'Reportes', 'url' => array('#'), 'visible' => in_array("AdminOperador", $this->roles)),
+                                    array('label' => 'Reportes', 'url' => array('/taxisPrivados/reporte'), 'visible' => in_array("AdminOperador", $this->roles)),
                                     array('label' => 'Salir', 'url' => array('/user/logout')),
                                 ),
                                 'htmlOptions' => array('class' => 'nav'),
@@ -91,7 +86,9 @@
                 <p>Desarrollado por Mi Empresa</p>
             </div>
         </footer>
-
+        <div id='ajaxLoader'>
+            <img src='/images/throbber-32.gif' />
+        </div>
         <script src="<?php echo Yii::app()->baseUrl; ?>/js/jquery-1.8.3.min.js"></script>
         <script src="<?php echo Yii::app()->baseUrl; ?>/js/jquery-ui-1.9.2.custom.min.js"></script>
         <script src="<?php echo Yii::app()->baseUrl; ?>/js/jquery-ui-timepicker-addon.js"></script>
