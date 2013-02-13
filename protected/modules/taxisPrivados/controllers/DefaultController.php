@@ -16,14 +16,14 @@ class DefaultController extends TPController {
                     if (Yii::app()->request->isAjaxRequest) {
                         
                     } else {
-                        $this->redirect('taxisPrivados/usuario/router');
+                        $this->redirect('/taxisPrivados/usuario/router');
                     }
                 }
             }
             // display the login form
             $this->render('/usuario/login', array('model' => $model));
         } else {
-            $this->redirect('taxisPrivados/usuario/router');
+            $this->redirect('/taxisPrivados/usuario/router');
         }
     }
 
