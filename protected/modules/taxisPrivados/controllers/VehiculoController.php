@@ -149,9 +149,9 @@ class VehiculoController extends TPController {
     
     public function actionLibres() {
         $vehiculos = Vehiculo::model()->findAll('id NOT IN (SELECT id_vehiculo FROM tbl_pedido_reserva WHERE 
-            (hora_inicio > :hora_inicio AND hora_inicio < :hora_fin) OR 
-            (hora_fin > :hora_inicio AND hora_fin < :hora_fin) OR 
-            (hora_inicio < :hora_inicio AND hora_fin > :hora_fin))', 
+            (hora_inicio >= :hora_inicio AND hora_inicio < :hora_fin) OR 
+            (hora_fin > :hora_inicio AND hora_fin <= :hora_fin) OR 
+            (hora_inicio <= :hora_inicio AND hora_fin >= :hora_fin))', 
                 array(':hora_inicio'=> $_GET['horaInicio'], ':hora_fin'=>$_GET['horaFin']));
         $rsp = array();
         if(count($vehiculos)){
@@ -164,7 +164,12 @@ class VehiculoController extends TPController {
         }
         echo json_encode($rsp);
     }
-
+    public function actionListar() {
+        $model = Vehiculo::model()->findAll();
+        $this->render('listar', array(
+            'model' => $model,
+        ));
+    }
     /**
      * Returns the data model based on the primary key given in the GET variable.
      * If the data model is not found, an HTTP exception will be raised.
