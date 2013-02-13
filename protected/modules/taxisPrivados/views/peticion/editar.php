@@ -1,15 +1,14 @@
 <?php
 $horaEmpresa = $peticion->hora_empresa;
 $sentido = $peticion->sentido;
-if($peticion->sentido == '0'){
+if ($peticion->sentido == '0') {
     $minTime = $horaEmpresa;
-    $maxTime = '';   
-}else{
+    $maxTime = '';
+} else {
     $minTime = 0;
     $maxTime = $horaEmpresa;
 }
 
-var_dump(date('l jS \of F Y h:i:s A'));
 
 $cs = Yii::app()->getClientScript();
 $cs->registerScript('script', <<<JS
@@ -29,6 +28,19 @@ $('#asignarPedido').click(function(){
     pedidoForm.attr('id', '');
     pedidoForm.prependTo('#pedidos').show();
     formPedidosEvent(pedidoForm);    
+});
+
+$('#eliminarPeticion').click(function(){
+    var url = '/taxisPrivados/peticion/eliminar';
+    data = {
+        id:$(this).data('idPeticion')
+    };
+    $('.eliminarPedido').click();
+    $.getJSON(url, data, function(rsp){
+        if(rsp.success){
+            window.location.pathname = '/taxisPrivados/peticion/ver';
+        }
+    });        
 });
 
 setTimePicker($('#pedidos'));
@@ -126,7 +138,7 @@ function setTimePicker(pedidoForm){
                     $.each(rsp.libres, function(index, value){            
                         direccion += '<option value="'+index+'">'+value+'</option>';
                     });                    
-                    that.parents('.pedidoForm').find('.vehiculoLista').html(direccion);;
+                    that.parents('.pedidoForm').find('.vehiculoLista').html(direccion).removeAttr('disabled');
                 }
             });
         }
@@ -198,32 +210,40 @@ function formPedidosEvent(pedidoForm){
 JS
         , CClientScript::POS_READY);
 ?>
+<style type="text/css">
+    .empresasDir, .pasajerosDir{
+        background-color: #f7f7f9;
+        border: 1px solid #e1e1e8;
+        border-radius: 4px;
+        min-height: 30px;
+        padding: 10px;
+    }
+    .eliminarDir{
+        float: right;
+    }
+</style>
 <div class="row">
-    <h1>Editar Petición</h1>
-    <div class="span5"><span><b>Empresa:</b> <?php echo $peticion->empresa->nombre; ?></span></div>
-    <div class="span5">  <span><b>Hora empresa:</b> <?php echo $peticion->hora_empresa ?></span></div>
+    <h1 class="span12">Editar Petición</h1>
+    <div class="span6"><span><b>Empresa:</b> <?php echo $peticion->empresa->nombre; ?></span></div>
+    <div class="span6"><span><b>Hora empresa:</b> <?php echo $peticion->hora_empresa ?></span></div>
 </div>
 <div class="row">
-    <div class="span5">
+    <div class="span6">
         <span><b>Direcciones empresa:</b></span>
-        <ul class="unstyled" id="empresaDir">
+        <ul class="unstyled empresasDir" id="empresaDir">
             <?php foreach ($empresaDir as $key => $dir) { ?>
                 <li data-id="<?php echo $key; ?>"><?php echo $dir; ?></li>
             <?php } ?>            
         </ul>
     </div>
-    <div class="span5">
+    <div class="span6">
         <span><b>Direcciones pasajeros:</b></span>        
         <ul class="unstyled pasajerosDir" id="pasajerosDir">
             <?php foreach ($pasajeroDir as $key => $dir) { ?>
                 <li data-id="<?php echo $key; ?>"><?php echo $dir; ?></li>
             <?php } ?>            
         </ul>
-    </div>
-    <div class="span2">
-        <button  class="btn btn-primary" id="asignarPedido">Asignar pedido</button>
-        <button type="button" class="btn btn-danger">Eliminar</button>
-    </div>
+    </div>    
 </div>
 <div class="row">
     <div class="span12">
@@ -232,58 +252,68 @@ JS
     </div>
 </div>
 <div class="row">
-    <h3>Pedidos</h3>
-    <div id="pedidos">
+    <div class="span12">
+        <button  class="btn btn-primary" id="asignarPedido">Asignar pedido</button>
+        <button type="button" class="btn btn-danger"id="eliminarPeticion" data-id-peticion="<?php echo $peticion->id; ?>">Eliminar</button>
+    </div>
+</div>
+<div class="row">
+    <h3 class="span12">Pedidos</h3>
+    <div id="pedidos" class="span12">
         <?php
         if (isset($pedidos)) {
             foreach ($pedidos as $idPedido => $pedido) {
                 ?>
                 <div class="pedidoForm row" data-id-peticion="<?php echo $peticion->id; ?>" data-id-pedido="<?php echo $idPedido; ?>">
-                    <form class="localPedidoForm">
-                        <div class="span5">
-                            <label>Hora <?php echo ($peticion->sentido == '0') ? 'fin:' : 'inicio:'; ?></label>
-                            <input type="text" class="timePicker required" value="<?php echo ($peticion->sentido == '0') ? $pedido['fin'] : $pedido['inicio']; ?>">
-                        </div>
-                        <div class="span5">
-                            <label>Vehiculo:</label>
-                            <select class="vehiculoLista required">
-                                <option value="<?php echo $pedido['idVehiculo']; ?>"><?php echo $pedido['placaVehiculo']; ?></option>
-                            </select>
-                        </div>
-                        <div class="span5">
-                            <p><b>Direcciones empresa:</b></p>
-                            <ul class="unstyled empresasDir" style="min-height: 10px;">
-                                <?php
-                                if (isset($pedido['empresaDir'])) {
-                                    foreach ($pedido['empresaDir'] as $idDireccion => $direccion) {
-                                        ?>
-                                        <li data-id="<?php echo $idDireccion; ?>"><?php echo $direccion; ?></li>   
-                                        <?php
+                    <form class="localPedidoForm span12">
+                        <div class="row">
+                            <div class="span6">
+                                <label>Hora <?php echo ($peticion->sentido == '0') ? 'fin:' : 'inicio:'; ?></label>
+                                <input type="text" class="timePicker required" value="<?php echo ($peticion->sentido == '0') ? $pedido['fin'] : $pedido['inicio']; ?>">
+                            </div>
+                            <div class="span6">
+                                <label>Vehiculo:</label>
+                                <select class="vehiculoLista required">
+                                    <option value="<?php echo $pedido['idVehiculo']; ?>"><?php echo $pedido['placaVehiculo']; ?></option>
+                                </select>
+                            </div>
+                            <div class="span6">
+                                <p><b>Direcciones empresa:</b></p>
+                                <ul class="unstyled empresasDir">
+                                    <?php
+                                    if (isset($pedido['empresaDir'])) {
+                                        foreach ($pedido['empresaDir'] as $idDireccion => $direccion) {
+                                            ?>
+                                            <li data-id="<?php echo $idDireccion; ?>"><?php echo $direccion; ?></li>   
+                                            <?php
+                                        }
                                     }
-                                }
-                                ?>
-                            </ul>
-                        </div>
-                        <div class="span5">
-                            <p><b>Direcciones pasajeros:</b></p>        
-                            <ul class="unstyled pasajerosDir" style="min-height: 10px;">
-                                <?php
-                                if (isset($pedido['pasajeroDir'])) {
-                                    foreach ($pedido['pasajeroDir'] as $idDireccion => $direccion) {
-                                        ?>
-                                        <li data-id="<?php echo $idDireccion; ?>"><?php echo $direccion; ?></li>   
-                                        <?php
+                                    ?>
+                                </ul>
+                            </div>
+                            <div class="span6">
+                                <p><b>Direcciones pasajeros:</b></p>        
+                                <ul class="unstyled pasajerosDir">
+                                    <?php
+                                    if (isset($pedido['pasajeroDir'])) {
+                                        foreach ($pedido['pasajeroDir'] as $idDireccion => $direccion) {
+                                            ?>
+                                            <li data-id="<?php echo $idDireccion; ?>"><?php echo $direccion; ?></li>   
+                                            <?php
+                                        }
                                     }
-                                }
-                                ?>
-                            </ul>
+                                    ?>
+                                </ul>
+                            </div>
+                            <div class="span12">
+                                <button class="btn btn-success editarPedido" type="submit">Editar</button>                            
+                                <button type="button" class="btn btn-danger eliminarPedido">Eliminar</button>
+                            </div>
+                            <br style="clear: both;">
                         </div>
-                        <div class="span2">
-                            <button class="btn btn-success editarPedido" type="submit">Editar</button>                            
-                            <button type="button" class="btn btn-danger eliminarPedido">Eliminar</button>
-                        </div>
-                    </form>
-                </div>
+                        <hr>
+                    </form>                    
+                </div>                
                 <?php
             }
         }
@@ -295,29 +325,35 @@ JS
 
 
 <div id="pedidoFormulario" class="pedidoForm row" style="display: none;" data-id-peticion="<?php echo $peticion->id; ?>" data-id-pedido="">
-    <form class="localPedidoForm">
-        <div class="span5">
-            <label>Hora <?php echo ($peticion->sentido == '0') ? 'fin:' : 'inicio:'; ?></label>
-            <input type="text" class="timePicker required">
+    <form class="localPedidoForm span12">
+        <div class="row">
+            <div class="span6">
+                <label>Hora <?php echo ($peticion->sentido == '0') ? 'fin:' : 'inicio:'; ?></label>
+                <input type="text" class="timePicker required">
+            </div>
+            <div class="span6">
+                <label>Vehiculo:</label>
+                <select class="vehiculoLista required" disabled>
+                    <option></option>
+                </select>
+            </div>
+            <div class="span6">
+                <p><b>Direcciones empresa:</b></p>
+                <ul class="unstyled empresasDir"></ul>
+            </div>
+            <div class="span6">
+                <p><b>Direcciones pasajeros:</b></p>        
+                <ul class="unstyled pasajerosDir"></ul>
+            </div>
+            <div class="span12">
+                <button class="btn btn-success editarPedido" type="submit" style="display: none;">Editar</button>
+                <button class="btn btn-primary guardarPedido" type="submit">Guardar</button>
+                <button type="button" class="btn btn-danger eliminarPedido">Eliminar</button>
+            </div>
+            <br style="clear: both;">
         </div>
-        <div class="span5">
-            <label>Vehiculo:</label>
-            <select class="vehiculoLista required">
-                <option></option>
-            </select>
-        </div>
-        <div class="span5">
-            <p><b>Direcciones empresa:</b></p>
-            <ul class="unstyled empresasDir" style="min-height: 10px;"></ul>
-        </div>
-        <div class="span5">
-            <p><b>Direcciones pasajeros:</b></p>        
-            <ul class="unstyled pasajerosDir" style="min-height: 10px;"></ul>
-        </div>
-        <div class="span2">
-            <button class="btn btn-success editarPedido" type="submit" style="display: none;">Editar</button>
-            <button class="btn btn-primary guardarPedido" type="submit">Guardar</button>
-            <button type="button" class="btn btn-danger eliminarPedido">Eliminar</button>
-        </div>
+        <hr>
     </form>
+
+    <hr>
 </div>
