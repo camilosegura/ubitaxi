@@ -103,19 +103,28 @@ function getUsuariosYDireccionesEmpresa(){
     };
     $.getJSON(url, data, function(rsp){
         var direccion = '<legend>Dirección empresa</legend>';
-        var pasajeros = '';        
+        var pasajeros = ''; 
+        var soloUna = 0;
         $.each(rsp.direccion, function(index, value){            
+            soloUna++;
             direccion += '<div class="row"><label class="checkbox span5"><input type="checkbox" name="direccionEmpresa[]" value="'+index+'">'+value+'</label><div class="span3"><button class="btn btn-success editarDireccion" type="button" data-id-direccion="'+index+'">Editar</button><button type="button" class="btn btn-danger eliminarDireccion" data-id-direccion="'+index+'">Eliminar</button></div></div>';
         });
+        if(soloUna === 1){
+            direccion = $(direccion);
+            $(direccion).find('input').attr("checked", true);
+        }
         $('#direccionesEmpresa').html(direccion);
-        
-        $.each(rsp.usuario, function(index, value){
-            pasajeros += '<fieldset id="pasajero-'+index+'" class="table-bordered"><legend>'+value.nombre+'</legend>';
-            $.each(value.direccion, function(id, dir){                
-                pasajeros += '<div class="row"><label class="checkbox span5"><input type="checkbox" class="chb" name="pasajeros[]" id="'+id+'" value="'+id+'">'+dir+'</label><div class="span3"><button class="btn btn-success editarDireccion" type="button" data-id-direccion="'+id+'">Editar</button><button type="button" class="btn btn-danger eliminarDireccion" data-id-direccion="'+id+'">Eliminar</button></div></div>';
-            }); 
-            pasajeros += '</fieldset>';
-        });
+        if(typeof rsp.usuario === "undefined"){
+            pasajeros = "<p>Por favor ingrese pasajeros.</p>";
+        }else{
+            $.each(rsp.usuario, function(index, value){
+                pasajeros += '<fieldset id="pasajero-'+index+'" class="table-bordered"><legend>'+value.nombre+'</legend>';
+                $.each(value.direccion, function(id, dir){                
+                    pasajeros += '<div class="row"><label class="checkbox span5"><input type="checkbox" class="chb" name="pasajeros[]" id="'+id+'" value="'+id+'">'+dir+'</label><div class="span3"><button class="btn btn-success editarDireccion" type="button" data-id-direccion="'+id+'">Editar</button><button type="button" class="btn btn-danger eliminarDireccion" data-id-direccion="'+id+'">Eliminar</button></div></div>';
+                }); 
+                pasajeros += '</fieldset>';
+            });
+        }
         direccionesPasajero.html(pasajeros);
         //checkToRadio();
         numPasajeros.val(0);
@@ -166,6 +175,9 @@ JS
     #pasajerosExcelForm fieldset{
         padding: 10px;
     }
+    .peticionLabel{
+        width: 220px;
+    }
 </style>
 <div class="row">
     <h1 class="span8">Crear Petición</h1>
@@ -173,11 +185,11 @@ JS
         <?php echo CHtml::beginForm(); ?>
 
         <div>
-            <?php echo CHtml::label('Sentido', 'sentido') ?>
+            <?php echo CHtml::label('Sentido', 'sentido', array('class'=>'peticionLabel')) ?>
             <?php echo CHtml::dropDownList('sentido', '', array('0' => 'Empresa - Casa', '1' => 'Casa - Empresa')); ?>            
         </div>
         <div>
-            <?php echo CHtml::label('Empresa', 'empresa') ?>
+            <?php echo CHtml::label('Empresa', 'empresa', array('class'=>'peticionLabel')) ?>
             <?php echo CHtml::dropDownList('empresa', '', $empresas); ?>            
         </div>
 
