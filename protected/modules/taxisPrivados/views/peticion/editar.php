@@ -231,17 +231,17 @@ JS
     <div class="span6">
         <span><b>Direcciones empresa:</b></span>
         <ul class="unstyled empresasDir" id="empresaDir">
-            <?php foreach ($empresaDir as $key => $dir) { ?>
+            <?php if(is_array($empresaDir)){foreach ($empresaDir as $key => $dir) { ?>
                 <li data-id="<?php echo $key; ?>"><?php echo $dir; ?></li>
-            <?php } ?>            
+            <?php }} ?>            
         </ul>
     </div>
     <div class="span6">
         <span><b>Direcciones pasajeros:</b></span>        
         <ul class="unstyled pasajerosDir" id="pasajerosDir">
-            <?php foreach ($pasajeroDir as $key => $dir) { ?>
+            <?php if(is_array($pasajeroDir)){foreach ($pasajeroDir as $key => $dir) { ?>
                 <li data-id="<?php echo $key; ?>"><?php echo $dir; ?></li>
-            <?php } ?>            
+            <?php }} ?>            
         </ul>
     </div>    
 </div>
