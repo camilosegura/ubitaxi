@@ -41,7 +41,7 @@ class UsuarioController extends TPController {
     public function actionNuevoAdministrador() {
         $model = new User;
         $id = $this->nuevoUsuario();
-        if (is_int((int) $id)) {
+        if (is_int((int) $id) && !is_array($id)) {
             $this->postNuevo($id);
             Rights::assign("Empresa", $id);
         } else {
@@ -57,7 +57,7 @@ class UsuarioController extends TPController {
         $model = new User;
         $empresas = array();
         $id = $this->nuevoUsuario();
-        if (is_int((int) $id)) {
+        if (is_int((int) $id) && !is_array($id)) {
             foreach ($_POST['empresa'] as $key => $idEmpresa) {
                 $this->setEmpresaUsuario($id, $idEmpresa);
             }
@@ -78,7 +78,7 @@ class UsuarioController extends TPController {
     public function actionNuevoPasajero() {
         $model = new User;
         $id = $this->nuevoUsuario();
-        if (is_int((int) $id)) {
+        if (is_int((int) $id) && !is_array($id)) {
             $this->postNuevo($id);
         } else {
             $model->addErrors($id);
@@ -93,12 +93,12 @@ class UsuarioController extends TPController {
         $vehiculo = array();
         $model = new User;
         $id = $this->nuevoUsuario();
-        if (is_int((int) $id)) {
+        if (is_int((int) $id) && !is_array($id)) {
             $setVehiculo = new ConductorVehiculo;
             $setVehiculo->id_conductor = $id;
             $setVehiculo->id_vehiculo = $_POST['vehiculo'];
             $setVehiculo->save();
-            
+
             $currentVehiculo = Vehiculo::model()->findByPk($_POST['vehiculo']);
             $currentVehiculo->id_conductor = $id;
             $currentVehiculo->save();
@@ -121,13 +121,21 @@ class UsuarioController extends TPController {
 
     private function postNuevo($id) {
         $this->setEmpresaUsuario($id, $_POST['empresa']);
+        return $this->setDireccion($id, "{$_POST['direccionTexto']} {$_POST['direccionNumero']} {$_POST['direccionCompl']}, {$_POST['ciudad']}", $_POST['latitud'], $_POST['longitud']);
+    }
 
+    private function setDireccion($id, $dir, $latitud, $longitud) {
         $direccion = new Direccion;
         $direccion->id_user = $id;
-        $direccion->direccion = "{$_POST['direccionTexto']} {$_POST['direccionNumero']} {$_POST['direccionCompl']} {$_POST['ciudad']}";
-        $direccion->latitud = $_POST['latitud'];
-        $direccion->longitud = $_POST['longitud'];
-        $direccion->save();
+        $direccion->direccion = $dir;
+        $direccion->latitud = $latitud;
+        $direccion->longitud = $longitud;
+
+        if ($direccion->save()) {
+            return $direccion->id;
+        } else {
+            return $direccion->getErrors();
+        }
     }
 
     private function setEmpresaUsuario($idUser, $idEmpresa) {
@@ -135,6 +143,99 @@ class UsuarioController extends TPController {
         $pasajero->id_usuario = $idUser;
         $pasajero->id_empresa = $idEmpresa;
         $pasajero->save();
+    }
+
+    public function actionNuevoArchivo() {
+
+        $rsp['pasajeros']['error'] = false;
+        $url = "http://maps.googleapis.com/maps/api/geocode/json?sensor=false&address=";
+        // get a reference to the path of PHPExcel classes 
+        $phpExcelPath = Yii::getPathOfAlias('ext.phpexcel.Classes');
+
+        // Turn off our amazing library autoload 
+        spl_autoload_unregister(array('YiiBase', 'autoload'));
+
+        //
+        // making use of our reference, include the main class
+        // when we do this, phpExcel has its own autoload registration
+        // procedure (PHPExcel_Autoloader::Register();)
+        include($phpExcelPath . DIRECTORY_SEPARATOR . 'PHPExcel.php');
+
+        $objPHPExcel = PHPExcel_IOFactory::load($_FILES["pasajerosExcel"]["tmp_name"]);
+        $sheetData = $objPHPExcel->getActiveSheet()->toArray(null, true, true, true);
+        spl_autoload_register(array('YiiBase', 'autoload'));
+
+        unset($sheetData[1]);
+        foreach ($sheetData as $key => $row) {
+            if (str_replace(' ', '', $row['A']) !== '' && (str_replace(' ', '', $row['B']) !== '' || str_replace(' ', '', $row['C']) !== '' || str_replace(' ', '', $row['E']) !== '')) {
+                
+                $nombre = ucwords($row['A']);
+                $direccion = ucfirst("{$row['B']}, {$row["C"]}, {$row['E']}");
+                $usernames = str_split(strtolower("$nombre{$row["D"]}"));
+                $username = '';
+                foreach ($usernames as $key => $letra) {
+                    if (preg_match('/^[A-Za-z0-9_]+$/u', $letra)) {
+                        $username .= $letra;
+                    }
+                }
+
+                $email = "$username@argesys.co";
+
+                $direccionCompleta = str_replace(" ", "+", "{$direccion}, Colombia");
+                $getUrl = "{$url}{$direccionCompleta}";
+
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, $getUrl);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                $json = curl_exec($ch);
+                curl_close($ch);
+
+                $respuesta = json_decode($json);
+
+                $_POST['User']['password'] = 123456;
+                $_POST['Profile']['firstname'] = "{$nombre}";
+                $_POST['Profile']['lastname'] = ".  ";
+                $_POST['empresa'] = $_POST['idEmpresa'];
+                $_POST['direccionTexto'] = $direccion;
+                $_POST['direccionNumero'] = '';
+                $_POST['direccionCompl'] = '';
+                $_POST['ciudad'] = '';
+                $_POST['latitud'] = (isset($respuesta->results[0]->geometry->location->lat)) ? $respuesta->results[0]->geometry->location->lat : 0;
+                $_POST['longitud'] = (isset($respuesta->results[0]->geometry->location->lng)) ? $respuesta->results[0]->geometry->location->lng : 0;
+
+                $user = User::model()->find('email=:email', array(':email' => $email));
+
+                if (is_null($user)) {
+                    $_POST['User']['username'] = $username;
+                    $_POST['User']['email'] = $email;
+                    $id = $this->nuevoUsuario();
+                    if (is_int((int) $id) && !is_array($id)) {
+                        $idDireccion = $this->postNuevo($id);
+                        $rsp['pasajeros'][$id]['nombre'] = $nombre;
+                        $rsp['pasajeros'][$id]['direccion'] = $direccion;
+                        $rsp['pasajeros'][$id]['idDireccion'] = $idDireccion;
+                        $rsp['success'] = true;
+                    } else {
+                        $rsp['errors'][] = $id;
+                    }
+                } else {
+                    $getDireccion = Direccion::model()->find('id_user=:id_user AND direccion =:direccion', array(':id_user' => $user->id, ':direccion' => $direccion));
+                    if (is_null($getDireccion)) {
+                        $idDireccion = $this->setDireccion($user->id, $direccion, $_POST['latitud'], $_POST['longitud']);
+                    } else {
+                        $idDireccion = $getDireccion->id;
+                    }
+                    $rsp['pasajeros'][$user->id]['nombre'] = $nombre;
+                    $rsp['pasajeros'][$user->id]['direccion'] = $direccion;
+                    $rsp['pasajeros'][$user->id]['idDireccion'] = $idDireccion;
+                    $rsp['success'] = true;
+                }
+            }else{
+                $rsp['pasajeros']['error'] = true;
+                $rsp['pasajeros']['errores'][] = "Fila $key, Nombre: {$row['A']}";
+            }
+        }
+        echo json_encode($rsp);
     }
 
     private function nuevoUsuario() {
