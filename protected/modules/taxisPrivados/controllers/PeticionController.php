@@ -129,7 +129,8 @@ class PeticionController extends TPController {
                     if ($direccion->id_user == '0') {
                         $empresaDir[$direccion->id] = str_replace(array(', Bogota, Colombia', ', Colombia'), '', $direccion->direccion);
                     } else {
-                        $pasajeroDir[$direccion->id] = str_replace(array(', Bogota, Colombia', ', Colombia'), '', $direccion->direccion);
+                        $pasajero = Profile::model()->find('user_id=:user_id', array(':user_id' => $direccion->id_user));                        
+                        $pasajeroDir[$direccion->id] = "{$pasajero->firstname} {$pasajero->lastname}<br>" . str_replace(array(', Bogota, Colombia', ', Colombia'), '', $direccion->direccion);
                     }
                 }
                 foreach ($peticion->reservas as $key => $reserva) {
@@ -146,7 +147,8 @@ class PeticionController extends TPController {
                         if ($direccion->id_user == '0') {
                             $pedidos[$reserva->id_pedido]['empresaDir'][$direccion->id] = str_replace(array(', Bogota, Colombia', ', Colombia'), '', $direccion->direccion);
                         } else {
-                            $pedidos[$reserva->id_pedido]['pasajeroDir'][$direccion->id] = str_replace(array(', Bogota, Colombia', ', Colombia'), '', $direccion->direccion);
+                            $pasajero = Profile::model()->find('user_id=:user_id', array(':user_id' => $direccion->id_user));
+                            $pedidos[$reserva->id_pedido]['pasajeroDir'][$direccion->id] = "{$pasajero->firstname} {$pasajero->lastname}<br>" . str_replace(array(', Bogota, Colombia', ', Colombia'), '', $direccion->direccion);
                             unset($pasajeroDir[$direccion->id]);
                         }
                     }
@@ -179,8 +181,8 @@ class PeticionController extends TPController {
                 echo json_encode($rsp);
             } else {
                 $this->redirect('/taxisPrivados/peticion/ver');
-            }            
-        }else{
+            }
+        } else {
             $this->redirect(Yii::app()->request->urlReferrer);
         }
     }
