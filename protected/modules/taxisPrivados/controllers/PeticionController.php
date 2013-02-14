@@ -79,33 +79,46 @@ class PeticionController extends TPController {
 
     public function actionNuevo() {
         $hasPedido['success'] = false;
+        $error = array();
         if (isset($_POST['empresa'])) {
-            $direccion = Direccion::model()->findByPk($_POST['direccionSalida']);
+            if (is_array($_POST['direccionEmpresa']) && is_array($_POST['pasajeros'])) {
+                $peticion = new Peticion;
+                $peticion->hora_empresa = $_POST['horaEmpresa'];
+                $peticion->id_empresa = $_POST['empresa'];
+                $peticion->estado = 0;
+                $peticion->sentido = $_POST['sentido'];
+                $peticion->observaciones = $_POST['observaciones'];
+                $peticion->time = date("Y-m-d H:i:s");
+                $peticion->id_usuario = Yii::app()->user->id;
 
-            $peticion = new Peticion;
-            $peticion->hora_empresa = $_POST['horaEmpresa'];
-            $peticion->id_empresa = $_POST['empresa'];
-            $peticion->estado = 0;
-            $peticion->sentido = $_POST['sentido'];
-            $peticion->observaciones = $_POST['observaciones'];
-            $peticion->time = date("Y-m-d H:i:s");
-            $peticion->id_usuario = Yii::app()->user->id;
-
-            if ($peticion->save()) {
-                $this->nuevoDireccion($_POST['direccionEmpresa'], $peticion->id, 1);
-                $this->nuevoDireccion($_POST['pasajeros'], $peticion->id, 0);
-                $hasPeticion['success'] = true;
-                $hasPeticion['id'] = $peticion->id;
+                if ($peticion->save()) {
+                    $this->nuevoDireccion($_POST['direccionEmpresa'], $peticion->id, 1);
+                    $this->nuevoDireccion($_POST['pasajeros'], $peticion->id, 0);
+                    $hasPeticion['success'] = true;
+                    $hasPeticion['id'] = $peticion->id;
+                    $this->redirect(array('editar', 'id' => $peticion->id));
+                } else {
+                    $error = $peticion->getErrors();
+                }
+            } else {
+                $error["Direccion"][0] = "No puede ser vacio.";
             }
         }
         $this->render('nuevo', array(
             'empresas' => $this->empresas,
-            'peticion' => $hasPeticion)
+            'peticion' => $hasPeticion,
+            'error' => $error)
         );
     }
 
     public function actionVer() {
-        
+        $model = Peticion::model()->with('empresa')->findAll(array(
+            'order' => 'hora_empresa DESC'
+                ));
+        $this->render('ver', array(
+            'model' => $model
+                )
+        );
     }
 
     public function actionEditar() {
@@ -155,6 +168,20 @@ class PeticionController extends TPController {
             $peticionDireccion->id_peticion = $idPeticion;
             $peticionDireccion->tipo = $tipo;
             $peticionDireccion->save();
+        }
+    }
+
+    public function actionEliminar() {
+        if (isset($_GET['id'])) {
+            $this->loadModel($_GET['id'])->delete();
+            if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+                $rsp['success'] = true;
+                echo json_encode($rsp);
+            } else {
+                $this->redirect('/taxisPrivados/peticion/ver');
+            }            
+        }else{
+            $this->redirect(Yii::app()->request->urlReferrer);
         }
     }
 
