@@ -221,6 +221,12 @@ JS
     .eliminarDir{
         float: right;
     }
+    .empresasDir li, .pasajerosDir li{
+        background-color: white;
+        padding: 5px;
+        border-radius: 5px;
+        border: 1px solid #e1e1e8;
+    }
 </style>
 <div class="row">
     <h1 class="span12">Editar Petición</h1>
@@ -231,17 +237,25 @@ JS
     <div class="span6">
         <span><b>Direcciones empresa:</b></span>
         <ul class="unstyled empresasDir" id="empresaDir">
-            <?php if(is_array($empresaDir)){foreach ($empresaDir as $key => $dir) { ?>
-                <li data-id="<?php echo $key; ?>"><?php echo $dir; ?></li>
-            <?php }} ?>            
+            <?php if (is_array($empresaDir)) {
+                foreach ($empresaDir as $key => $dir) {
+                    ?>
+                    <li data-id="<?php echo $key; ?>"><?php echo $dir; ?></li>
+                <?php }
+            }
+            ?>            
         </ul>
     </div>
     <div class="span6">
         <span><b>Direcciones pasajeros:</b></span>        
         <ul class="unstyled pasajerosDir" id="pasajerosDir">
-            <?php if(is_array($pasajeroDir)){foreach ($pasajeroDir as $key => $dir) { ?>
-                <li data-id="<?php echo $key; ?>"><?php echo $dir; ?></li>
-            <?php }} ?>            
+            <?php if (is_array($pasajeroDir)) {
+                foreach ($pasajeroDir as $key => $dir) {
+                    ?>
+                    <li data-id="<?php echo $key; ?>"><?php echo $dir; ?></li>
+    <?php }
+}
+?>            
         </ul>
     </div>    
 </div>
@@ -260,10 +274,10 @@ JS
 <div class="row">
     <h3 class="span12">Pedidos</h3>
     <div id="pedidos" class="span12">
-        <?php
-        if (isset($pedidos)) {
-            foreach ($pedidos as $idPedido => $pedido) {
-                ?>
+<?php
+if (isset($pedidos)) {
+    foreach ($pedidos as $idPedido => $pedido) {
+        ?>
                 <div class="pedidoForm row" data-id-peticion="<?php echo $peticion->id; ?>" data-id-pedido="<?php echo $idPedido; ?>">
                     <form class="localPedidoForm span12">
                         <div class="row">
@@ -285,10 +299,10 @@ JS
                                         foreach ($pedido['empresaDir'] as $idDireccion => $direccion) {
                                             ?>
                                             <li data-id="<?php echo $idDireccion; ?>"><?php echo $direccion; ?></li>   
-                                            <?php
-                                        }
-                                    }
-                                    ?>
+                <?php
+            }
+        }
+        ?>
                                 </ul>
                             </div>
                             <div class="span6">
@@ -299,10 +313,10 @@ JS
                                         foreach ($pedido['pasajeroDir'] as $idDireccion => $direccion) {
                                             ?>
                                             <li data-id="<?php echo $idDireccion; ?>"><?php echo $direccion; ?></li>   
-                                            <?php
-                                        }
-                                    }
-                                    ?>
+                <?php
+            }
+        }
+        ?>
                                 </ul>
                             </div>
                             <div class="span12">
@@ -314,10 +328,10 @@ JS
                         <hr>
                     </form>                    
                 </div>                
-                <?php
-            }
-        }
-        ?>
+        <?php
+    }
+}
+?>
     </div>    
 </div>
 
