@@ -239,9 +239,12 @@ class PedidoController extends TPController {
     public function actionGetReservasVehiculo() {
         $pedidos = array();
         $rsp = array();
-        $reservas = PedidoReserva::model()->with('direccionesCompletas')->findAll('id_vehiculo=:id_vehiculo AND hora_inicio > NOW()', array(':id_vehiculo' => $_GET['id_vehiculo']));
+        $ahora = date("Y-m-d H:i:s");
+        $reservas = PedidoReserva::model()->with('direccionesCompletas')->findAll(array('condition'=>'id_vehiculo=:id_vehiculo AND (hora_inicio > :ahora OR :ahora BETWEEN hora_inicio AND hora_fin)',
+                                                                                        'order'=>'hora_inicio ASC',
+                                                                                        'params'=>array(':id_vehiculo' => $_GET['id_vehiculo'], ':ahora'=>$ahora)));
         if (count($reservas)) {
-            foreach ($reservas as $key => $reserva) {
+            foreach ($reservas as $keyRev => $reserva) {
                 foreach ($reserva->direccionesCompletas as $key => $direccion) {
                     if ($direccion->id_user == '0') {
                         $pedidos[$reserva->id_pedido]['empresaDir'][$direccion->id]['direccion'] = $direccion->direccion;
@@ -253,11 +256,15 @@ class PedidoController extends TPController {
                         $pedidos[$reserva->id_pedido]['pasajeroDir'][$direccion->id]['direccion'] = $direccion->direccion;
                         $pedidos[$reserva->id_pedido]['pasajeroDir'][$direccion->id]['latitud'] = $direccion->latitud;
                         $pedidos[$reserva->id_pedido]['pasajeroDir'][$direccion->id]['longitud'] = $direccion->longitud;
+                        $pedidoConfirmacion = PedidoConfirmacion::model()->find('id_pedido=:id_pedido AND id_direccion=:id_direccion', array(':id_pedido'=>$reserva->id_pedido, ':id_direccion'=>$direccion->id));
+                        $pedidos[$reserva->id_pedido]['pasajeroDir'][$direccion->id]['confirmado'] = !is_null($pedidoConfirmacion);
                     }
                     $peticion = Peticion::model()->with('peticionPedidos')->find('id_pedido=:id_pedido', array(':id_pedido'=>$reserva->id_pedido));
                     $pedidos[$reserva->id_pedido]['sentido'] = $peticion->sentido;                    
                     $pedidos[$reserva->id_pedido]['inicio'] = $reserva->hora_inicio;
                     $pedidos[$reserva->id_pedido]['fin'] = $reserva->hora_fin;
+                    $pedidos[$reserva->id_pedido]['orden'] = $keyRev;
+                    
                 }
             }
             $rsp['success'] = true;
@@ -265,9 +272,58 @@ class PedidoController extends TPController {
         }else{
             $rsp['success'] = false;
         }
+        ksort($rsp);
         echo json_encode($rsp);
     }
 
+    
+    public function actionSetConfirmacion() {
+        $rsp = array();
+        $pedidoConfirmacion = PedidoConfirmacion::model()->find('id_pedido=:id_pedido AND id_direccion=:id_direccion', array(':id_pedido'=>$_GET['idPedido'], ':id_direccion'=>$_GET['idDir']));
+
+        if(is_null($pedidoConfirmacion)){
+            $pedidoConfirmacion = new PedidoConfirmacion;
+            $pedidoConfirmacion->id_direccion = $_GET['idDir'];
+            $pedidoConfirmacion->id_pedido = $_GET['idPedido'];
+            if($pedidoConfirmacion->save()){
+                $rsp['success'] = true;
+            }else{
+                $rsp['success'] = false;
+            }
+        }else{  
+            if($_GET['check'] == 'false' ){
+                $pedidoConfirmacion->delete();
+            }else if(isset ($_GET['pass'])){
+                $pedidoConfirmacion->pasajero_confirmacion = 1;
+                if($pedidoConfirmacion->save()){
+                    $rsp['success'] = true;
+                }
+            }else{
+                $rsp['success'] = false;
+            }
+        }
+        echo json_encode($rsp);
+    }
+    
+    public function actionBorrarConfirmacion() {
+        PedidoConfirmacion::model()->deleteAll('id_pedido=:id_pedido AND id_direccion=:id_direccion', array(':id_pedido'=>$_GET['idPedido'], ':id_direccion'=>$_GET['idDir']));
+    }
+    
+    public function actionActualizarEstado() {
+        $rsp = array();
+        $model = Pedido::model()->findByPk($_GET['id']);
+        if(is_null($model)){
+            $rsp['success'] = false;
+        }else{
+            $model->id_estado = $_GET['estado'];
+            if($model->save()){
+                $rsp['success'] = true;
+            }else{
+                $rsp['success'] = false;
+            }
+        }
+        echo json_encode($rsp);
+    }
     // Uncomment the following methods and override them if needed
 
     public function filters() {
