@@ -127,9 +127,9 @@ class PeticionController extends TPController {
             if (!is_null($peticion)) {
                 foreach ($peticion->direcciones as $key => $direccion) {
                     if ($direccion->id_user == '0') {
-                        $empresaDir[$direccion->id] = $direccion->direccion;
+                        $empresaDir[$direccion->id] = str_replace(array(', Bogota, Colombia', ', Colombia'), '', $direccion->direccion);
                     } else {
-                        $pasajeroDir[$direccion->id] = $direccion->direccion;
+                        $pasajeroDir[$direccion->id] = str_replace(array(', Bogota, Colombia', ', Colombia'), '', $direccion->direccion);
                     }
                 }
                 foreach ($peticion->reservas as $key => $reserva) {
@@ -144,9 +144,9 @@ class PeticionController extends TPController {
                     foreach ($direccionesPedido->direccionesCompletas as $key => $direccion) {
 
                         if ($direccion->id_user == '0') {
-                            $pedidos[$reserva->id_pedido]['empresaDir'][$direccion->id] = $direccion->direccion;
+                            $pedidos[$reserva->id_pedido]['empresaDir'][$direccion->id] = str_replace(array(', Bogota, Colombia', ', Colombia'), '', $direccion->direccion);
                         } else {
-                            $pedidos[$reserva->id_pedido]['pasajeroDir'][$direccion->id] = $direccion->direccion;
+                            $pedidos[$reserva->id_pedido]['pasajeroDir'][$direccion->id] = str_replace(array(', Bogota, Colombia', ', Colombia'), '', $direccion->direccion);
                             unset($pasajeroDir[$direccion->id]);
                         }
                     }
