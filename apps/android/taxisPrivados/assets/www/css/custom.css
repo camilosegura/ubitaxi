@@ -1,39 +1,38 @@
 #control .ui-content {
-	height: 100%;
-	padding: 0px;
+    height: 100%;
+    padding: 0px;
 }
 
 #control {
-	height: 100%;
+    height: 100%;
 }
-
-#estado-button {
-	float: left;
-	margin: 3px 0px 0px 5px;
-	width: 200px;
+#panelPedidos-popup {
+    right: 0 !important;
+    left: auto !important;
 }
-
-.menu-hiden { /*display: none!important;*/
-	
+#panelPedidos {
+    border: 1px solid #000;
+    border-right: none;
+    background: rgba(0,0,0,.5);
+    margin: -1px 0;
 }
-
-#iniciar {
-	position: relative;
-	float: left;
+#panelPedidos .ui-btn {
+    margin: 2em 15px;
 }
-
-#sefue {
-	float: left;
-	margin-top: 3px;
-	margin-left: 10px;
+.pedidoDirCont{
+    float: left;
+    margin: -20px 1% 0 1%;
+    width: 48%;
 }
-#llegada{
-	float: left;
-	margin: 3px 0px 0px 5px;
+h3{
+    color: yellow;    
 }
-#ocupado{
-	margin-top: -42px;
-	margin-bottom: 0px;
-	width: 124px;
-	float: right;
+.cerrarPopup{    
+    float: right;
+}
+.popupPedido{
+    background: rgba(0,0,0,.5);
+}
+#panelSelectPedido-popup, #panelPedido-popup{
+    width: 100%;
 }
