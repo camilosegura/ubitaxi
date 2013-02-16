@@ -38,26 +38,27 @@
         </div>        
         <div data-role="page" id="control" data-theme="e">
             <div data-role="header" data-theme="e">
-                <a href="#panelSelectPedido" data-theme="b" data-rel="popup" id="verPedido" data-icon="arrow-d" style="display: none;">
-                    Ver pedido
-                </a>
+                <a href="#" id="salir" data-inline="true">Salir</a>
                 <h1 id="reloj"></h1>
-                <a href="#panelPedidos" id="todosPedidos" data-rel="popup" data-icon="arrow-d" class="ui-btn-right" style="margin-right: 90px;">
-                    Todos los pedidos
-                </a>
-                <a href="#popupMainMenu" data-rel="popup" data-icon="grid" class="ui-btn-right">
-                    Menú
-                </a>
-                <div data-role="popup" id="popupMainMenu" data-theme="a">
-                    <ul data-role="listview" data-inset="true" style="min-width: 210px;" data-theme="b">                        
-                        <li><a href="#" id="salir" data-inline="true">Salir</a></li>
-                    </ul>
-                </div>
+                <a href="#panelPedido" data-theme="b" data-rel="popup" id="verPedido" data-icon="arrow-d" style="display: none;">
+                    Ver pedido
+                </a>                                               
                 <div data-role="popup" id="panelPedidos" data-corners="false" data-theme="none" data-shadow="false" data-tolerance="0,0" class="popupPedido"></div>
 
-                <div id="panelPedido" data-role="popup" data-corners="false" data-theme="none" data-shadow="false" data-tolerance="0,0" class="popupPedido"></div>
-                <div data-role="popup" id="panelSelectPedido" data-corners="false" data-theme="none" data-shadow="false" data-tolerance="0,0" class="popupPedido"></div>
-                <div id="panelPopupLoginForm"></div>                
+                <div id="panelPedido" data-role="popup" data-corners="false" data-theme="none" data-shadow="false" data-tolerance="0,0" class="popupPedido">
+                    <div>
+                        <a href="#" data-rel="back" data-role="button" data-theme="a" data-icon="check" data-inline="true" id="finalizar" class="finalizar">Finalizar</a>
+                        <a href="#" data-rel="back" data-role="button" data-theme="b" data-icon="check" data-inline="true" id="fallido" class="fallido">Fallido</a>
+                        <a href="#" data-role="button" data-theme="c" data-icon="delete" data-inline="true" id="cancelarFallido" class="fallido">Cancelar</a>
+                        
+                        <span id="relojPedido"></span>
+                        <span id="idPedido">Pedido: <span></span></span>
+                        <a href="#" data-rel="back" data-role="button" data-theme="c" data-icon="delete" class="cerrarPopup" data-inline="true">Volver</a>
+                    </div>
+                    <div id="panelPedidoInfo">
+                        
+                    </div>
+                </div>
             </div>
 
             <div data-role="content" id="controlContent">
