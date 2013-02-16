@@ -2,13 +2,13 @@
     height: 100%;
     padding: 0px;
 }
-
 #control {
     height: 100%;
 }
 #panelPedidos-popup {
     right: 0 !important;
     left: auto !important;
+    top: 0;
 }
 #panelPedidos {
     border: 1px solid #000;
@@ -35,4 +35,23 @@ h3{
 }
 #panelSelectPedido-popup, #panelPedido-popup{
     width: 100%;
+}
+#verPedido{
+    right: 250px;
+}
+.finalizar{
+    width: 300px;
+    margin-right: 55px;
+}
+#relojPedido, #idPedido{
+   margin-top: 10px;
+   color: yellow;
+   font-weight: bold;
+}
+#idPedido{
+    margin-left: 50px;
+}
+
+#cancelarFallido{
+    margin-right: 99px;
 }
