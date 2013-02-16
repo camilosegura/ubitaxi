@@ -240,7 +240,8 @@ class PedidoController extends TPController {
         $pedidos = array();
         $rsp = array();
         $ahora = date("Y-m-d H:i:s");
-        $reservas = PedidoReserva::model()->with('direccionesCompletas', 'empresa')->findAll(array('condition' => 'id_vehiculo=:id_vehiculo AND (hora_inicio > :ahora OR :ahora BETWEEN hora_inicio AND hora_fin)',
+        $reservas = PedidoReserva::model()->with('direccionesCompletas', 'empresa', 'pedido')->findAll(array(
+            'condition' => 'id_vehiculo=:id_vehiculo AND (hora_inicio > :ahora OR :ahora BETWEEN hora_inicio AND hora_fin) AND (pedido.id_estado = 3 OR pedido.id_estado = 9)',
             'order' => 'hora_inicio ASC',
             'params' => array(':id_vehiculo' => $_GET['id_vehiculo'], ':ahora' => $ahora)));
         if (count($reservas)) {
