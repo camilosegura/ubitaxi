@@ -240,91 +240,104 @@ class PedidoController extends TPController {
         $pedidos = array();
         $rsp = array();
         $ahora = date("Y-m-d H:i:s");
-        $reservas = PedidoReserva::model()->with('direccionesCompletas', 'empresa')->findAll(array('condition'=>'id_vehiculo=:id_vehiculo AND (hora_inicio > :ahora OR :ahora BETWEEN hora_inicio AND hora_fin)',
-                                                                                        'order'=>'hora_inicio ASC',
-                                                                                        'params'=>array(':id_vehiculo' => $_GET['id_vehiculo'], ':ahora'=>$ahora)));
+        $reservas = PedidoReserva::model()->with('direccionesCompletas', 'empresa')->findAll(array('condition' => 'id_vehiculo=:id_vehiculo AND (hora_inicio > :ahora OR :ahora BETWEEN hora_inicio AND hora_fin)',
+            'order' => 'hora_inicio ASC',
+            'params' => array(':id_vehiculo' => $_GET['id_vehiculo'], ':ahora' => $ahora)));
         if (count($reservas)) {
             foreach ($reservas as $keyRev => $reserva) {
                 foreach ($reserva->direccionesCompletas as $key => $direccion) {
                     if ($direccion->id_user == '0') {
                         $pedidos[$reserva->id_pedido]['empresaDir'][$direccion->id]['direccion'] = str_replace(array('Cundinamarca, Colombia', ', Bogota, Colombia', ', Colombia'), '', $direccion->direccion);
                         $pedidos[$reserva->id_pedido]['empresaDir'][$direccion->id]['latitud'] = $direccion->latitud;
-                        $pedidos[$reserva->id_pedido]['empresaDir'][$direccion->id]['longitud'] = $direccion->longitud;                        
+                        $pedidos[$reserva->id_pedido]['empresaDir'][$direccion->id]['longitud'] = $direccion->longitud;
                     } else {
                         $pasajero = Profile::model()->find("user_id=:user_id", array(':user_id' => $direccion->id_user));
                         $pedidos[$reserva->id_pedido]['pasajeroDir'][$direccion->id]['nombre_pasajero'] = "{$pasajero->firstname} {$pasajero->lastname}";
                         $pedidos[$reserva->id_pedido]['pasajeroDir'][$direccion->id]['direccion'] = str_replace(array('Cundinamarca, Colombia', ', Bogota, Colombia', ', Colombia'), '', $direccion->direccion);
                         $pedidos[$reserva->id_pedido]['pasajeroDir'][$direccion->id]['latitud'] = $direccion->latitud;
                         $pedidos[$reserva->id_pedido]['pasajeroDir'][$direccion->id]['longitud'] = $direccion->longitud;
-                        $pedidoConfirmacion = PedidoConfirmacion::model()->find('id_pedido=:id_pedido AND id_direccion=:id_direccion', array(':id_pedido'=>$reserva->id_pedido, ':id_direccion'=>$direccion->id));
+                        $pedidoConfirmacion = PedidoConfirmacion::model()->find('id_pedido=:id_pedido AND id_direccion=:id_direccion', array(':id_pedido' => $reserva->id_pedido, ':id_direccion' => $direccion->id));
                         $pedidos[$reserva->id_pedido]['pasajeroDir'][$direccion->id]['confirmado'] = !is_null($pedidoConfirmacion);
                     }
-                    $peticion = Peticion::model()->with('peticionPedidos')->find('id_pedido=:id_pedido', array(':id_pedido'=>$reserva->id_pedido));
-                    $pedidos[$reserva->id_pedido]['sentido'] = $peticion->sentido;                    
+                    $peticion = Peticion::model()->with('peticionPedidos')->find('id_pedido=:id_pedido', array(':id_pedido' => $reserva->id_pedido));
+                    $pedidos[$reserva->id_pedido]['sentido'] = $peticion->sentido;
                     $pedidos[$reserva->id_pedido]['inicio'] = $reserva->hora_inicio;
                     $pedidos[$reserva->id_pedido]['fin'] = $reserva->hora_fin;
                     $pedidos[$reserva->id_pedido]['orden'] = $keyRev;
                     $pedidos[$reserva->id_pedido]['empresa'] = $reserva->empresa->nombre;
-                    
                 }
             }
             $rsp['success'] = true;
             $rsp['pedidos'] = $pedidos;
-        }else{
+        } else {
             $rsp['success'] = false;
         }
         ksort($rsp);
         echo json_encode($rsp);
     }
 
-    
     public function actionSetConfirmacion() {
         $rsp = array();
-        $pedidoConfirmacion = PedidoConfirmacion::model()->find('id_pedido=:id_pedido AND id_direccion=:id_direccion', array(':id_pedido'=>$_GET['idPedido'], ':id_direccion'=>$_GET['idDir']));
+        $pedidoConfirmacion = PedidoConfirmacion::model()->find('id_pedido=:id_pedido AND id_direccion=:id_direccion', array(':id_pedido' => $_GET['idPedido'], ':id_direccion' => $_GET['idDir']));
+        $pedido = Pedido::model()->findByPk($_GET['idPedido']);
 
-        if(is_null($pedidoConfirmacion)){
+        if (is_null($pedidoConfirmacion)) {
             $pedidoConfirmacion = new PedidoConfirmacion;
             $pedidoConfirmacion->id_direccion = $_GET['idDir'];
             $pedidoConfirmacion->id_pedido = $_GET['idPedido'];
-            if($pedidoConfirmacion->save()){
+            if ($pedidoConfirmacion->save()) {
+                $pedido->id_estado = 3;
+                $pedido->save();
                 $rsp['success'] = true;
-            }else{
+            } else {
                 $rsp['success'] = false;
             }
-        }else{  
-            if($_GET['check'] == 'false' ){
+        } else {
+            if ($_GET['check'] == 'false') {
                 $pedidoConfirmacion->delete();
-            }else if(isset ($_GET['pass'])){
+                $pedidoConfirmaciones = PedidoConfirmacion::model()->findAll('id_pedido=:id_pedido', array(':id_pedido' => $_GET['idPedido']));
+                if (!count($pedidoConfirmaciones)) {
+                    $pedido->id_estado = 9;
+                    $pedido->save();
+                }
+            } else if (isset($_GET['pass'])) {
                 $pedidoConfirmacion->pasajero_confirmacion = 1;
-                if($pedidoConfirmacion->save()){
+                if ($pedidoConfirmacion->save()) {
                     $rsp['success'] = true;
                 }
-            }else{
+            } else {
                 $rsp['success'] = false;
             }
         }
         echo json_encode($rsp);
     }
-    
+
     public function actionBorrarConfirmacion() {
-        PedidoConfirmacion::model()->deleteAll('id_pedido=:id_pedido AND id_direccion=:id_direccion', array(':id_pedido'=>$_GET['idPedido'], ':id_direccion'=>$_GET['idDir']));
+        PedidoConfirmacion::model()->deleteAll('id_pedido=:id_pedido AND id_direccion=:id_direccion', array(':id_pedido' => $_GET['idPedido'], ':id_direccion' => $_GET['idDir']));
+        $pedidoConfirmaciones = PedidoConfirmacion::model()->findAll('id_pedido=:id_pedido', array(':id_pedido' => $_GET['idPedido']));
+        if (!count($pedidoConfirmaciones)) {
+            $pedido = Pedido::model()->findByPk($_GET['idPedido']);
+            $pedido->id_estado = 9;
+            $pedido->save();
+        }
     }
-    
+
     public function actionActualizarEstado() {
         $rsp = array();
         $model = Pedido::model()->findByPk($_GET['id']);
-        if(is_null($model)){
+        if (is_null($model)) {
             $rsp['success'] = false;
-        }else{
+        } else {
             $model->id_estado = $_GET['estado'];
-            if($model->save()){
+            if ($model->save()) {
                 $rsp['success'] = true;
-            }else{
+            } else {
                 $rsp['success'] = false;
             }
         }
         echo json_encode($rsp);
     }
+
     // Uncomment the following methods and override them if needed
 
     public function filters() {
