@@ -40,7 +40,9 @@ var reintentos = {};
 var popupPedido = {};
 var panelPedido;
 var panelPedidos;
-var panelSelectPedido;
+var panelPedidoInfo;
+var idPedidocont;
+var finalizar;
 var directionsService = new google.maps.DirectionsService();
 var taxiIcon = new google.maps.MarkerImage(
         'http://ubitaxi.argesys.co/images/taxi.png',
@@ -99,101 +101,61 @@ control.live("pageshow", function() {
     layer = new google.maps.TrafficLayer();
     layer.setMap(map);
     getPedido();
+    panelPedidos.popup('open');
 });
 control.live("pageinit", function() {
     controlContent = $('#controlContent');
     mapCanvas = $('#map_canvas');
+    setPanelHeight();
     panelPedido = $('#panelPedido');
     panelPedidos = $('#panelPedidos');
-    panelSelectPedido = $('#panelSelectPedido');
+    verPedido = $('#verPedido');
+    panelPedidoInfo = $('#panelPedidoInfo');
+    idPedidocont = $('#idPedido');
+    finalizar = $('#finalizar');
+    $('.fallido').hide();
     setControlHeight();
     setInterval(getPedido, 20000);
 });
-$(document).on('click', '.iniciar', function() {
 
-    idPedido = $(this).data('idPedido');
-    var url = 'http://ubitaxi.argesys.co/taxisPrivados/pedido/actualizarEstado';
-    var data = {
-        id: idPedido,
-        estado: 3
-    };
-    if (typeof dirPasajeros[idPedido] === "undefined") {
-        navigator.notification.alert("Debe seleccionar un pasajero", function() {
-        }, "Error", "Aceptar");
-        return false;
-    }
-    $.getJSON(url, data, function(rsp) {
-    }).error(function(jqXHR, textStatus, errorThrown) {
-        var currentTime = new Date().getTime();
-        reintentos[currentTime] = setInterval(function() {
-            reintentarEnvio(url, data, currentTime, dummy)
-        }, 5000);
-
-    });
-    dirDestinos = reservas[idPedido]['pasajeroDir'];
-    var listPasajeroDir = listPasajeroFin(idPedido, dirPasajeros[idPedido]);
-    var listEmpresaDir = listEmpresadirInicio(reservas[idPedido]['empresaDir'], reservas[idPedido]['sentido'], reservas[idPedido]['inicio'], reservas[idPedido]['fin']);
-    var popupPedido = pedidoPopup(idPedido, listPasajeroDir, listEmpresaDir, reservas[idPedido]['sentido'], 'panelSelectPedido', '<a href="#" data-rel="back" data-role="button" data-theme="b" data-icon="minus" data-inline="true" class="finalizar" data-id-pedido="' + idPedido + '">Finalizar</a>');
-
-    panelSelectPedido.html($(popupPedido).html());
-    panelSelectPedido.trigger("create");
-
-    setPanelHeight();
-    panelSelectPedido.popup('open');
-    $('#verPedido').show();
-
-});
-$(document).on('click', '.finalizar', function() {
+$(document).on('click', '#finalizar', function() {
     idPedido = $(this).data('idPedido');
     var url = 'http://ubitaxi.argesys.co/taxisPrivados/pedido/actualizarEstado';
     var data = {
         id: idPedido,
         estado: 4
     };
-    dirDestinos = 0;
-    mapRefresh();
-    $('#verPedido').hide();
-    $.getJSON(url, data, function(rsp) {
-    }).error(function(jqXHR, textStatus, errorThrown) {
-        var currentTime = new Date().getTime();
-        reintentos[currentTime] = setInterval(function() {
-            reintentarEnvio(url, data, currentTime, dummy)
-        }, 5000);
 
-    });
+    if (typeof dirPasajeros[idPedido] === 'undefined' || !Object.keys(dirPasajeros[idPedido]).length) {
+        $(this).hide();
+        $('.fallido').show();        
+        return false;
+    }
+    finalizarPedido(url, data);
+    getPedido();
+});
+$(document).on('click', '#fallido', function() {    
+    var url = 'http://ubitaxi.argesys.co/taxisPrivados/pedido/actualizarEstado';
+    var data = {
+        id: idPedido,
+        estado: 2
+    };
+    finalizarPedido(url, data);
+    getPedido();
+});
+$(document).on('click', '#cancelarFallido', function() {
+    $('.fallido').hide();
+    finalizar.show();
 });
 $(document).on('click', '#salir', function() {
     logout();
     $.mobile.changePage('#pageLogin');
 });
-$(document).on('submit', '.popupLoginForm', function() {
-    var formData = $(this).serializeArray();
-    var url = 'http://ubitaxi.argesys.co/taxisPrivados/pedido/setConfirmacion';
-    var data = {};
-    if ($("input[type=submit][clicked=true]", $(this)).val() === "Enviar") {
-        $.each(formData, function(i, field) {
-            data[field.name] = field.value;
-        });
-        $.getJSON(url, data, function(rsp) {
-        }).error(function(jqXHR, textStatus, errorThrown) {
-            var currentTime = new Date().getTime();
-            reintentos[currentTime] = setInterval(function() {
-                reintentarEnvio(url, data, currentTime, dummy)
-            }, 5000);
 
-        });
-    }
-    $(this).parent().popup("close");
-    panelSelectPedido.popup('open');
-    return false;
-});
-$(document).on('click', "form input[type=submit]", function() {
-    $("input[type=submit]", $(this).parents("form")).removeAttr("clicked");
-    $(this).attr("clicked", "true");
-});
 
 $(document).on('click', '.popupPedidoBtn', function() {
-    setPopupPedido(popupPedido[$(this).data('idPedido')]);
+    idPedido = $(this).data('idPedido');
+    setPopupPedido(popupPedido[idPedido]);
 });
 $(document).on('change', '.checkPasajero', function() {
     var url = '';
@@ -294,7 +256,6 @@ function handleLogin() {
 
     return false;
 }
-
 function Locator() {
 }
 
@@ -339,11 +300,11 @@ Locator.prototype.sendLocation = function(lat, lng, alt, speed, time) {
 
 window.locator = new Locator();
 
-function getIdVehiculo() {    
+function getIdVehiculo() {
     var url = "http://ubitaxi.argesys.co/destinos/vehiculo/getid.html";
     var data = {
         id_telefono: idTelefono
-    };    
+    };
     $.getJSON(url, data, function(rsp) {
 
         if (rsp.success) {
@@ -363,6 +324,7 @@ function getIdVehiculo() {
 
 function getPedido() {
     //navigator.notification.alert("sss");
+    var botonesPedido = '<a href="#" data-role="button" data-theme="a">No tiene pedidos</a>';
     var url = 'http://ubitaxi.argesys.co/taxisPrivados/pedido/getReservasVehiculo';
     var data = {
         id_vehiculo: idVehiculo
@@ -374,26 +336,29 @@ function getPedido() {
         if (rsp.success && !Object.identical(reservas, getPedidos)) {
             reservas = getPedidos;
             var botonPedido = {};
-            var botonesPedido = '';
             var listEmpresaDir = '';
             var listPasajeroDir = '';
             var selectoresPanel = '';
             var dirPasajero = {};
             var primerPedido = 0;
-
+            var theme = '';
+            var servicio = '';
+            botonesPedido = '';
             $.each(rsp.pedidos, function(id, pedido) {
-
                 selectoresPanel += '#panelPedido-' + id + ',';
-                botonPedido[pedido.orden] = '<a href="#panelPedido" data-role="button" data-rel="popup" data-id-pedido="' + id + '" class="popupPedidoBtn">' + pedido.inicio + '</a>';
+                theme = ((pedido.sentido==='0') ? 'e' : 'b');
+                servicio = ((pedido.sentido==='0') ? 'Recogida' : 'Entrada');
+                botonPedido[pedido.orden] = '<a href="#panelPedido" data-role="button" data-rel="popup" data-id-pedido="' + id + '" class="popupPedidoBtn" data-theme="'+theme+'">' + pedido.inicio + '</a>';
                 $.each(pedido.pasajeroDir, function(idDir, direccion) {
                     if (direccion.confirmado) {
                         dirPasajero[idDir] = direccion;
                         dirPasajeros[id] = dirPasajero;
                     }
                 });
-                listPasajeroDir = listPasajeroInicio(id, pedido.pasajeroDir);
-                listEmpresaDir = listEmpresadirInicio(pedido.empresaDir, pedido.sentido, pedido.inicio, pedido.fin);
-                popupPedido[id] = $(pedidoPopup(id, listPasajeroDir, listEmpresaDir, pedido.sentido, 'panelPedido', '<a href="#" data-rel="back" data-role="button" data-theme="b" data-icon="check" data-inline="true" class="iniciar" data-id-pedido="' + id + '">Iniciar</a>'));
+            
+                listPasajeroDir = listPasajeroInicio(id, pedido.pasajeroDir, theme);
+                listEmpresaDir = listEmpresadirInicio(pedido.empresaDir, pedido.sentido, pedido.inicio, pedido.fin, pedido.empresa, theme);
+                popupPedido[id] = $(pedidoPopup(id, listPasajeroDir, listEmpresaDir, pedido.sentido, 'panelPedido', Object.keys(pedido.pasajeroDir).length, servicio));
             });
             $.each(botonPedido, function(i, boton) {
                 if (primerPedido === 0) {
@@ -404,40 +369,36 @@ function getPedido() {
 
             panelPedidos.html(botonesPedido);
             panelPedidos.trigger("create");
-
-            setPopupPedido(popupPedido[$(primerPedido).data('idPedido')]);
-            //$('.popupPedido').popup('close');
-            setPanelHeight();
+            idPedido = $(primerPedido).data('idPedido');
+            setPopupPedido(popupPedido[idPedido]);
+            panelPedido.popup('close');
             panelPedido.popup('open');
             speak('Tiene un pedido');
             navigator.notification.vibrate(1000);
+            verPedido.show();
         } else if (!rsp.success) {
             panelPedidos.html(botonesPedido);
             panelPedidos.trigger("create");
+            panelPedido.popup('close');
+            verPedido.hide();
         }
     });
 }
-function pedidoPopup(id, listPasajeroDir, listEmpresaDir, sentido, idPop, extra) {
+function pedidoPopup(id, listPasajeroDir, listEmpresaDir, sentido, idPop, totalPasasjeros, servicio) {
     var popupPedido = '';
     popupPedido += '<div data-role="popup" id="' + idPop + '-' + id + '" data-corners="false" data-theme="none" data-shadow="false" class="popupPedido">';
-    popupPedido += '<div class="botonesPanel">';
-    popupPedido += extra;
-    popupPedido += '<a href="#" data-rel="back" data-role="button" data-theme="c" data-icon="delete" class="cerrarPopup" data-inline="true">Cerrar</a>';
-    popupPedido += '</div>';
     if (sentido === '0') {
-        popupPedido += '<div class="pedidoDirCont"><h3>Inicio recorrido</h3>';
-        popupPedido += '<ul data-role="listview" data-inset="true">';
+        popupPedido += '<div class="pedidoDirCont"><h3>Inicio &nbsp;&nbsp;&nbsp;- &nbsp;&nbsp;&nbsp;'+servicio+'</h3>';
         popupPedido += listEmpresaDir;
-        popupPedido += '</ul></div>';
-        popupPedido += '<div class="pedidoDirCont"><h3>Fin recorrido</h3>';
+        popupPedido += '</div>';
+        popupPedido += '<div class="pedidoDirCont"><h3>Fin &nbsp;&nbsp;&nbsp;- &nbsp;&nbsp;&nbsp;'+totalPasasjeros+' Pasajero(s)</h3>';
         popupPedido += listPasajeroDir;
         popupPedido += '</div>';
     } else {
-        popupPedido += '<div class="pedidoDirCont"><h3>Inicio recorrido</h3>';
+        popupPedido += '<div class="pedidoDirCont"><h3>Inicio &nbsp;&nbsp;&nbsp;- &nbsp;&nbsp;&nbsp;'+servicio+'</h3>';
         popupPedido += listPasajeroDir;
         popupPedido += '</div>';
-        popupPedido += '<div class="pedidoDirCont"><h3>Fin recorrido</h3>';
-        popupPedido += '';
+        popupPedido += '<div class="pedidoDirCont"><h3>Fin &nbsp;&nbsp;&nbsp;- &nbsp;&nbsp;&nbsp;'+totalPasasjeros+' Pasajero(s)</h3>';
         popupPedido += listEmpresaDir;
         popupPedido += '</div>';
     }
@@ -445,54 +406,29 @@ function pedidoPopup(id, listPasajeroDir, listEmpresaDir, sentido, idPop, extra)
     popupPedido += '<div style="clear:both;"></div></div>';
     return popupPedido;
 }
-function listPasajeroInicio(id, pasajeroDir) {
+function listPasajeroInicio(id, pasajeroDir, theme) {
     var checked = '';
-    var listPasajeroDir = '<fieldset data-role="controlgroup">';
+    var listPasajeroDir = '<fieldset data-role="controlgroup" data-theme="'+theme+'">';
     $.each(pasajeroDir, function(idDir, direccion) {
         if (direccion.confirmado) {
             checked = 'checked';
         } else {
             checked = '';
         }
-        listPasajeroDir += '<input type="checkbox" name="checkbox-' + idDir + '" id="checkbox-' + idDir + '" class="custom checkPasajero" data-id-pedido="' + id + '" data-id-direccion="' + idDir + '" ' + checked + ' />';
-        listPasajeroDir += '<label for="checkbox-' + idDir + '">' + direccion.direccion + '<br>' + direccion.nombre_pasajero + '</label>';
+        listPasajeroDir += '<input type="checkbox" name="checkbox-' + idDir + '" id="checkbox-' + idDir + '" class="custom checkPasajero" data-id-pedido="' + id + '" data-id-direccion="' + idDir + '" ' + checked + ' data-theme="'+theme+'" />';
+        listPasajeroDir += '<label for="checkbox-' + idDir + '" data-theme="'+theme+'">' + direccion.direccion + '<br>' + direccion.nombre_pasajero + '</label>';
     });
     listPasajeroDir += '</fieldset>';
     return listPasajeroDir;
 }
-function listPasajeroFin(id, pasajeroDir) {
-    var confirmPopups = '';
-    var listPasajeroDir = '<ul data-role="listview" data-inset="true">';
-    $.each(pasajeroDir, function(idDir, direccion) {
-        listPasajeroDir += '<li><a href="#popupLogin-' + idDir + '" data-rel="popup" style="display:block;"> ' + direccion.direccion + '<br>' + direccion.nombre_pasajero + '</a></li>';
 
-        confirmPopups += '<div data-role="popup" id="popupLogin-' + idDir + '" data-theme="a" class="ui-corner-all">';
-        confirmPopups += '<form data-ajax="false" class="popupLoginForm">';
-        confirmPopups += '<div style="padding:10px 20px;">';
-        confirmPopups += '<h3>' + direccion.nombre_pasajero + '</h3>';
-        confirmPopups += '<h3>Ingrese su contraseña</h3>';
-        confirmPopups += '<label for="pass" class="ui-hidden-accessible">Password:</label>';
-        confirmPopups += '<input type="password" name="pass" id="pass" value="" placeholder="contraseña" data-theme="a" /><br><br><br>';
-        confirmPopups += '<input type="hidden" name="idDir" id="idDir" value="' + idDir + '"  />';
-        confirmPopups += '<input type="hidden" name="idPedido" id="idPedido" value="' + id + '"  />';
-        confirmPopups += '<input type="submit" data-theme="b" data-inline="true" value="Enviar"/>';
-        confirmPopups += '<input type="submit" data-theme="c" data-inline="true" value="Cerrar" />';
-        confirmPopups += '</div>';
-        confirmPopups += '</form>';
-        confirmPopups += '</div>';
-    });
-    listPasajeroDir += '</ul>';
-    $('#panelPopupLoginForm').html(confirmPopups);
-    $('#panelPopupLoginForm').trigger("create");
-    return listPasajeroDir;
-}
-function listEmpresadirInicio(empresaDir, sentido, inicio, fin) {
-    var listEmpresaDir = '<ul data-role="listview" data-inset="true">';
+function listEmpresadirInicio(empresaDir, sentido, inicio, fin, nombre, theme) {
+    var listEmpresaDir = '<ul data-role="listview" data-inset="true" data-theme="'+theme+'">';
     $.each(empresaDir, function(idDir, direccion) {
         if (sentido == '0') {
-            listEmpresaDir += '<li>' + direccion.direccion + '<br>' + inicio + '</li>';
+            listEmpresaDir += '<li>' + nombre + '<br>' + direccion.direccion + '<br>' + inicio + '</li>';
         } else {
-            listEmpresaDir += '<li>' + direccion.direccion + '<br>' + fin + '</li>';
+            listEmpresaDir += '<li>' + nombre + '<br>' + direccion.direccion + '<br>' + fin + '</li>';
         }
     });
     listEmpresaDir += '</ul>';
@@ -574,9 +510,11 @@ function startTime()
     m = checkTime(m);
     s = checkTime(s);
     document.getElementById('reloj').innerHTML = h + ":" + m + ":" + s;
+    document.getElementById('relojPedido').innerHTML = h + ":" + m + ":" + s;
     t = setTimeout(function() {
         startTime()
     }, 500);
+
 }
 
 function checkTime(i)
@@ -587,8 +525,32 @@ function checkTime(i)
     }
     return i;
 }
-
 function setPopupPedido(popupPedidoHtml) {
-    panelPedido.html(popupPedidoHtml.html());
-    panelPedido.trigger("create");
+    panelPedidoInfo.html(popupPedidoHtml.html());
+    panelPedidoInfo.trigger("create");
+    $('span', idPedidocont).html(idPedido);
+    finalizar.data('idPedido', idPedido);
 }
+function finalizarPedido(url, data) {
+    dirDestinos = 0;
+    mapRefresh();
+    verPedido.hide();
+    $.getJSON(url, data, function(rsp) {
+    }).error(function(jqXHR, textStatus, errorThrown) {
+        var currentTime = new Date().getTime();
+        reintentos[currentTime] = setInterval(function() {
+            reintentarEnvio(url, data, currentTime, dummy)
+        }, 5000);
+
+    });
+}
+$(document).on('popupafteropen', '#panelPedido', function() {
+    verPedido.hide();
+    panelPedidos.hide();
+    $('#reloj').hide();
+});
+$(document).on('popupafterclose', '#panelPedido', function() {
+    verPedido.show();
+    panelPedidos.show();
+    $('#reloj').show();
+});	   
