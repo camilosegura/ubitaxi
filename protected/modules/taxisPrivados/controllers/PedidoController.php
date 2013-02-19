@@ -266,6 +266,11 @@ class PedidoController extends TPController {
                     $pedidos[$reserva->id_pedido]['fin'] = $reserva->hora_fin;
                     $pedidos[$reserva->id_pedido]['orden'] = $keyRev;
                     $pedidos[$reserva->id_pedido]['empresa'] = $reserva->empresa->nombre;
+                    if($reserva->estado == '0'){
+                        $reserva->estado = 1;
+                        $reserva->save();
+                    }
+                    
                 }
             }
             $rsp['success'] = true;
@@ -336,6 +341,26 @@ class PedidoController extends TPController {
                 $rsp['success'] = false;
             }
         }
+        echo json_encode($rsp);
+    }
+    
+    public function actionGetEstados() {
+        $rsp = array();
+        if(isset($_GET['idPedidos'])){
+            $idPedidos = implode("','", $_GET['idPedidos']);
+            $idPedidos = "'$idPedidos'";
+            $reservas = PedidoReserva::model()->findAll("id_pedido IN ($idPedidos)");
+            if(count($reservas)){
+                foreach ($reservas as $key => $reserva) {
+                    $rsp['pedidos'][$reserva->id_pedido] = $reserva->estado;
+                }
+                $rsp['success'] = true;
+            }else{
+                $rsp['success'] = false;
+            }
+        }else{
+            $rsp['success'] = false;
+        }        
         echo json_encode($rsp);
     }
 
