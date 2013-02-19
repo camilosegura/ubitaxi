@@ -138,6 +138,7 @@ class PeticionController extends TPController {
                     $pedidos[$reserva->id_pedido]['inicio'] = $reserva->hora_inicio;
                     $pedidos[$reserva->id_pedido]['fin'] = $reserva->hora_fin;
                     $pedidos[$reserva->id_pedido]['idVehiculo'] = $reserva->id_vehiculo;
+                    $pedidos[$reserva->id_pedido]['estadoReserva'] = $reserva->estado;
                     $vehiculo = Vehiculo::model()->findByPk($reserva->id_vehiculo);
                     $pedidos[$reserva->id_pedido]['placaVehiculo'] = $vehiculo->placa;
                     $direccionesPedido = PedidoReserva::model()->with('direccionesCompletas')->find('t.id_pedido=:id_pedido', array(':id_pedido' => $reserva->id_pedido));
