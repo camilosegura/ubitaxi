@@ -16,7 +16,12 @@ $cs->registerScript('script', <<<JS
    var horaEmpresa = "$horaEmpresa";   
    var sentido = "$sentido";
    var minTime = "$minTime";
-   var maxTime = "$maxTime";    
+   var maxTime = "$maxTime";
+   var pedidos = $('#pedidos');
+   
+
+   setTimePicker($('#pedidos'));
+   setInterval(buscarLeidos, 5000);
    
     $( "#empresaDir" ).sortable({
       connectWith: ".empresasDir",
@@ -42,10 +47,6 @@ $('#eliminarPeticion').click(function(){
         }
     });        
 });
-
-setTimePicker($('#pedidos'));
-
-
 
 $('#pedidos').on('click', '.eliminarDir', function(){
     $(this).parent().remove();
@@ -77,9 +78,12 @@ $('#pedidos').on('click', '.guardarPedido', function(){
     if($(frm).valid()){       
      $.getJSON(url, data, function(rsp){
         if(rsp.success){
-            pedidoForm.data('idPedido', rsp.id);            
+            pedidoForm.data('idPedido', rsp.id);  
+            pedidoForm.addClass('rSinLeer');
+            pedidoForm.attr('id', 'pedidoForm-'+rsp.id);            
             that.hide();
-            $('.editarPedido', pedidoForm).show();
+            $('i', pedidoForm).addClass('icon-time');
+            $('.editarPedido', pedidoForm).show();            
         }
      });
      return false;
@@ -207,6 +211,41 @@ function formPedidosEvent(pedidoForm){
     setTimePicker(pedidoForm);
 }
 
+function buscarLeidos(){
+    var url = '/taxisPrivados/pedido/getEstados';
+    var data = {
+        idPedidos:{}
+    };
+    var rSinLeer = $('.rSinLeer', pedidos);
+    if(rSinLeer.length){
+        $.each(rSinLeer, function(i, sinLeer){
+            data.idPedidos[i] = $(sinLeer).data('idPedido');
+        });
+        jQuery.ajaxSetup({
+            beforeSend: function() {},
+            complete: function() {}
+        });
+        $.getJSON(url, data, function(rsp){
+            if(rsp.success){
+                $.each(rsp.pedidos, function(id, estado){
+                    if(estado === '1'){
+                        $('i', '#pedidoForm-'+id).removeClass('icon-time');
+                        $('i', '#pedidoForm-'+id).addClass('icon-ok');
+                        $('#pedidoForm-'+id).removeClass('rSinLeer');
+                        $('#pedidoForm-'+id).addClass('rLeido');
+                    }
+                });
+            }
+        });
+        jQuery.ajaxSetup({beforeSend: function() {
+            $('#ajaxLoader').toggle();
+        },
+        complete: function() {
+            $('#ajaxLoader').toggle();
+        }});
+    }
+}
+
 JS
         , CClientScript::POS_READY);
 ?>
@@ -268,7 +307,7 @@ JS
 <div class="row">
     <div class="span12">
         <button  class="btn btn-primary" id="asignarPedido">Asignar pedido</button>
-        <button type="button" class="btn btn-danger"id="eliminarPeticion" data-id-peticion="<?php echo $peticion->id; ?>">Eliminar</button>
+        <button type="button" class="btn btn-danger"id="eliminarPeticion" data-id-peticion="<?php echo $peticion->id; ?>">Eliminar</button>        
     </div>
 </div>
 <div class="row">
@@ -278,7 +317,7 @@ JS
 if (isset($pedidos)) {
     foreach ($pedidos as $idPedido => $pedido) {
         ?>
-                <div class="pedidoForm row" data-id-peticion="<?php echo $peticion->id; ?>" data-id-pedido="<?php echo $idPedido; ?>">
+                <div id="pedidoForm-<?php echo $idPedido ?>" class="pedidoForm row <?php echo ($pedido["estadoReserva"] == '0') ? 'rSinLeer' : 'rLeido'; ?>" data-id-peticion="<?php echo $peticion->id; ?>" data-id-pedido="<?php echo $idPedido; ?>">
                     <form class="localPedidoForm span12">
                         <div class="row">
                             <div class="span6">
@@ -322,6 +361,7 @@ if (isset($pedidos)) {
                             <div class="span12">
                                 <button class="btn btn-success editarPedido" type="submit">Editar</button>                            
                                 <button type="button" class="btn btn-danger eliminarPedido">Eliminar</button>
+                                <i class="<?php echo ($pedido["estadoReserva"] == '0') ? 'icon-time' : 'icon-ok'; ?>"></i>
                             </div>
                             <br style="clear: both;">
                         </div>
@@ -363,6 +403,7 @@ if (isset($pedidos)) {
                 <button class="btn btn-success editarPedido" type="submit" style="display: none;">Editar</button>
                 <button class="btn btn-primary guardarPedido" type="submit">Guardar</button>
                 <button type="button" class="btn btn-danger eliminarPedido">Eliminar</button>
+                <i></i>
             </div>
             <br style="clear: both;">
         </div>
