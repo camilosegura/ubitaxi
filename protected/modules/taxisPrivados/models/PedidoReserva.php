@@ -55,10 +55,17 @@ class PedidoReserva extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-                    'pedido' =>array(self::BELONGS_TO, 'Pedido', 'id_pedido'),
+                    'pedido' =>array(self::BELONGS_TO, 'Pedido', 'id_pedido'),                    
                     'direcciones' =>array(self::HAS_MANY, 'PedidoDireccion', array('id'=>'id_pedido'), 'through'=>'pedido'),
                     'direccionesCompletas' => array(self::HAS_MANY, 'Direccion', array('id_direccion'=>'id'), 'through'=>'direcciones'),
-		);
+                    'pedidoPet' =>array(self::BELONGS_TO, 'Pedido', 'id_pedido'),
+                    'peticionPedido' =>array(self::HAS_ONE, 'PeticionPedido', array('id'=>'id_pedido'), 'through'=>'pedidoPet'),
+                    'peticion' =>array(self::HAS_ONE, 'Peticion', array('id_peticion'=>'id'), 'through'=>'peticionPedido'),
+                    'empresa' =>array(self::HAS_ONE, 'Empresa', array('id_empresa'=>'id'), 'through'=>'peticion'),
+                    'vehiculo' =>array(self::BELONGS_TO, 'Vehiculo', 'id_vehiculo'),
+                    'pedidoValor' =>array(self::BELONGS_TO, 'Pedido', 'id_pedido'),
+                    'valor' =>array(self::HAS_ONE, 'PedidoTpValor', array('id'=>'id_pedido'), 'through'=>'pedidoValor'),
+		);  
 	}
 
 	/**
