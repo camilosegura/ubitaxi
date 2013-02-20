@@ -65,6 +65,7 @@ class Peticion extends CActiveRecord
                     'reservas' => array(self::HAS_MANY, 'PedidoReserva', array('id_pedido'=>'id_pedido'), 'through'=>'peticionPedidos'),
                     'direccionesPedido' => array(self::HAS_MANY, 'PedidoDireccion', array('id'=>'id_pedido'), 'through'=>'pedidos'),
                     'direccionesPedidoCompletas' => array(self::HAS_MANY, 'Direccion', array('id_direccion'=>'id'), 'through'=>'direccionesPedido'),
+                    'peticionConfirmacion' => array(self::HAS_MANY, 'PedidoConfirmacion', array('id_pedido'=>'id_pedido'), 'through'=>'peticionPedidos'),
 		);
 	}
 
