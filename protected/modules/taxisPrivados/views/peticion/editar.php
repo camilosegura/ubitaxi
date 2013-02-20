@@ -81,7 +81,8 @@ $('#pedidos').on('click', '.guardarPedido', function(){
             pedidoForm.attr('id', 'pedidoForm-'+rsp.id);            
             that.hide();
             $('.botonesPedido i', pedidoForm).addClass('icon-time');
-            $('.editarPedido', pedidoForm).show();            
+            $('.editarPedido', pedidoForm).show();
+            $('.pedidoNumero', pedidoForm).html('Pedido: '+rsp.id).attr('id', 'pedidoNumero-'+rsp.id);
         }
      });
      return false;
@@ -379,8 +380,13 @@ JS
             foreach ($pedidos as $idPedido => $pedido) {
                 ?>
                 <div id="pedidoForm-<?php echo $idPedido ?>" class="pedidoForm row <?php echo ($pedido["estadoReserva"] == '0') ? 'rSinLeer' : 'rLeido'; ?>" data-id-peticion="<?php echo $peticion->id; ?>" data-id-pedido="<?php echo $idPedido; ?>">
-                    <form class="localPedidoForm span12">
+                    <form class="localPedidoForm span12">                        
                         <div class="row">
+                            <div class="span12">
+
+                                <h4 id="pedidoNumero-<?php echo $idPedido ?>" class="pedidoNumero">Pedido: <?php echo $idPedido ?></h4>
+
+                            </div>
                             <div class="span12">
                                 <div class="row">
                                     <div class="span6">
@@ -455,6 +461,9 @@ JS
     <form class="localPedidoForm span12">
         <div class="row">
             <div class="span12">
+                <h4 id="" class="pedidoNumero"></h4>
+            </div>
+            <div class="span12">
                 <div class="row">
                     <div class="span6">
                         <label>Hora <?php echo ($peticion->sentido == '0') ? 'fin:' : 'inicio:'; ?></label>
@@ -499,28 +508,28 @@ JS
 </div>
 <!-- Modal -->
 <div id="eliminarPedidoModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="eliminarPedidoModalLabel" aria-hidden="true">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-    <h3 id="eliminarPedidoModalLabel">¿Eliminar?</h3>
-  </div>
-  <div class="modal-body">
-    <p>¿Desea eliminar este Pedido?</p>
-  </div>
-  <div class="modal-footer">
-    <button class="btn" data-dismiss="modal" aria-hidden="true">Cerrar</button>
-    <button class="btn btn-primary" id="aceptarEliminarPedidoModal">Aceptar</button>
-  </div>
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="eliminarPedidoModalLabel">¿Eliminar?</h3>
+    </div>
+    <div class="modal-body">
+        <p>¿Desea eliminar este Pedido?</p>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Cerrar</button>
+        <button class="btn btn-primary" id="aceptarEliminarPedidoModal">Aceptar</button>
+    </div>
 </div>
 <div id="eliminarPeticionModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="eliminarPeticionModalLabel" aria-hidden="true">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-    <h3 id="eliminarPeticionModalLabel">¿Eliminar?</h3>
-  </div>
-  <div class="modal-body">
-    <p>¿Desea eliminar esta Peticion?</p>
-  </div>
-  <div class="modal-footer">
-    <button class="btn" data-dismiss="modal" aria-hidden="true">Cerrar</button>
-    <button class="btn btn-primary" id="aceptarEliminarPeticionModal">Aceptar</button>
-  </div>
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="eliminarPeticionModalLabel">¿Eliminar?</h3>
+    </div>
+    <div class="modal-body">
+        <p>¿Desea eliminar esta Peticion?</p>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Cerrar</button>
+        <button class="btn btn-primary" id="aceptarEliminarPeticionModal">Aceptar</button>
+    </div>
 </div>
