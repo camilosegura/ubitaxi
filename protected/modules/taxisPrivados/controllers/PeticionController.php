@@ -129,7 +129,7 @@ class PeticionController extends TPController {
                     if ($direccion->id_user == '0') {
                         $empresaDir[$direccion->id] = str_replace(array(', Bogota, Colombia', ', Colombia'), '', $direccion->direccion);
                     } else {
-                        $pasajero = Profile::model()->find('user_id=:user_id', array(':user_id' => $direccion->id_user));                        
+                        $pasajero = Profile::model()->find('user_id=:user_id', array(':user_id' => $direccion->id_user));
                         $pasajeroDir[$direccion->id] = "{$pasajero->firstname} {$pasajero->lastname}<br>" . str_replace(array(', Bogota, Colombia', ', Colombia'), '', $direccion->direccion);
                     }
                 }
@@ -186,6 +186,28 @@ class PeticionController extends TPController {
         } else {
             $this->redirect(Yii::app()->request->urlReferrer);
         }
+    }
+
+    public function actionGetConfirmados() {
+        $rsp = array();
+        if (isset($_GET['idPeticion'])) {
+            $peticion = Peticion::model()->with('peticionConfirmacion')->findByPk($_GET['idPeticion']);
+            if (is_null($peticion)) {
+                $rsp['success'] = false;
+            } else {
+                if (count($peticion->peticionConfirmacion)) {
+                    foreach ($peticion->peticionConfirmacion as $key => $confirmacion) {
+                        $rsp['confirmaciones'][] = $confirmacion->attributes;
+                    }
+                    $rsp['success'] = true;
+                }else{
+                    $rsp['success'] = false;
+                }
+            }
+        } else {
+            $rsp['success'] = false;
+        }
+        echo json_encode($rsp);
     }
 
     /**
