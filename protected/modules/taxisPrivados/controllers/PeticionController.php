@@ -176,6 +176,13 @@ class PeticionController extends TPController {
 
     public function actionEliminar() {
         if (isset($_GET['id'])) {
+            $peticion = Peticion::model()->with('peticionPedidos')->findByPk($_GET['id']);
+            foreach ($peticion->peticionPedidos as $key => $pedido) {
+                PedidoDireccion::model()->deleteAll('id_pedido=:id_pedido', array(':id_pedido' => $pedido->id_pedido));
+                Pedido::model()->deleteByPk($pedido->id_pedido);
+                PedidoReserva::model()->deleteAll('id_pedido=:id_pedido', array(':id_pedido' => $pedido->id_pedido));
+                PeticionPedido::model()->deleteAll('id_pedido=:id_pedido', array(':id_pedido' => $pedido->id_pedido));
+            }
             $this->loadModel($_GET['id'])->delete();
             if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
                 $rsp['success'] = true;
@@ -200,7 +207,7 @@ class PeticionController extends TPController {
                         $rsp['confirmaciones'][] = $confirmacion->attributes;
                     }
                     $rsp['success'] = true;
-                }else{
+                } else {
                     $rsp['success'] = false;
                 }
             }
