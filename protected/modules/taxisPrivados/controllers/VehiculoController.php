@@ -149,10 +149,10 @@ class VehiculoController extends TPController {
     
     public function actionLibres() {
         $vehiculos = Vehiculo::model()->findAll('id NOT IN (SELECT id_vehiculo FROM tbl_pedido_reserva WHERE 
-            (hora_inicio >= :hora_inicio AND hora_inicio < :hora_fin) OR 
+            ((hora_inicio >= :hora_inicio AND hora_inicio < :hora_fin) OR 
             (hora_fin > :hora_inicio AND hora_fin <= :hora_fin) OR 
-            (hora_inicio <= :hora_inicio AND hora_fin >= :hora_fin))', 
-                array(':hora_inicio'=> $_GET['horaInicio'], ':hora_fin'=>$_GET['horaFin']));
+            (hora_inicio <= :hora_inicio AND hora_fin >= :hora_fin)) AND tbl_pedido_reserva.id_pedido NOT LIKE :id_pedido)', 
+                array(':hora_inicio'=> $_GET['horaInicio'], ':hora_fin'=>$_GET['horaFin'], ':id_pedido' => $_GET['idPedido']));
         $rsp = array();
         if(count($vehiculos)){
             $rsp['success'] = true;
