@@ -17,11 +17,12 @@ $cs->registerScript('script', <<<JS
    var sentido = "$sentido";
    var minTime = "$minTime";
    var maxTime = "$maxTime";
-   var pedidos = $('#pedidos');
-   
+   var idPeticion = $('#pedidoFormulario').data('idPeticion');
+   var pedidos = $('#pedidos');      
 
    setTimePicker($('#pedidos'));
    setInterval(buscarLeidos, 5000);
+   setInterval(buscarConfirmaciones, 5000);
    
     $( "#empresaDir" ).sortable({
       connectWith: ".empresasDir",
@@ -61,7 +62,7 @@ $('#pedidos').on('click', '.editarPedido', function(){
     if($(frm).valid()){       
         $.getJSON(url, data, function(rsp){
             if(rsp.success){
-                console.log(rsp);
+                
             }
         });
         return false;
@@ -82,7 +83,7 @@ $('#pedidos').on('click', '.guardarPedido', function(){
             pedidoForm.addClass('rSinLeer');
             pedidoForm.attr('id', 'pedidoForm-'+rsp.id);            
             that.hide();
-            $('i', pedidoForm).addClass('icon-time');
+            $('.botonesPedido i', pedidoForm).addClass('icon-time');
             $('.editarPedido', pedidoForm).show();            
         }
      });
@@ -102,8 +103,7 @@ $('#pedidos').on('click', '.eliminarPedido', function(){
     if(typeof idPedido != "undefined"){
         $.getJSON(url, data, function(rsp){
             if(rsp.success){
-                console.log(rsp);
-                var listas = pedidoForm.find('.pasajerosDir').html();    
+                var listas = pedidoForm.find('.pasajerosDir').html().replace('<i class="icon-time"></i>', '').replace('<i class="icon-ok"></i>', '');
                 $('#pasajerosDir').append(listas);
                 pedidoForm.remove();
             }
@@ -182,7 +182,16 @@ function formPedidosEvent(pedidoForm){
     
     $( ".pasajerosDir").sortable({
       connectWith: ".pasajerosDir",
-      cursor: "move"
+      cursor: "move",
+      receive: function(event, ui){
+        console.log();
+        if(ui.item.parents('#pasajerosDir').length === 1){
+            ui.item.children('i').remove();
+        }else{
+            ui.item.children('i').remove();
+            ui.item.append('<i class="icon-time"></i>');
+        }        
+      }
     });    
     $( ".empresasDir" ).sortable({
       connectWith: ".empresasDir",
@@ -229,8 +238,8 @@ function buscarLeidos(){
             if(rsp.success){
                 $.each(rsp.pedidos, function(id, estado){
                     if(estado === '1'){
-                        $('i', '#pedidoForm-'+id).removeClass('icon-time');
-                        $('i', '#pedidoForm-'+id).addClass('icon-ok');
+                        $('.botonesPedido i', '#pedidoForm-'+id).removeClass('icon-time');
+                        $('.botonesPedido i', '#pedidoForm-'+id).addClass('icon-ok');
                         $('#pedidoForm-'+id).removeClass('rSinLeer');
                         $('#pedidoForm-'+id).addClass('rLeido');
                     }
@@ -244,6 +253,34 @@ function buscarLeidos(){
             $('#ajaxLoader').toggle();
         }});
     }
+}
+
+function buscarConfirmaciones(){
+    var url = '/taxisPrivados/peticion/getConfirmados';
+    var data = {
+        idPeticion:idPeticion
+    };
+    
+    jQuery.ajaxSetup({
+        beforeSend: function() {},
+        complete: function() {}
+    });
+    $.getJSON(url, data, function(rsp){
+        if(rsp.success){            
+            $('.pasajerosDir li i', pedidos).removeClass('icon-ok');
+            $('.pasajerosDir li i', pedidos).addClass('icon-time');
+            $.each(rsp.confirmaciones, function(i, confirmacion){
+                $('i', '#dir-'+confirmacion.id_direccion).removeClass('icon-time');
+                $('i', '#dir-'+confirmacion.id_direccion).addClass('icon-ok');
+            });
+        }
+    });
+    jQuery.ajaxSetup({beforeSend: function() {
+        $('#ajaxLoader').toggle();
+    },
+    complete: function() {
+        $('#ajaxLoader').toggle();
+    }});
 }
 
 JS
@@ -276,11 +313,13 @@ JS
     <div class="span6">
         <span><b>Direcciones empresa:</b></span>
         <ul class="unstyled empresasDir" id="empresaDir">
-            <?php if (is_array($empresaDir)) {
+            <?php
+            if (is_array($empresaDir)) {
                 foreach ($empresaDir as $key => $dir) {
                     ?>
-                    <li data-id="<?php echo $key; ?>"><?php echo $dir; ?></li>
-                <?php }
+            <li id="dir-<?php echo $key; ?>" data-id="<?php echo $key; ?>"><?php echo $dir; ?></li>
+                <?php
+                }
             }
             ?>            
         </ul>
@@ -288,11 +327,13 @@ JS
     <div class="span6">
         <span><b>Direcciones pasajeros:</b></span>        
         <ul class="unstyled pasajerosDir" id="pasajerosDir">
-            <?php if (is_array($pasajeroDir)) {
+            <?php
+            if (is_array($pasajeroDir)) {
                 foreach ($pasajeroDir as $key => $dir) {
                     ?>
-                    <li data-id="<?php echo $key; ?>"><?php echo $dir; ?></li>
-    <?php }
+                    <li id="dir-<?php echo $key; ?>" data-id="<?php echo $key; ?>"><?php echo $dir; ?></li>
+    <?php
+    }
 }
 ?>            
         </ul>
@@ -337,7 +378,7 @@ if (isset($pedidos)) {
                                     if (isset($pedido['empresaDir'])) {
                                         foreach ($pedido['empresaDir'] as $idDireccion => $direccion) {
                                             ?>
-                                            <li data-id="<?php echo $idDireccion; ?>"><?php echo $direccion; ?></li>   
+                                            <li id="dir-<?php echo $idDireccion; ?>" data-id="<?php echo $idDireccion; ?>"><?php echo $direccion; ?></li>   
                 <?php
             }
         }
@@ -351,14 +392,14 @@ if (isset($pedidos)) {
                                     if (isset($pedido['pasajeroDir'])) {
                                         foreach ($pedido['pasajeroDir'] as $idDireccion => $direccion) {
                                             ?>
-                                            <li data-id="<?php echo $idDireccion; ?>"><?php echo $direccion; ?></li>   
+                                            <li id="dir-<?php echo $idDireccion; ?>" data-id="<?php echo $idDireccion; ?>"><?php echo $direccion; ?><i class="icon-time"></i></li>   
                 <?php
             }
         }
         ?>
                                 </ul>
                             </div>
-                            <div class="span12">
+                            <div class="span12 botonesPedido">
                                 <button class="btn btn-success editarPedido" type="submit">Editar</button>                            
                                 <button type="button" class="btn btn-danger eliminarPedido">Eliminar</button>
                                 <i class="<?php echo ($pedido["estadoReserva"] == '0') ? 'icon-time' : 'icon-ok'; ?>"></i>
@@ -399,7 +440,7 @@ if (isset($pedidos)) {
                 <p><b>Direcciones pasajeros:</b></p>        
                 <ul class="unstyled pasajerosDir"></ul>
             </div>
-            <div class="span12">
+            <div class="span12 botonesPedido">
                 <button class="btn btn-success editarPedido" type="submit" style="display: none;">Editar</button>
                 <button class="btn btn-primary guardarPedido" type="submit">Guardar</button>
                 <button type="button" class="btn btn-danger eliminarPedido">Eliminar</button>
