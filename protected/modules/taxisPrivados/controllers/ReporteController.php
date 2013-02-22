@@ -3,7 +3,49 @@
 class ReporteController extends TPController {
 
     public function actionIndex() {
+        $pedidos = $this->pedidos();
+        $this->render('index', array(
+            'pedidos' => $pedidos['pedidos'],
+            'empresas' => $this->empresas,
+            'vehiculos' => $pedidos['vehiculos'],
+            'selected' => $pedidos['selected'],
+        ));
+    }
+    
+    public function actionPedidos() {
+        $pedidos = $this->pedidos();
+        
+        $this->render('pedidos', array(
+            'pedidos' => $pedidos['pedidos'],
+            'empresas' => $this->empresas,
+            'vehiculos' => $pedidos['vehiculos'],
+            'selected' => $pedidos['selected'],
+        ));
+    }
+
+    public function actionActualizar() {
+
+
+        if (isset($_GET['pedido'])) {
+            foreach ($_GET['pedido'] as $key => $pedido) {
+
+                $valor = PedidoTpValor::model()->find('id_pedido=:id_pedido', array(':id_pedido' => $key));
+                if (is_null($valor)) {
+                    $valor = new PedidoTpValor;
+                }
+                $valor->id_pedido = $key;
+                $valor->valor_empresa = $pedido['valorEmpresa'];
+                $valor->valor_vehiculo = $pedido['valorVehiculo'];
+                $valor->ruta = $pedido['ruta'];
+                $valor->save();
+            }
+            $rsp['success'] = true;
+            echo json_encode($rsp);
+        }
+    }
+    private function pedidos() {
         $selected = array('fechaInicio' => '', 'fechaFin' => '', 'empresa' => '', 'vehiculo' => '', 'estado' => '');
+        $pedidos = array();
         if (isset($_POST['empresa'])) {
             $selected['empresa'] = $_POST['empresa'];
             $selected['fechaInicio'] = $_POST['fechaInicio'];
@@ -51,35 +93,12 @@ class ReporteController extends TPController {
             }
         }
         $vehiculos = Vehiculo::model()->findAll();
-        $this->render('index', array(
-            'pedidos' => $pedidos,
-            'empresas' => $this->empresas,
-            'vehiculos' => $vehiculos,
-            'selected' => $selected,
-        ));
+        $rsp['vehiculos'] = $vehiculos;
+        $rsp['pedidos'] = $pedidos;
+        $rsp['selected'] = $selected;
+        
+        return $rsp;
     }
-
-    public function actionActualizar() {
-
-
-        if (isset($_GET['pedido'])) {
-            foreach ($_GET['pedido'] as $key => $pedido) {
-
-                $valor = PedidoTpValor::model()->find('id_pedido=:id_pedido', array(':id_pedido' => $key));
-                if (is_null($valor)) {
-                    $valor = new PedidoTpValor;
-                }
-                $valor->id_pedido = $key;
-                $valor->valor_empresa = $pedido['valorEmpresa'];
-                $valor->valor_vehiculo = $pedido['valorVehiculo'];
-                $valor->ruta = $pedido['ruta'];
-                $valor->save();
-            }
-            $rsp['success'] = true;
-            echo json_encode($rsp);
-        }
-    }
-
     public function actionAExcel() {
         header("Content-type: application/vnd.ms-excel; name='excel'");
         header("Content-Disposition: filename=reporte.xls");
