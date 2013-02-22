@@ -21,6 +21,23 @@ $cs->registerScript('script', <<<JS
         $.getJSON(url, data, function(rsp){});
     });
     
+    var form = ' <form action="/taxisPrivados/reporte/aExcel" method="post" target="_blank" id="toFormatForm"><input type="hidden" id="contenido" name="contenido" /></form>';
+    jQuery(form).insertAfter('#reporteGeneral');
+            
+    jQuery("#generarExcel").click(function(event) {  
+        var tableClone = jQuery("#reporteGeneral").eq(0).clone();
+        
+        $.each($(tableClone).find('tbody tr'), function(index, tr){
+            $(tr).find('.valorEmpresa').replaceWith('<span>'+$(tr).find('.valorEmpresa').val()+'</span>');
+            $(tr).find('.ruta').replaceWith('<span>'+$(tr).find('.ruta').val()+'</span>');
+            $(tr).find('.valorVehiculo').replaceWith('<span>'+$(tr).find('.valorVehiculo').val()+'</span>');
+        });
+
+        jQuery("#contenido").val( jQuery("<div>").append(tableClone).html());                
+        jQuery("#toFormatForm").submit();  
+        
+    });
+    
 JS
         , CClientScript::POS_READY);
 //$cs->registerCssFile();
@@ -35,6 +52,9 @@ JS
     }
     .row{
         margin-bottom: 20px;
+    }
+    #guardarReporte{
+        float: right;
     }
 </style>
 <div class="row">
@@ -56,6 +76,14 @@ JS
                         <option value="<?php echo $vehiculo->id; ?>" <?php echo ($selected['vehiculo'] == $vehiculo->id) ? 'selected="selected"' : ''; ?>><?php echo $vehiculo->placa; ?></option>
                     <?php } ?>
                 </select>
+                <label>Estado</label>
+                <select name="estado" id="estado">
+                    <option value="">(Todos)</option>
+                    <option value="2" <?php echo ($selected['estado'] == '2') ? 'selected="selected"' : ''; ?>>Fallido</option>
+                    <option value="3" <?php echo ($selected['estado'] == '3') ? 'selected="selected"' : ''; ?>>Iniciado</option>
+                    <option value="4" <?php echo ($selected['estado'] == '4') ? 'selected="selected"' : ''; ?>>Terminado</option>
+                    <option value="9" <?php echo ($selected['estado'] == '9') ? 'selected="selected"' : ''; ?>>Reservado</option>
+                </select>
             </div>
             <div class="span6">
                 <label>Fecha inicio</label>
@@ -64,7 +92,7 @@ JS
                 <input type="text" name="fechaFin" id="fechaFin" class="fecha" value="<?php echo ($selected['fechaFin'] == '') ? date("Y-m-d") : $selected['fechaFin']; ?>">
             </div>
             <div class="span12">
-                <button type="submit" class="btn">Generar</button>
+                <button type="submit" class="btn btn-primary">Generar</button>
             </div>
         </form>
     </div>
@@ -78,6 +106,7 @@ JS
                     <th>Planilla</th>                    
                     <th>Nombre de funcionarios</th>
                     <th>#</th>
+                    <th>Estado</th>
                     <th>Empresa</th>
                     <th>Valor empresa</th>
                     <th>Ruta</th>
@@ -95,7 +124,7 @@ JS
                                 <?php echo $pedido['fecha']; ?>
                             </td>
                             <td>
-                                <?php echo $key; ?>
+                                <a href="/taxisPrivados/peticion/editar/id/<?php echo $pedido['peticion']; ?>.html#pedidoNumero-<?php echo $key; ?>" target="_blank"><?php echo $key; ?></a>
                             </td>
                             <td>
                                 <?php
@@ -112,6 +141,26 @@ JS
                             </td>
                             <td>
                                 <?php echo $i; ?>
+                            </td>
+                            <td>
+                                <?php                                     
+                                    switch ($pedido['estado']) {
+                                        case '2':
+                                            echo 'Fallido';
+                                            break;
+                                        case '3':
+                                            echo 'Iniciado';
+                                            break;
+                                        case '4':
+                                            echo 'Terminado';
+                                            break;
+                                        case 9:
+                                            echo 'Reservado';
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                ?>
                             </td>
                             <td>
                                 <?php echo $pedido['empresa']; ?>
@@ -138,6 +187,7 @@ JS
                 } ?>
             </tbody>
         </table>
+        <button class="btn btn-info" id="generarExcel">Excel</button>
         <button class="btn btn-primary" id="guardarReporte">Guardar</button>
     </div>
 </div>
