@@ -112,6 +112,14 @@ $(document).on('change', '.chb', function(){
     $('.chb', $(this).parent().parent().parent()).attr('checked',false);
 });
 
+$(document).on('mouseenter', '.editButtons', function(){
+    $('i', $(this)).removeClass('icon-white');
+});
+
+$(document).on('mouseleave', '.editButtons', function(){
+    $('i', $(this)).addClass('icon-white');
+});
+
 function eliminarDireccion(){
     var url = '/taxisPrivados/usuario/desactivarDireccion';
     var data = {
@@ -150,7 +158,7 @@ function getUsuariosYDireccionesEmpresa(){
         var soloUna = 0;
         $.each(rsp.direccion, function(index, value){            
             soloUna++;
-            direccion += '<div class="row"><label class="checkbox span5"><input type="checkbox" name="direccionEmpresa[]" value="'+index+'">'+value+'</label><div class="span3"><button class="btn btn-success editarDireccion" type="button" data-id-direccion="'+index+'">Editar</button><button type="button" class="btn btn-danger eliminarDireccion" data-id-direccion="'+index+'">Eliminar</button></div></div>';
+            direccion += '<div class="row"><label class="checkbox span6"><input type="checkbox" name="direccionEmpresa[]" value="'+index+'">'+value+'</label><div class="span1 editButtons"><i class="icon-edit icon-white editarDireccion" data-id-direccion="'+index+'"></i><i class="icon-trash icon-white eliminarDireccion" data-id-direccion="'+index+'"></i></div></div>';
         });
         if(soloUna === 1){
             direccion = $(direccion);
@@ -161,12 +169,12 @@ function getUsuariosYDireccionesEmpresa(){
             pasajeros = "<p>Por favor ingrese pasajeros.</p>";
         }else{
             $.each(rsp.usuario, function(index, value){
-                pasajeros += '<fieldset id="pasajero-'+index+'" class="table-bordered"><legend><span class="span5">'+value.nombre+'</span><span class="span3 editButtons"><button class="btn btn-success editarPasajero" type="button" data-id-pasajero="'+index+'">Editar</button><button type="button" class="btn btn-danger eliminarPasajero" data-id-pasajero="'+index+'">Eliminar</button></span><br class="clearfix"></legend>';
+                pasajeros += '<fieldset id="pasajero-'+index+'" class="table-bordered"><legend><span class="span6">'+value.nombre+'</span><span class="span1 editButtons"><i class="icon-edit icon-white editarPasajero" data-id-pasajero="'+index+'"></i><i class="icon-trash icon-white eliminarPasajero" data-id-pasajero="'+index+'"></i></span><br class="clearfix"></legend>';
                 if(typeof value.direccion === "undefined"){
                     pasajeros += "<p>Por favor ingrese una dirección.</p>";
                 }else{
                     $.each(value.direccion, function(id, dir){                
-                        pasajeros += '<div class="row"><label class="checkbox span5"><input type="checkbox" class="chb" name="pasajeros[]" id="'+id+'" value="'+id+'">'+dir+'</label><div class="span3 editButtons"><button class="btn btn-success editarDireccion" type="button" data-id-direccion="'+id+'">Editar</button><button type="button" class="btn btn-danger eliminarDireccion" data-id-direccion="'+id+'">Eliminar</button></div></div>';
+                        pasajeros += '<div class="row"><label class="checkbox span6"><input type="checkbox" class="chb" name="pasajeros[]" id="'+id+'" value="'+id+'">'+dir+'</label><div class="span1 editButtons"><i class="icon-edit icon-white editarDireccion" data-id-direccion="'+id+'"></i><i class="icon-trash icon-white eliminarDireccion" data-id-direccion="'+id+'"></i></div></div>';
                     });
                 }    
                 pasajeros += '</fieldset>';
@@ -224,6 +232,9 @@ JS
     }
     .peticionLabel{
         width: 220px;
+    }
+    i{
+        cursor: pointer;
     }
 </style>
 <div class="row">
