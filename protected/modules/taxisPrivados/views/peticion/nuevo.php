@@ -9,6 +9,7 @@ var numPasajeros = $('#numPasajeros');
 var empresa = $('#empresa');    
 var pasajerosExcelForm = $('#pasajerosExcelForm');
 var direccionesPasajero = $('#direccionesPasajero');
+var localDireccion;
 $('#horaEmpresa').datetimepicker({
     dateFormat: "yy-mm-dd",
     timeFormat: "HH:mm:ss"
@@ -72,8 +73,23 @@ pasajerosExcelForm.submit(function(){
 });
 
 $(document).on('click', '.eliminarDireccion', function(){
-    console.log($(this).data('idDireccion'));
-    $(this).parent().parent().remove();
+    localDireccion = $(this);
+    $('#eliminarDireccionModal').modal('toggle');            
+});
+
+$('#aceptarEliminarDireccionModal').click(function(){
+    eliminarDireccion();
+    $('#eliminarDireccionModal').modal('toggle');
+});
+
+$(document).on('click', '.eliminarPasajero', function(){
+    localPasajero = $(this);
+    $('#eliminarPasajeroModal').modal('toggle');            
+});
+
+$('#aceptarEliminarPasajeroModal').click(function(){
+    eliminarPasajero();
+    $('#eliminarPasajeroModal').modal('toggle');
 });
 
 $(document).on('click', '.editarDireccion', function(){
@@ -95,6 +111,33 @@ $(document).on('change', '.chb', function(){
     $(this).removeClass('chb');
     $('.chb', $(this).parent().parent().parent()).attr('checked',false);
 });
+
+function eliminarDireccion(){
+    var url = '/taxisPrivados/usuario/desactivarDireccion';
+    var data = {
+        idDireccion:localDireccion.data('idDireccion')
+    };
+    
+    $.getJSON(url, data, function(rsp){
+        if(rsp.success){
+            localDireccion.parent().parent().remove();
+        }
+    });
+}
+
+function eliminarPasajero(){
+    var url = '/taxisPrivados/usuario/desactivar';
+    var data = {
+        idPasajero:localPasajero.data('idPasajero')
+    };
+    
+    $.getJSON(url, data, function(rsp){
+        if(rsp.success){
+            localPasajero.parent().parent().parent().remove();
+        }
+    });
+}
+
 function getUsuariosYDireccionesEmpresa(){
     var idEmpresa = $('#empresa').val();
     var url = '/taxisPrivados/empresa/usuariosYDirecciones';
@@ -118,10 +161,14 @@ function getUsuariosYDireccionesEmpresa(){
             pasajeros = "<p>Por favor ingrese pasajeros.</p>";
         }else{
             $.each(rsp.usuario, function(index, value){
-                pasajeros += '<fieldset id="pasajero-'+index+'" class="table-bordered"><legend>'+value.nombre+'</legend>';
-                $.each(value.direccion, function(id, dir){                
-                    pasajeros += '<div class="row"><label class="checkbox span5"><input type="checkbox" class="chb" name="pasajeros[]" id="'+id+'" value="'+id+'">'+dir+'</label><div class="span3"><button class="btn btn-success editarDireccion" type="button" data-id-direccion="'+id+'">Editar</button><button type="button" class="btn btn-danger eliminarDireccion" data-id-direccion="'+id+'">Eliminar</button></div></div>';
-                }); 
+                pasajeros += '<fieldset id="pasajero-'+index+'" class="table-bordered"><legend><span class="span5">'+value.nombre+'</span><span class="span3 editButtons"><button class="btn btn-success editarPasajero" type="button" data-id-pasajero="'+index+'">Editar</button><button type="button" class="btn btn-danger eliminarPasajero" data-id-pasajero="'+index+'">Eliminar</button></span><br class="clearfix"></legend>';
+                if(typeof value.direccion === "undefined"){
+                    pasajeros += "<p>Por favor ingrese una dirección.</p>";
+                }else{
+                    $.each(value.direccion, function(id, dir){                
+                        pasajeros += '<div class="row"><label class="checkbox span5"><input type="checkbox" class="chb" name="pasajeros[]" id="'+id+'" value="'+id+'">'+dir+'</label><div class="span3 editButtons"><button class="btn btn-success editarDireccion" type="button" data-id-direccion="'+id+'">Editar</button><button type="button" class="btn btn-danger eliminarDireccion" data-id-direccion="'+id+'">Eliminar</button></div></div>';
+                    });
+                }    
                 pasajeros += '</fieldset>';
             });
         }
@@ -149,7 +196,7 @@ JS
         padding: 0 20px;
         margin-bottom: 15px;
     }
-    .editarDireccion{
+    .editarDireccion, .editarPasajero{
         margin-right: 10px;
     }
     .span3 {
@@ -267,5 +314,32 @@ JS
                 </div>
             </div>
         </div>
+    </div>
+</div>
+
+<div id="eliminarDireccionModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="eliminarDireccionModalLabel" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="eliminarDireccionModalLabel">¿Eliminar?</h3>
+    </div>
+    <div class="modal-body">
+        <p>¿Desea eliminar esta dirección?</p>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Cerrar</button>
+        <button class="btn btn-primary" id="aceptarEliminarDireccionModal">Aceptar</button>
+    </div>
+</div>
+<div id="eliminarPasajeroModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="eliminarPasajeroModalLabel" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="eliminarPasajeroModalLabel">¿Eliminar?</h3>
+    </div>
+    <div class="modal-body">
+        <p>¿Desea eliminar este pasajero?</p>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Cerrar</button>
+        <button class="btn btn-primary" id="aceptarEliminarPasajeroModal">Aceptar</button>
     </div>
 </div>
