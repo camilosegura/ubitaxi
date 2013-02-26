@@ -195,13 +195,14 @@ class EmpresaController extends TPController {
     public function actionUsuariosYDirecciones() {
         $rsp = array();
         if (isset($_GET['id'])) {
-            $usuarios = Empresa::model()->with('usuarioPerfil')->findAllByPk($_GET['id']);
+            $usuarios = Empresa::model()->with('user')->findAllByPk($_GET['id'], 'user.status=:status', array(':status'=> 1));
             
-            foreach ($usuarios[0]->usuarioPerfil as $key => $usuario) {
-                $rsp["usuario"][$usuario->user_id]['nombre'] = "{$usuario->firstname} {$usuario->lastname}";
+            foreach ($usuarios[0]->user as $key => $usuario) {
+                $perfil = Profile::model()->find('user_id=:user_id', array(':user_id'=>$usuario->id));
+                $rsp["usuario"][$usuario->id]['nombre'] = "{$perfil->firstname} {$perfil->lastname}";
             }
             
-            $usuariosDireccion = Empresa::model()->with('usuarioDireccion')->findAllByPk($_GET['id']);
+            $usuariosDireccion = Empresa::model()->with('usuarioDireccion')->findAllByPk($_GET['id'], 'usuarioDireccion.status=:status', array(':status'=>1));
             foreach ($usuariosDireccion[0]->usuarioDireccion as $key => $direccion) {
                 $rsp["usuario"][$direccion->id_user]['direccion'][$direccion->id] = "{$direccion->direccion}";
             }
