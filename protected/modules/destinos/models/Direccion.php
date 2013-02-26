@@ -9,6 +9,7 @@
  * @property string $direccion
  * @property string $latitud
  * @property string $longitud
+ * @property integer $status
  */
 class Direccion extends CActiveRecord
 {
@@ -39,12 +40,12 @@ class Direccion extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('id_user, direccion, latitud, longitud', 'required'),
-			array('id_user', 'numerical', 'integerOnly'=>true),
+			array('id_user, status', 'numerical', 'integerOnly'=>true),
 			array('direccion', 'length', 'max'=>500),
 			array('latitud, longitud', 'length', 'max'=>255),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('id, id_user, direccion, latitud, longitud', 'safe', 'on'=>'search'),
+			array('id, id_user, direccion, latitud, longitud, status', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -70,6 +71,7 @@ class Direccion extends CActiveRecord
 			'direccion' => 'Direccion',
 			'latitud' => 'Latitud',
 			'longitud' => 'Longitud',
+			'status' => 'Status',
 		);
 	}
 
@@ -89,6 +91,7 @@ class Direccion extends CActiveRecord
 		$criteria->compare('direccion',$this->direccion,true);
 		$criteria->compare('latitud',$this->latitud,true);
 		$criteria->compare('longitud',$this->longitud,true);
+		$criteria->compare('status',$this->status);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
