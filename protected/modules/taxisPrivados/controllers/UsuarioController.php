@@ -168,7 +168,7 @@ class UsuarioController extends TPController {
         unset($sheetData[1]);
         foreach ($sheetData as $key => $row) {
             if (str_replace(' ', '', $row['A']) !== '' && (str_replace(' ', '', $row['B']) !== '' || str_replace(' ', '', $row['C']) !== '' || str_replace(' ', '', $row['E']) !== '')) {
-                
+
                 $nombre = ucwords($row['A']);
                 $direccion = ucfirst("{$row['B']}, {$row["C"]}, {$row['E']}");
                 $usernames = str_split(strtolower("$nombre{$row["D"]}"));
@@ -230,7 +230,7 @@ class UsuarioController extends TPController {
                     $rsp['pasajeros'][$user->id]['idDireccion'] = $idDireccion;
                     $rsp['success'] = true;
                 }
-            }else{
+            } else {
                 $rsp['pasajeros']['error'] = true;
                 $rsp['pasajeros']['errores'][] = "Fila $key, Nombre: {$row['A']}";
             }
@@ -276,6 +276,46 @@ class UsuarioController extends TPController {
         }
 
         return $model->getErrors();
+    }
+
+    public function actionDesactivarDireccion() {
+        $rsp = array();
+        if (isset($_GET['idDireccion'])) {
+            $direccion = Direccion::model()->findByPk($_GET['idDireccion']);
+            if (is_null($direccion)) {
+                $rsp['success'] = false;
+            } else {
+                $direccion->status = 0;
+                if ($direccion->save()) {
+                    $rsp['success'] = true;
+                } else {
+                    $rsp['success'] = false;
+                }
+            }
+        } else {
+            $rsp['success'] = false;
+        }
+        echo json_encode($rsp);
+    }
+
+    public function actionDesactivar() {
+        $rsp = array();
+        if (isset($_GET['idPasajero'])) {
+            $model = User::model()->findByPk($_GET['idPasajero']);
+            if (is_null($model)) {
+                $rsp['success'] = false;
+            } else {
+                $model->status = 0;
+                if ($model->save()) {
+                    $rsp['success'] = true;
+                } else {
+                    $rsp['success'] = false;
+                }
+            }
+        } else {
+            $rsp['success'] = false;
+        }
+        echo json_encode($rsp);
     }
 
     // Uncomment the following methods and override them if needed
