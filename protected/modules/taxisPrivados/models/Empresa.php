@@ -56,6 +56,8 @@ class Empresa extends CActiveRecord
                     'usuarioDireccion' => array(self::HAS_MANY, 'Direccion', array('id_usuario'=>'id_user'), 'through'=>'usuario'),
                     'empresaDireccio' => array(self::HAS_MANY, 'EmpresaDireccion', 'id_empresa'),
                     'direccion' => array(self::HAS_MANY, 'Direccion', array('id_direccion'=>'id'), 'through'=>'empresaDireccio'),
+                    'usuarios' => array(self::HAS_MANY, 'EmpresaUsuario', 'id_empresa'),
+                    'user' => array(self::HAS_MANY, 'User', array('id_usuario'=>'id'), 'through'=>'usuarios'),
 		);
 	}
 
