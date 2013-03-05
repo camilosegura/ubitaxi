@@ -94,6 +94,7 @@
         </div>
         <script src="<?php echo Yii::app()->baseUrl; ?>/js/jquery-1.8.3.min.js"></script>
         <script src="<?php echo Yii::app()->baseUrl; ?>/js/jquery-ui-1.9.2.custom.min.js"></script>
+        <script src="<?php echo Yii::app()->baseUrl; ?>/js/jquery.ui.touch-punch.min.js"></script>
         <script src="<?php echo Yii::app()->baseUrl; ?>/js/jquery-ui-timepicker-addon.js"></script>
         <script src="<?php echo Yii::app()->baseUrl; ?>/js/jquery.validate.js"></script>
         <script src="<?php echo Yii::app()->theme->getBaseUrl(); ?>/js/bootstrap.min.js"></script>
