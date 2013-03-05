@@ -366,12 +366,15 @@ class PedidoController extends TPController {
     
     public function actionFinalizarHoraFin() {
         $rsp = array();
-        if(isset($_GET['idPedido'])){
-            $reservas = PedidoReserva::model()->find('id_pedido=:id_pedido', array(':id_pedido'=>$_GET['idPedido']));
-            if(is_null($reservas)){
+        if(isset($_GET['id'])){
+            $reservas = PedidoReserva::model()->find('id_pedido=:id_pedido', array(':id_pedido'=>$_GET['id']));
+            if(!is_null($reservas)){
                 $reservas->hora_fin = date("Y-m-d H:i:s");
                 if($reservas->save()){
                     $rsp['success'] = true;
+                }else{
+                    $rsp['success'] = false;
+                    $rsp["error"] = $reservas->getErrors();
                 }
             }else{
                 $rsp['success'] = false;
